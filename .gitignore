@@ -1,0 +1,53 @@
+# ─── Dependencies ───
+node_modules/
+.pnpm-store/
+
+# ─── Build outputs ───
+dist/
+build/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+
+# ─── Environment ───
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# ─── Logs ───
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ─── Test ───
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# ─── OS ───
+.DS_Store
+Thumbs.db
+
+# ─── IDE ───
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+
+# ─── Misc ───
+*.tgz
+.cache/
+
+# ─── Prisma ───
+apps/api/prisma/migrations/dev.db*
+
+# ─── Sentry ───
+.sentryclirc

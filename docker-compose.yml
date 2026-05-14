@@ -1,0 +1,55 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Drikon — Local development stack
+# Run:  docker-compose up -d
+# Stop: docker-compose down
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: drikon-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: drikon
+      POSTGRES_PASSWORD: drikon_dev_password
+      POSTGRES_DB: drikon
+    ports:
+      - "5432:5432"
+    volumes:
+      - drikon-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U drikon"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: drikon-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - drikon-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mailhog:
+    # Catches all outgoing email in dev so we can preview templates without sending real mail.
+    # UI: http://localhost:8025
+    image: mailhog/mailhog:latest
+    container_name: drikon-mailhog
+    restart: unless-stopped
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI
+
+volumes:
+  drikon-postgres-data:
+  drikon-redis-data:
