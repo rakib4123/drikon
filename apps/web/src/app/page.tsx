@@ -1,4 +1,4 @@
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import { ArrowRight, Sparkles, ShieldCheck, Truck, Headphones } from 'lucide-react';
