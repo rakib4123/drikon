@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -10,7 +10,7 @@ import { useAuthStore } from '@/store/auth-store';
 import { ApiError } from '@/lib/api-client';
 import { ArrowRight, Loader2 } from 'lucide-react';
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const search = useSearchParams();
   const login = useAuthStore((s) => s.login);
@@ -42,7 +42,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] grid lg:grid-cols-2">
-      {/* Left: form */}
       <div className="flex items-center justify-center px-6 py-16">
         <div className="w-full max-w-sm">
           <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
@@ -122,7 +121,6 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right: editorial panel */}
       <div className="hidden lg:block relative bg-drikon-gradient grain">
         <div className="absolute inset-0 grid place-items-center p-16">
           <div className="max-w-md text-white">
@@ -137,6 +135,20 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[calc(100vh-4rem)] grid place-items-center">
+          <Loader2 className="w-6 h-6 animate-spin text-[color:var(--accent)]" />
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }
 
