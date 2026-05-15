@@ -12,7 +12,8 @@
  *   - Graceful shutdown
  */
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { VersioningType } from '@nestjs/common';
+import { ZodValidationPipe } from 'nestjs-zod';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -113,15 +114,8 @@ async function bootstrap() {
   app.setGlobalPrefix('api', { exclude: ['health'] });
 
   // ───── Global validation ─────
-  // Strips unknown properties, throws on extras — stops mass-assignment attacks.
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-      transformOptions: { enableImplicitConversion: true },
-    }),
-  );
+  // Use nestjs-zod's validation pipe so our Zod DTOs are actually enforced.
+  app.useGlobalPipes(new ZodValidationPipe());
 
   // ───── Global exception filter ─────
   // Catches anything that escaped, logs it, returns a clean JSON error.
