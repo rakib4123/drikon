@@ -1,3 +1,5 @@
+export const revalidate = 60;
+
 import Link from 'next/link';
 import { ArrowRight, Sparkles, ShieldCheck, Truck, Headphones } from 'lucide-react';
 import { ProductCard } from '@/components/shop/product-card';
