@@ -47,7 +47,7 @@ export class AuthController {
     const common = {
       httpOnly: true,
       secure,
-      sameSite: (process.env.NODE_ENV === 'production' ? 'none' : 'lax') as const,
+      sameSite: (process.env.NODE_ENV === 'production' ? 'none' : 'lax') as 'none' | 'lax',
       domain,
       signed: true,
       path: '/',
