@@ -39,8 +39,8 @@ export class AuthController {
 
   // ─── Helper: write tokens to httpOnly cookies ───
   private setAuthCookies(res: Response, tokens: TokenPair): void {
-    const accessTtl = this.config.get<number>('JWT_ACCESS_TTL', 900);
-    const refreshTtl = this.config.get<number>('JWT_REFRESH_TTL', 604_800);
+    const accessTtl = Number(this.config.get('JWT_ACCESS_TTL') ?? 900);
+    const refreshTtl = Number(this.config.get('JWT_REFRESH_TTL') ?? 604_800);
     const secure = this.config.get<boolean>('COOKIE_SECURE', false);
     const domain = this.config.get<string>('COOKIE_DOMAIN') || undefined;
 

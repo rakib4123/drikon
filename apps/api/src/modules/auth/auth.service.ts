@@ -404,8 +404,8 @@ export class AuthService {
   // ───────────────────────────────────────────────────────────────────
 
   private async issueTokenPair(user: User, ctx: LoginContext): Promise<TokenPair> {
-    const accessTtl = this.config.get<number>('JWT_ACCESS_TTL', 900);
-    const refreshTtl = this.config.get<number>('JWT_REFRESH_TTL', 604_800);
+    const accessTtl = Number(this.config.get('JWT_ACCESS_TTL') ?? 900);
+    const refreshTtl = Number(this.config.get('JWT_REFRESH_TTL') ?? 604_800);
 
     const sessionId = randomUUID();
     const accessJti = randomUUID();
