@@ -42,7 +42,7 @@ export class AuthController {
     const accessTtl = this.config.get<number>('JWT_ACCESS_TTL', 900);
     const refreshTtl = this.config.get<number>('JWT_REFRESH_TTL', 604_800);
     const secure = this.config.get<boolean>('COOKIE_SECURE', false);
-    const domain = this.config.get<string>('COOKIE_DOMAIN', 'localhost');
+    const domain = this.config.get<string>('COOKIE_DOMAIN') || undefined;
 
     const common = {
       httpOnly: true,
@@ -66,7 +66,7 @@ export class AuthController {
   }
 
   private clearAuthCookies(res: Response): void {
-    const domain = this.config.get<string>('COOKIE_DOMAIN', 'localhost');
+    const domain = this.config.get<string>('COOKIE_DOMAIN') || undefined;
     res.clearCookie('drikon_access', { domain, path: '/' });
     res.clearCookie('drikon_refresh', { domain, path: '/api/v1/auth' });
   }
