@@ -94,7 +94,7 @@ export function Navbar() {
               className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[color:var(--bg-soft)] transition-colors text-sm font-medium"
             >
               <User className="w-4 h-4" />
-              <span className="hidden md:inline">{user.name.split(' ')[0]}</span>
+              <span className="hidden md:inline">{user.name?.split(' ')[0]}</span>
             </Link>
           ) : (
             <>
