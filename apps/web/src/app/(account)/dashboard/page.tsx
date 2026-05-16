@@ -42,7 +42,7 @@ export default function DashboardPage() {
         </div>
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-full bg-[color:var(--bg)] border border-[color:var(--border)] grid place-items-center font-bold text-lg">
-            {user.name.charAt(0).toUpperCase()}
+            {user?.name?.charAt(0)?.toUpperCase() ?? "?"}
           </div>
           <div className="min-w-0">
             <div className="font-semibold truncate">{user.name}</div>
