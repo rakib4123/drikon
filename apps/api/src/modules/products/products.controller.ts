@@ -39,6 +39,13 @@ export class ProductsController {
     return this.products.findBySlug(slug);
   }
 
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Get(':id')
+  @ApiOperation({ summary: '(Admin) Get a product by ID for editing' })
+  findById(@Param('id') id: string) {
+    return this.products.findById(id);
+  }
+
   // ─── Admin-only mutations ───
   @Post()
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)

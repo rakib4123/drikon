@@ -116,10 +116,17 @@ export class ProductsService {
     return product;
   }
 
+  // ─────────────────────────────────────────────────────────────────
+  // GET ONE BY ID (admin edit form)
+  // ─────────────────────────────────────────────────────────────────
   async findById(id: string) {
     const product = await this.prisma.product.findUnique({
       where: { id },
-      include: { images: true, variants: true, category: true, brand: true },
+      include: {
+        images: { orderBy: { position: 'asc' } },
+        category: { select: { id: true, name: true, slug: true } },
+        brand: { select: { id: true, name: true, slug: true } },
+      },
     });
     if (!product) throw new NotFoundException('Product not found');
     return product;

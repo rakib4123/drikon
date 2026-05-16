@@ -4,13 +4,14 @@ import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import { Moon, Sun, ShoppingBag, User, Search } from 'lucide-react';
-import { useAuthStore } from '@/store/auth-store';
+import { useAuthStore, useIsAdmin } from '@/store/auth-store';
 import { useCartStore } from '@/store/cart-store';
 
 export function Navbar() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const user = useAuthStore((s) => s.user);
+  const isAdmin = useIsAdmin();
   const fetchMe = useAuthStore((s) => s.fetchMe);
   const cartCount = useCartStore((s) => s.items.reduce((n, i) => n + i.quantity, 0));
 
@@ -47,6 +48,11 @@ export function Navbar() {
           <Link href="/products?category=fashion" className="hover:text-[color:var(--accent)] transition-colors">
             Fashion
           </Link>
+          {isAdmin && (
+            <Link href="/admin" className="text-[color:var(--accent)] hover:underline transition-colors">
+              Admin
+            </Link>
+          )}
         </nav>
 
         <div className="flex items-center gap-2">

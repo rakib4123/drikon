@@ -9,6 +9,8 @@ import { PrismaModule } from './modules/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { ProductsModule } from './modules/products/products.module';
+import { CategoriesModule } from './modules/categories/categories.module';
+import { BrandsModule } from './modules/brands/brands.module';
 import { HealthModule } from './modules/health/health.module';
 import { MailModule } from './modules/mail/mail.module';
 
@@ -61,6 +63,8 @@ import { MailModule } from './modules/mail/mail.module';
     AuthModule,
     UsersModule,
     ProductsModule,
+    CategoriesModule,
+    BrandsModule,
     HealthModule,
   ],
   providers: [

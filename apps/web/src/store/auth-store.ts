@@ -54,3 +54,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 }));
+// ─── Helpers ───
+export const useIsAdmin = (): boolean => {
+  const user = useAuthStore((s) => s.user);
+  return user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
+};
