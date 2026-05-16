@@ -31,7 +31,7 @@ export default function DashboardPage() {
       <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
         Your account
       </div>
-      <h1 className="display text-4xl md:text-5xl mb-2">Hi, {user.name.split(' ')[0]}.</h1>
+      <h1 className="display text-4xl md:text-5xl mb-2">Hi, {user?.name?.split(' ')[0]}.</h1>
       <p className="text-[color:var(--fg-muted)] mb-10">{user.email}</p>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">

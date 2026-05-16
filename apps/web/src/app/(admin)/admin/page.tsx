@@ -25,7 +25,7 @@ export default function AdminHomePage() {
       <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
         Welcome back
       </div>
-      <h1 className="display text-4xl mb-1">Hi, {user?.name.split(' ')[0]} 👋</h1>
+      <h1 className="display text-4xl mb-1">Hi, {user?.name?.split(' ')[0]} 👋</h1>
       <p className="text-[color:var(--fg-muted)] mb-10">Here's what's happening with Drikon.</p>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
