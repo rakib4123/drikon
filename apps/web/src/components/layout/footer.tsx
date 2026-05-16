@@ -3,7 +3,7 @@ import Link from 'next/link';
 export function Footer() {
   return (
     <footer className="mt-24 border-t border-[color:var(--border)]">
-      <div className="max-w-7xl mx-auto px-6 py-14 grid gap-10 md:grid-cols-4">
+      <div className="max-w-7xl mx-auto px-6 py-14 grid gap-10 md:grid-cols-3">
         <div className="md:col-span-2">
           <div className="flex items-center gap-2 mb-3">
             <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-500 grid place-items-center text-white font-bold">দ</span>
@@ -21,16 +21,6 @@ export function Footer() {
             <li><Link href="/products?featured=true" className="hover:text-[color:var(--fg)]">Featured</Link></li>
             <li><Link href="/products?category=electronics" className="hover:text-[color:var(--fg)]">Electronics</Link></li>
             <li><Link href="/products?category=fashion" className="hover:text-[color:var(--fg)]">Fashion</Link></li>
-          </ul>
-        </div>
-
-        <div>
-          <div className="text-sm font-semibold mb-3">Company</div>
-          <ul className="space-y-2 text-sm text-[color:var(--fg-muted)]">
-            <li><Link href="/about" className="hover:text-[color:var(--fg)]">About</Link></li>
-            <li><Link href="/careers" className="hover:text-[color:var(--fg)]">Careers</Link></li>
-            <li><Link href="/contact" className="hover:text-[color:var(--fg)]">Contact</Link></li>
-            <li><Link href="/privacy" className="hover:text-[color:var(--fg)]">Privacy</Link></li>
           </ul>
         </div>
       </div>

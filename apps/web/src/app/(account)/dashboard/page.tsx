@@ -3,12 +3,13 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuthStore } from '@/store/auth-store';
-import { LogOut, ShoppingBag, Settings, ShieldCheck } from 'lucide-react';
+import { useAuthStore, useIsAdmin } from '@/store/auth-store';
+import { LogOut, ShoppingBag, LayoutDashboard } from 'lucide-react';
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, initialized, fetchMe, logout } = useAuthStore();
+  const isAdmin = useIsAdmin();
 
   useEffect(() => {
     if (!initialized) fetchMe();
@@ -34,16 +35,35 @@ export default function DashboardPage() {
       <h1 className="display text-4xl md:text-5xl mb-2">Hi, {user?.name?.split(' ')[0]}.</h1>
       <p className="text-[color:var(--fg-muted)] mb-10">{user.email}</p>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        <DashCard icon={<ShoppingBag className="w-5 h-5" />} title="Orders" href="/dashboard/orders">
-          Track shipments, request returns, download invoices.
+      {/* Profile summary card — always visible */}
+      <div className="card max-w-xl mb-6">
+        <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
+          Profile
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-[color:var(--bg)] border border-[color:var(--border)] grid place-items-center font-bold text-lg">
+            {user.name.charAt(0).toUpperCase()}
+          </div>
+          <div className="min-w-0">
+            <div className="font-semibold truncate">{user.name}</div>
+            <div className="text-sm text-[color:var(--fg-muted)] truncate">{user.email}</div>
+            <div className="text-[10px] font-mono uppercase tracking-wider text-[color:var(--accent)] mt-1">
+              {user.role === 'SUPER_ADMIN' ? 'Super Admin' : user.role === 'ADMIN' ? 'Admin' : 'Customer'}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick links */}
+      <div className="grid sm:grid-cols-2 gap-5 max-w-xl mb-10">
+        <DashCard icon={<ShoppingBag className="w-5 h-5" />} title="Continue shopping" href="/products">
+          Discover new arrivals and curated essentials.
         </DashCard>
-        <DashCard icon={<Settings className="w-5 h-5" />} title="Profile" href="/dashboard/profile">
-          Update your name, phone, and shipping addresses.
-        </DashCard>
-        <DashCard icon={<ShieldCheck className="w-5 h-5" />} title="Security" href="/dashboard/security">
-          Manage 2FA, devices, and active sessions.
-        </DashCard>
+        {isAdmin && (
+          <DashCard icon={<LayoutDashboard className="w-5 h-5" />} title="Admin panel" href="/admin">
+            Manage products, orders, and users.
+          </DashCard>
+        )}
       </div>
 
       <button
@@ -53,7 +73,7 @@ export default function DashboardPage() {
           router.push('/');
           router.refresh();
         }}
-        className="btn-ghost mt-10 inline-flex"
+        className="btn-ghost inline-flex"
       >
         <LogOut className="w-4 h-4" /> Sign out
       </button>

@@ -81,11 +81,6 @@ function LoginForm() {
               </Field>
             )}
 
-            <div className="flex items-center justify-between text-sm">
-              <Link href="/forgot-password" className="text-[color:var(--fg-muted)] hover:text-[color:var(--accent)]">
-                Forgot password?
-              </Link>
-            </div>
 
             {serverError && (
               <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-sm text-red-400">
