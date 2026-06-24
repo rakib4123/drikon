@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore, useIsAdmin } from '@/store/auth-store';
-import { LogOut, ShoppingBag, LayoutDashboard } from 'lucide-react';
+import { LogOut, ShoppingBag, LayoutDashboard, Heart, Package } from 'lucide-react';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -58,6 +58,12 @@ export default function DashboardPage() {
       <div className="grid sm:grid-cols-2 gap-5 max-w-xl mb-10">
         <DashCard icon={<ShoppingBag className="w-5 h-5" />} title="Continue shopping" href="/products">
           Discover new arrivals and curated essentials.
+        </DashCard>
+        <DashCard icon={<Package className="w-5 h-5" />} title="Your orders" href="/orders">
+          Track and revisit everything you&apos;ve ordered.
+        </DashCard>
+        <DashCard icon={<Heart className="w-5 h-5" />} title="Wishlist" href="/wishlist">
+          The things you&apos;ve saved for later.
         </DashCard>
         {isAdmin && (
           <DashCard icon={<LayoutDashboard className="w-5 h-5" />} title="Admin panel" href="/admin">

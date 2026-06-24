@@ -5,6 +5,7 @@ import { ArrowLeft, Star, ShieldCheck, Truck, RefreshCw } from 'lucide-react';
 import { apiGet, ApiError } from '@/lib/api-client';
 import { ProductCard } from '@/components/shop/product-card';
 import { AddToCart } from '@/components/shop/add-to-cart';
+import { WishlistButton } from '@/components/shop/wishlist-button';
 import { formatPrice } from '@/lib/utils';
 import type { ProductSummary } from '@drikon/shared-types';
 
@@ -150,17 +151,25 @@ export default async function ProductDetailPage({ params }: PageProps) {
           </div>
 
           {/* Add to cart */}
-          <div className="mb-8">
-            <AddToCart
-              product={{
-                id: product.id,
-                name: product.name,
-                slug: product.slug,
-                image: product.images?.[0]?.url,
-                price,
-                currency: product.currency,
-                stock: product.stock,
-              }}
+          <div className="mb-8 flex items-stretch gap-3">
+            <div className="flex-1">
+              <AddToCart
+                product={{
+                  id: product.id,
+                  name: product.name,
+                  slug: product.slug,
+                  image: product.images?.[0]?.url,
+                  price,
+                  currency: product.currency,
+                  stock: product.stock,
+                }}
+              />
+            </div>
+            <WishlistButton
+              productId={product.id}
+              productName={product.name}
+              variant="inline"
+              className="self-start"
             />
           </div>
 
