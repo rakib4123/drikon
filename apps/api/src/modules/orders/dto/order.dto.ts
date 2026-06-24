@@ -23,6 +23,7 @@ export const CreateOrderSchema = z.object({
   items: z.array(CheckoutItemSchema).min(1).max(50),
   shippingAddress: ShippingAddressSchema,
   notes: z.string().max(500).trim().optional(),
+  couponCode: z.string().max(40).trim().optional().or(z.literal('')),
 });
 export class CreateOrderDto extends createZodDto(CreateOrderSchema) {}
 

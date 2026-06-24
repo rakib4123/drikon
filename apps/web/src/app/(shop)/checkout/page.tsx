@@ -1,19 +1,19 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Lock, ArrowRight, ShoppingBag } from 'lucide-react';
+import { Loader2, Lock, ArrowRight, ShoppingBag, Tag, X } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   ShippingAddressSchema,
   type ShippingAddressInput,
   type OrderSummary,
 } from '@drikon/shared-types';
-import { apiPost, ApiError } from '@/lib/api-client';
+import { apiGet, apiPost, ApiError } from '@/lib/api-client';
 import { formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/store/cart-store';
 import { useAuthStore } from '@/store/auth-store';
@@ -43,10 +43,37 @@ export default function CheckoutPage() {
     defaultValues: { country: 'BD' },
   });
 
+  const [couponInput, setCouponInput] = useState('');
+  const [applying, setApplying] = useState(false);
+  const [coupon, setCoupon] = useState<{ code: string; discount: number } | null>(null);
+
   const sub = subtotal();
   const currency = items[0]?.currency ?? 'BDT';
   const shipping = sub >= FREE_SHIPPING_THRESHOLD ? 0 : items.length ? FLAT_SHIPPING_FEE : 0;
-  const total = sub + shipping;
+  const discount = coupon ? Math.min(coupon.discount, sub) : 0;
+  const total = Math.max(0, sub + shipping - discount);
+
+  const applyCoupon = async () => {
+    const code = couponInput.trim();
+    if (!code) return;
+    setApplying(true);
+    try {
+      const res = await apiGet<{ valid: boolean; discount: string | number; message: string; code?: string }>(
+        `/api/v1/coupons/validate?code=${encodeURIComponent(code)}&subtotal=${sub}`,
+      );
+      if (res.valid) {
+        setCoupon({ code: res.code ?? code.toUpperCase(), discount: Number(res.discount) });
+        toast.success(res.message);
+      } else {
+        setCoupon(null);
+        toast.error(res.message);
+      }
+    } catch {
+      toast.error('Could not validate coupon');
+    } finally {
+      setApplying(false);
+    }
+  };
 
   const onSubmit = async (address: ShippingAddressInput) => {
     if (items.length === 0) {
@@ -61,6 +88,7 @@ export default function CheckoutPage() {
           quantity: i.quantity,
         })),
         shippingAddress: address,
+        couponCode: coupon?.code,
       });
       clear();
       toast.success('Order placed!', { description: order.orderNumber });
@@ -159,12 +187,47 @@ export default function CheckoutPage() {
             ))}
           </ul>
 
+          {/* Coupon */}
+          <div className="mt-4">
+            {coupon ? (
+              <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-[color:var(--accent)]/10 border border-[color:var(--accent)]/30 text-sm">
+                <span className="inline-flex items-center gap-1.5 font-medium text-[color:var(--accent)]">
+                  <Tag className="w-3.5 h-3.5" /> {coupon.code}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => { setCoupon(null); setCouponInput(''); }}
+                  className="text-[color:var(--fg-muted)] hover:text-red-400"
+                  aria-label="Remove coupon"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  className="input font-mono uppercase text-sm"
+                  placeholder="Coupon code"
+                  value={couponInput}
+                  onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); applyCoupon(); } }}
+                />
+                <button type="button" onClick={applyCoupon} disabled={applying || !couponInput.trim()} className="btn-ghost !px-4 shrink-0">
+                  {applying ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Apply'}
+                </button>
+              </div>
+            )}
+          </div>
+
           <div className="h-px bg-[color:var(--border)] my-4" />
           <Row label="Subtotal" value={formatPrice(sub, currency)} />
           <Row
             label="Shipping"
             value={shipping === 0 ? 'Free' : formatPrice(shipping, currency)}
           />
+          {discount > 0 && (
+            <Row label={`Discount (${coupon?.code})`} value={`− ${formatPrice(discount, currency)}`} />
+          )}
           <div className="h-px bg-[color:var(--border)] my-4" />
           <Row label="Total" value={formatPrice(total, currency)} strong />
 

@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { OrderStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { CouponsService } from '../coupons/coupons.service';
 import type { CreateOrderDto, OrderQueryDto } from './dto/order.dto';
 
 // Flat shipping fee (BDT) below the free-shipping threshold.
@@ -16,7 +17,10 @@ const FLAT_SHIPPING_FEE = new Prisma.Decimal(60);
 export class OrdersService {
   private readonly logger = new Logger(OrdersService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly coupons: CouponsService,
+  ) {}
 
   // ─────────────────────────────────────────────────────────────────
   // CREATE — turn a cart payload into a real Order (no payment yet)
@@ -77,7 +81,16 @@ export class OrdersService {
       ? new Prisma.Decimal(0)
       : FLAT_SHIPPING_FEE;
     const tax = new Prisma.Decimal(0);
-    const discount = new Prisma.Decimal(0);
+
+    // Apply a coupon if one was supplied (server-validated).
+    let discount = new Prisma.Decimal(0);
+    let couponId: string | null = null;
+    if (dto.couponCode) {
+      const resolved = await this.coupons.resolveForOrder(dto.couponCode, subtotal.toNumber());
+      discount = resolved.discount;
+      couponId = resolved.couponId;
+    }
+
     const total = subtotal.add(shipping).add(tax).sub(discount);
     const currency = lines[0]?.currency ?? 'BDT';
 
@@ -100,6 +113,7 @@ export class OrdersService {
           discount,
           total,
           currency,
+          couponId,
           shippingAddressId: address.id,
           notes: dto.notes,
           items: {
@@ -131,6 +145,13 @@ export class OrdersService {
             data: { stock: { decrement: l.quantity } },
           });
         }
+      }
+
+      if (couponId) {
+        await tx.coupon.update({
+          where: { id: couponId },
+          data: { redemptionCount: { increment: 1 } },
+        });
       }
 
       return created;
