@@ -89,7 +89,7 @@ export function FlashSaleSection() {
                       <Image src={it.product.images[0].url} alt={it.product.images[0].alt ?? it.product.name} fill sizes="20vw" className="object-cover" />
                     )}
                     {off > 0 && (
-                      <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-bold rounded-md bg-[color:var(--accent)] text-[#06070d]">−{off}%</span>
+                      <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-bold rounded-md bg-[color:var(--accent)] text-white">−{off}%</span>
                     )}
                   </div>
                   <div className="p-3">

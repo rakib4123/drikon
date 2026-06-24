@@ -102,7 +102,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
               });
               toast.success('Added to cart', { description: product.name });
             }}
-            className="p-2.5 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] hover:bg-[color:var(--accent)] hover:text-[#06070d] hover:border-[color:var(--accent)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="p-2.5 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] hover:bg-[color:var(--accent)] hover:text-white hover:border-[color:var(--accent)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             aria-label="Add to cart"
           >
             <ShoppingBag className="w-4 h-4" />

@@ -23,8 +23,8 @@ export function BrandMark({
   ) : (
     <>
       <span
-        className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#22d3ee] to-[#a855f7]
-                   grid place-items-center text-[#06070d] font-bold shadow-lg shadow-[#22d3ee]/30
+        className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#2563eb] to-[#1e3a8a]
+                   grid place-items-center text-white font-bold shadow-lg shadow-[#2563eb]/30
                    transition-transform group-hover:scale-110"
         aria-hidden
       >
