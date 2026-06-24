@@ -12,6 +12,7 @@ import {
   Users,
   Ticket,
   Zap,
+  GalleryHorizontalEnd,
   Settings as SettingsIcon,
 } from 'lucide-react';
 
@@ -25,6 +26,7 @@ type NavItem = {
 
 const NAV: NavItem[] = [
   { href: '/admin', label: 'Overview', icon: LayoutDashboard, exact: true },
+  { href: '/admin/banners', label: 'Hero banners', icon: GalleryHorizontalEnd },
   { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
   { href: '/admin/products', label: 'Products', icon: Package },
   { href: '/admin/categories', label: 'Categories', icon: Tags },
