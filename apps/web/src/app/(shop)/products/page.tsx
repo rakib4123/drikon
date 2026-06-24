@@ -27,16 +27,21 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   const page = parseInt((params.page as string) ?? '1', 10);
   const currentSort = (params.sort as string) ?? 'newest';
   const currentCategory = params.category as string | undefined;
+  const currentSearch = params.search as string | undefined;
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-14">
       <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
         <div>
           <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
-            {currentCategory ? currentCategory : 'Shop'}
+            {currentSearch ? 'Search' : currentCategory ? currentCategory : 'Shop'}
           </div>
           <h1 className="display text-4xl md:text-5xl">
-            {currentCategory ? capitalize(currentCategory) : 'All products'}
+            {currentSearch
+              ? `“${currentSearch}”`
+              : currentCategory
+                ? capitalize(currentCategory)
+                : 'All products'}
           </h1>
           {data && (
             <p className="text-sm text-[color:var(--fg-muted)] mt-2">
