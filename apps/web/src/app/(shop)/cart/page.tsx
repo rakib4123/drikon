@@ -81,9 +81,9 @@ export default function CartPage() {
             <span>Total</span>
             <span>{formatPrice(total)}</span>
           </div>
-          <button type="button" className="btn-primary w-full mt-5">
+          <Link href="/checkout" className="btn-primary w-full mt-5">
             Proceed to checkout <ArrowRight className="w-4 h-4" />
-          </button>
+          </Link>
           <p className="text-[11px] text-[color:var(--fg-muted)] mt-3 text-center">
             Secure payment via Stripe. Cards never touch our servers.
           </p>

@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ShoppingBag, Star } from 'lucide-react';
+import { toast } from 'sonner';
 import type { ProductSummary } from '@drikon/shared-types';
 import { formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/store/cart-store';
@@ -84,6 +85,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
                 unitPrice: price,
                 currency: product.currency,
               });
+              toast.success('Added to cart', { description: product.name });
             }}
             className="p-2.5 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] hover:bg-[color:var(--accent)] hover:text-white hover:border-[color:var(--accent)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             aria-label="Add to cart"

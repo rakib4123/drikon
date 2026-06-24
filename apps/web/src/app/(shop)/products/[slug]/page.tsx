@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, Star, ShoppingBag, ShieldCheck, Truck, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Star, ShieldCheck, Truck, RefreshCw } from 'lucide-react';
 import { apiGet, ApiError } from '@/lib/api-client';
 import { ProductCard } from '@/components/shop/product-card';
+import { AddToCart } from '@/components/shop/add-to-cart';
 import { formatPrice } from '@/lib/utils';
 import type { ProductSummary } from '@drikon/shared-types';
 
@@ -149,15 +150,18 @@ export default async function ProductDetailPage({ params }: PageProps) {
           </div>
 
           {/* Add to cart */}
-          <div className="flex gap-3 mb-8">
-            <button
-              type="button"
-              disabled={product.stock === 0}
-              className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <ShoppingBag className="w-4 h-4" />
-              {product.stock === 0 ? 'Out of stock' : 'Add to cart'}
-            </button>
+          <div className="mb-8">
+            <AddToCart
+              product={{
+                id: product.id,
+                name: product.name,
+                slug: product.slug,
+                image: product.images?.[0]?.url,
+                price,
+                currency: product.currency,
+                stock: product.stock,
+              }}
+            />
           </div>
 
           {/* Trust signals */}
