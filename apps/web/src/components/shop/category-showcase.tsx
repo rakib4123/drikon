@@ -73,7 +73,7 @@ export function CategoryShowcase() {
           >
             <Link
               href={tile.href}
-              className="group relative h-full w-full overflow-hidden rounded-2xl border border-[color:var(--border)] bg-[color:var(--bg-soft)] p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:border-[color:var(--accent)] hover:shadow-[0_24px_60px_-30px_rgba(226,104,60,0.45)]"
+              className="group relative h-full w-full overflow-hidden rounded-2xl border border-[color:var(--border)] bg-[color:var(--bg-soft)] p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:border-[color:var(--accent)] hover:shadow-[0_24px_60px_-30px_rgba(34,211,238,0.45)]"
             >
               {/* Hover gradient wash */}
               <div

@@ -1,26 +1,36 @@
 @import 'tailwindcss';
 
-/* ─── Drikon design tokens — warm editorial (amber & terracotta) ─── */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ─── Design tokens — futuristic dark / neon ───
+   --accent / --accent-2 are overridable at runtime by the brand settings,
+   so the whole UI re-themes from one admin-controlled colour. */
 :root {
-  --bg:        #fdfaf5;
-  --bg-soft:   #f4ece1;
-  --fg:        #1c1408;
-  --fg-muted:  #6b5d4d;
-  --border:    #e8dccb;
-  --accent:    #d2552a;
-  --accent-2:  #d9941a;
-  --ring:      #d2552a;
+  --bg:        #eef2fc;
+  --bg-soft:   #ffffff;
+  --fg:        #0a0e1a;
+  --fg-muted:  #586087;
+  --border:    #e1e7f7;
+  --accent:    #0891b2;
+  --accent-2:  #7c3aed;
+  --ring:      #0891b2;
+  --glow:      rgba(8,145,178,0.35);
+  --glass:     rgba(255,255,255,0.7);
+  --grid-line: rgba(10,14,26,0.05);
 }
 
 .dark {
-  --bg:        #14100c;
-  --bg-soft:   #1f1813;
-  --fg:        #f3ede4;
-  --fg-muted:  #ab9a8a;
-  --border:    #2e2519;
-  --accent:    #e2683c;
-  --accent-2:  #f0a830;
-  --ring:      #e2683c;
+  --bg:        #06070d;
+  --bg-soft:   #0e1120;
+  --fg:        #e9edff;
+  --fg-muted:  #8a93b6;
+  --border:    #1c2342;
+  --accent:    #22d3ee;
+  --accent-2:  #a855f7;
+  --ring:      #22d3ee;
+  --glow:      rgba(34,211,238,0.45);
+  --glass:     rgba(18,23,44,0.55);
+  --grid-line: rgba(120,160,255,0.06);
 }
 
 * { border-color: var(--border); }
@@ -34,19 +44,16 @@ html, body {
   text-rendering: optimizeLegibility;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-
-/* ─── Smooth focus ring ─── */
+/* ─── Focus ring ─── */
 *:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
   border-radius: 6px;
 }
 
-/* ─── Selection ─── */
-::selection { background: var(--accent); color: white; }
+::selection { background: var(--accent); color: #06070d; }
 
-/* ─── Custom scrollbar (subtle) ─── */
+/* ─── Scrollbar ─── */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
@@ -54,33 +61,98 @@ html, body {
   border-radius: 999px;
   border: 2px solid var(--bg);
 }
-::-webkit-scrollbar-thumb:hover { background: var(--fg-muted); }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-/* ─── Utility: subtle grain texture for hero backgrounds ─── */
-.grain::before {
+/* ─── Display heading: tight techy sans ─── */
+.display {
+  font-family: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+}
+
+/* ─── Neon gradient text ─── */
+.neon-text {
+  background-image: linear-gradient(120deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ─── Glassmorphism surfaces ─── */
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid var(--border);
+}
+
+/* ─── Futuristic grid backdrop ─── */
+.grid-overlay::before {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.035;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='3'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%);
   z-index: 0;
 }
 
-/* ─── Reusable button + card primitives ─── */
+/* ─── Aurora blobs (animated, GPU-cheap: transform/opacity only) ─── */
+.aurora { position: relative; overflow: hidden; }
+.aurora::before,
+.aurora::after {
+  content: '';
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+}
+.aurora::before {
+  width: 480px; height: 480px;
+  background: radial-gradient(circle, var(--accent), transparent 70%);
+  top: -120px; right: -80px;
+  animation: float-a 14s ease-in-out infinite;
+}
+.aurora::after {
+  width: 420px; height: 420px;
+  background: radial-gradient(circle, var(--accent-2), transparent 70%);
+  bottom: -140px; left: -60px;
+  animation: float-b 18s ease-in-out infinite;
+}
+@keyframes float-a {
+  0%, 100% { transform: translate3d(0,0,0) scale(1); }
+  50%      { transform: translate3d(-30px,40px,0) scale(1.08); }
+}
+@keyframes float-b {
+  0%, 100% { transform: translate3d(0,0,0) scale(1); }
+  50%      { transform: translate3d(40px,-30px,0) scale(1.12); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aurora::before, .aurora::after { animation: none; }
+}
+
+/* ─── Buttons ─── */
 .btn-primary {
+  position: relative;
   display: inline-flex; align-items: center; justify-content: center;
   gap: 0.5rem;
   padding: 0.7rem 1.3rem;
   border-radius: 12px;
-  background: linear-gradient(135deg, #e2683c, #f0a830);
-  color: white;
-  font-weight: 600;
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  color: #06070d;
+  font-weight: 700;
   font-size: 0.95rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-  box-shadow: 0 10px 30px -10px rgba(226,104,60,0.5);
+  box-shadow: 0 8px 30px -8px var(--glow), inset 0 1px 0 rgba(255,255,255,0.25);
 }
-.btn-primary:hover { transform: translateY(-2px); filter: brightness(1.05); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 44px -10px var(--glow); filter: brightness(1.08); }
 .btn-primary:active { transform: translateY(0); }
 
 .btn-ghost {
@@ -89,13 +161,14 @@ html, body {
   padding: 0.7rem 1.3rem;
   border-radius: 12px;
   border: 1px solid var(--border);
-  background: transparent;
+  background: color-mix(in srgb, var(--bg-soft) 60%, transparent);
   color: var(--fg);
-  font-weight: 500;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  font-weight: 600;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
-.btn-ghost:hover { background: var(--bg-soft); border-color: var(--fg-muted); }
+.btn-ghost:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 8px 30px -12px var(--glow); }
 
+/* ─── Card ─── */
 .card {
   background: var(--bg-soft);
   border: 1px solid var(--border);
@@ -105,40 +178,28 @@ html, body {
 }
 .card:hover {
   transform: translateY(-3px);
-  border-color: var(--accent);
-  box-shadow: 0 14px 40px -20px rgba(226,104,60,0.3);
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+  box-shadow: 0 18px 50px -24px var(--glow);
 }
 
-/* ─── Display heading ─── */
-.display {
-  font-family: 'Fraunces', ui-serif, Georgia, serif;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
-}
-/* ─── Form inputs (admin forms) ─── */
+/* ─── Form inputs ─── */
 .input {
   width: 100%;
   padding: 0.7rem 1rem;
   border-radius: 0.75rem;
-  background-color: var(--bg-soft);
+  background-color: color-mix(in srgb, var(--bg-soft) 80%, transparent);
   border: 1px solid var(--border);
   color: var(--fg);
   font-size: 0.9rem;
-  transition: border-color 150ms;
+  transition: border-color 150ms, box-shadow 150ms;
   outline: none;
 }
 .input:focus {
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--glow);
 }
-.input::placeholder {
-  color: var(--fg-muted);
-  opacity: 0.7;
-}
-textarea.input {
-  font-family: inherit;
-  line-height: 1.5;
-}
+.input::placeholder { color: var(--fg-muted); opacity: 0.7; }
+textarea.input { font-family: inherit; line-height: 1.5; }
 select.input {
   appearance: none;
   -webkit-appearance: none;
@@ -148,4 +209,15 @@ select.input {
   background-size: 12px;
   padding-right: 2.25rem;
   cursor: pointer;
+}
+
+/* ─── Grain (kept for subtle texture) ─── */
+.grain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='3'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  z-index: 0;
 }

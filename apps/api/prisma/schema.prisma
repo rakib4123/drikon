@@ -506,3 +506,22 @@ model AdminLog {
   @@index([action])
   @@index([createdAt])
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SITE SETTINGS (white-label branding — single row)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model SiteSettings {
+  id           String   @id @default("singleton")
+  siteName     String   @default("Drikon")
+  tagline      String?
+  logoUrl      String?
+  faviconUrl   String?
+  // Hex colours that override the storefront --accent / --accent-2 at runtime.
+  accentColor  String?
+  accentColor2 String?
+  supportEmail String?
+  socialFacebook  String?
+  socialInstagram String?
+  updatedAt    DateTime @updatedAt @default(now())
+}

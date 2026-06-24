@@ -8,12 +8,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { LoginSchema, type LoginInput } from '@drikon/shared-types';
 import { useAuthStore } from '@/store/auth-store';
 import { ApiError } from '@/lib/api-client';
+import { useBrand } from '@/components/layout/settings-context';
 import { ArrowRight, Loader2 } from 'lucide-react';
 
 function LoginForm() {
   const router = useRouter();
   const search = useSearchParams();
   const login = useAuthStore((s) => s.login);
+  const { siteName } = useBrand();
   const [serverError, setServerError] = useState<string | null>(null);
   const [requires2FA, setRequires2FA] = useState(false);
 
@@ -47,7 +49,7 @@ function LoginForm() {
           <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
             Welcome back
           </div>
-          <h1 className="display text-3xl md:text-4xl mb-8">Sign in to Drikon</h1>
+          <h1 className="display text-3xl md:text-4xl mb-8">Sign in to {siteName}</h1>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
             <Field label="Email" error={errors.email?.message}>
@@ -107,7 +109,7 @@ function LoginForm() {
             </a>
 
             <p className="text-center text-sm text-[color:var(--fg-muted)] mt-6">
-              New to Drikon?{' '}
+              New to {siteName}?{' '}
               <Link href="/register" className="text-[color:var(--accent)] font-medium hover:underline">
                 Create an account
               </Link>
@@ -123,7 +125,7 @@ function LoginForm() {
               Vision,<br />engineered.
             </div>
             <p className="mt-6 text-white/80">
-              Drikon is type-safe end to end, secure by default, and fast everywhere.
+              {siteName} is type-safe end to end, secure by default, and fast everywhere.
               Sign in to pick up your cart and continue where you left off.
             </p>
           </div>

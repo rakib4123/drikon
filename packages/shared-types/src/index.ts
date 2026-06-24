@@ -242,3 +242,34 @@ export interface OrderListResponse {
   items: OrderSummary[];
   pagination: Pagination;
 }
+
+// ────────────────────────────────────────────────────────────────────────────
+// SITE SETTINGS (white-label branding)
+// ────────────────────────────────────────────────────────────────────────────
+
+export interface SiteSettings {
+  id: string;
+  siteName: string;
+  tagline?: string | null;
+  logoUrl?: string | null;
+  faviconUrl?: string | null;
+  accentColor?: string | null;
+  accentColor2?: string | null;
+  supportEmail?: string | null;
+  socialFacebook?: string | null;
+  socialInstagram?: string | null;
+  updatedAt?: string;
+}
+
+export const UpdateSettingsSchema = z.object({
+  siteName: z.string().min(1, 'Required').max(60).trim(),
+  tagline: z.string().max(160).trim().optional().or(z.literal('')),
+  logoUrl: z.string().url().optional().or(z.literal('')),
+  faviconUrl: z.string().url().optional().or(z.literal('')),
+  accentColor: z.string().regex(/^#([0-9a-fA-F]{6})$/, '6-digit hex').optional().or(z.literal('')),
+  accentColor2: z.string().regex(/^#([0-9a-fA-F]{6})$/, '6-digit hex').optional().or(z.literal('')),
+  supportEmail: z.string().email().optional().or(z.literal('')),
+  socialFacebook: z.string().url().optional().or(z.literal('')),
+  socialInstagram: z.string().url().optional().or(z.literal('')),
+});
+export type UpdateSettingsInput = z.infer<typeof UpdateSettingsSchema>;

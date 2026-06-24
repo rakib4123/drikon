@@ -7,10 +7,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { RegisterSchema, type RegisterInput } from '@drikon/shared-types';
 import { useAuthStore } from '@/store/auth-store';
 import { ApiError } from '@/lib/api-client';
+import { useBrand } from '@/components/layout/settings-context';
 import { ArrowRight, Check, Loader2 } from 'lucide-react';
 
 export default function RegisterPage() {
   const register = useAuthStore((s) => s.register);
+  const { siteName } = useBrand();
   const [serverError, setServerError] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
 
@@ -67,7 +69,7 @@ export default function RegisterPage() {
           <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
             Create an account
           </div>
-          <h1 className="display text-3xl md:text-4xl mb-8">Welcome to Drikon</h1>
+          <h1 className="display text-3xl md:text-4xl mb-8">Welcome to {siteName}</h1>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
             <Field label="Full name" error={errors.name?.message}>
