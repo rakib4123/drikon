@@ -11,6 +11,9 @@ import { UsersModule } from './modules/users/users.module';
 import { ProductsModule } from './modules/products/products.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { BrandsModule } from './modules/brands/brands.module';
+import { WishlistModule } from './modules/wishlist/wishlist.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
+import { OrdersModule } from './modules/orders/orders.module';
 import { HealthModule } from './modules/health/health.module';
 import { MailModule } from './modules/mail/mail.module';
 
@@ -65,6 +68,9 @@ import { MailModule } from './modules/mail/mail.module';
     ProductsModule,
     CategoriesModule,
     BrandsModule,
+    WishlistModule,
+    ReviewsModule,
+    OrdersModule,
     HealthModule,
   ],
   providers: [
