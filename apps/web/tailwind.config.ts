@@ -21,9 +21,9 @@ const config: Config = {
           950: '#0c0e1a',
         },
         brand: {
-          blue: '#2563eb',
-          navy: '#1e3a8a',
-          sky:  '#3b82f6',
+          orange: '#ef6a20',
+          navy:   '#14233f',
+          amber:  '#f5a524',
         },
       },
       fontFamily: {
@@ -33,9 +33,9 @@ const config: Config = {
         mono:    ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       backgroundImage: {
-        'drikon-gradient': 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 55%, #3b82f6 100%)',
+        'drikon-gradient': 'linear-gradient(135deg, #14233f 0%, #b8501a 70%, #ef6a20 100%)',
         'drikon-mesh':
-          'radial-gradient(at 18% 12%, rgba(37,99,235,0.10) 0px, transparent 50%), radial-gradient(at 82% 88%, rgba(30,58,138,0.08) 0px, transparent 50%)',
+          'radial-gradient(at 18% 12%, rgba(239,106,32,0.10) 0px, transparent 50%), radial-gradient(at 82% 88%, rgba(20,35,63,0.08) 0px, transparent 50%)',
       },
       keyframes: {
         'fade-up': {

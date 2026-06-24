@@ -8,7 +8,7 @@ export function Footer({ brand }: { brand: BrandInfo }) {
       <div className="max-w-7xl mx-auto px-6 py-14 grid gap-10 md:grid-cols-3">
         <div className="md:col-span-2">
           <div className="mb-3">
-            <BrandMark brand={brand} href={null} />
+            <BrandMark brand={brand} href={null} showTagline />
           </div>
           <p className="text-sm text-[color:var(--fg-muted)] max-w-sm">
             {brand.tagline || 'A modern marketplace built around taste, performance, and trust.'}
