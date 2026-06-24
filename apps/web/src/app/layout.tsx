@@ -4,6 +4,7 @@ import { Providers } from '@/components/layout/providers';
 import { TopBar } from '@/components/layout/top-bar';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
+import { CompareTray } from '@/components/shop/compare-tray';
 import { getSettings } from '@/lib/settings';
 import { getCategories } from '@/lib/catalog';
 
@@ -54,6 +55,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Navbar brand={brand} categories={categories} />
           <main className="flex-1">{children}</main>
           <Footer brand={brand} />
+          <CompareTray />
         </Providers>
       </body>
     </html>
