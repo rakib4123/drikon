@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ArrowRight, Sparkles, ShieldCheck, Truck, Headphones } from 'lucide-react';
 import { ProductGrid } from '@/components/shop/product-grid';
 import { CategoryShowcase } from '@/components/shop/category-showcase';
+import { FlashSaleSection } from '@/components/shop/flash-sale-section';
 import { Reveal } from '@/components/ui/reveal';
 import { apiGet } from '@/lib/api-client';
 import { getSettings } from '@/lib/settings';
@@ -75,6 +76,9 @@ export default async function HomePage() {
           <Feature icon={<Sparkles className="w-5 h-5" />} title="Curated only" body="Edited by people, not robots" />
         </div>
       </section>
+
+      {/* ─── FLASH SALE (only renders when one is live) ─── */}
+      <FlashSaleSection />
 
       {/* ─── SHOP BY CATEGORY ─── */}
       <CategoryShowcase />

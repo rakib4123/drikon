@@ -15,7 +15,15 @@ import {
   Settings as SettingsIcon,
 } from 'lucide-react';
 
-const NAV = [
+type NavItem = {
+  href: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  exact?: boolean;
+  soon?: boolean;
+};
+
+const NAV: NavItem[] = [
   { href: '/admin', label: 'Overview', icon: LayoutDashboard, exact: true },
   { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
   { href: '/admin/products', label: 'Products', icon: Package },
@@ -24,7 +32,7 @@ const NAV = [
   { href: '/admin/reviews', label: 'Reviews', icon: Star },
   { href: '/admin/users', label: 'Users', icon: Users },
   { href: '/admin/coupons', label: 'Coupons', icon: Ticket },
-  { href: '/admin/flash-sales', label: 'Flash sales', icon: Zap, soon: true },
+  { href: '/admin/flash-sales', label: 'Flash sales', icon: Zap },
   { href: '/admin/settings', label: 'Settings', icon: SettingsIcon },
 ];
 

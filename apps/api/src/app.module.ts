@@ -16,6 +16,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { CouponsModule } from './modules/coupons/coupons.module';
+import { FlashSalesModule } from './modules/flash-sales/flash-sales.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { HealthModule } from './modules/health/health.module';
 import { MailModule } from './modules/mail/mail.module';
@@ -76,6 +77,7 @@ import { MailModule } from './modules/mail/mail.module';
     OrdersModule,
     SettingsModule,
     CouponsModule,
+    FlashSalesModule,
     AdminModule,
     HealthModule,
   ],
