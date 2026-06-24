@@ -23,7 +23,7 @@ const NAV = [
   { href: '/admin/brands', label: 'Brands', icon: Tag },
   { href: '/admin/reviews', label: 'Reviews', icon: Star },
   { href: '/admin/users', label: 'Users', icon: Users },
-  { href: '/admin/coupons', label: 'Coupons', icon: Ticket, soon: true },
+  { href: '/admin/coupons', label: 'Coupons', icon: Ticket },
   { href: '/admin/flash-sales', label: 'Flash sales', icon: Zap, soon: true },
   { href: '/admin/settings', label: 'Settings', icon: SettingsIcon },
 ];
