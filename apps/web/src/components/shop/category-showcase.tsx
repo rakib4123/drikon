@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { ArrowUpRight, Cpu, Shirt, Sofa, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Laptop, Cpu, Keyboard, Zap } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 interface Tile {
@@ -18,34 +18,34 @@ interface Tile {
 
 const TILES: Tile[] = [
   {
-    title: 'Electronics',
-    blurb: 'Audio, wearables, and the gear that keeps up.',
-    href: '/products?category=electronics',
-    icon: <Cpu className="w-5 h-5" />,
+    title: 'Laptops & PCs',
+    blurb: 'Laptops, desktops, workstations, and mini PCs.',
+    href: '/products?category=laptops-pcs',
+    icon: <Laptop className="w-5 h-5" />,
     span: 'sm:col-span-2 sm:row-span-2',
     gradient: 'from-orange-500/20 to-amber-500/5',
   },
   {
-    title: 'Fashion',
-    blurb: 'Edited essentials, not fast fashion.',
-    href: '/products?category=fashion',
-    icon: <Shirt className="w-5 h-5" />,
+    title: 'Components',
+    blurb: 'CPUs, GPUs, motherboards, memory & storage.',
+    href: '/products?category=components',
+    icon: <Cpu className="w-5 h-5" />,
     span: '',
     gradient: 'from-amber-500/20 to-orange-500/5',
   },
   {
-    title: 'Home & Living',
-    blurb: 'Objects worth keeping.',
-    href: '/products?category=home-living',
-    icon: <Sofa className="w-5 h-5" />,
+    title: 'Peripherals',
+    blurb: 'Keyboards, mice, monitors, and headsets.',
+    href: '/products?category=peripherals',
+    icon: <Keyboard className="w-5 h-5" />,
     span: '',
     gradient: 'from-orange-600/20 to-red-500/5',
   },
   {
-    title: 'Featured',
-    blurb: 'This week’s hand-picked drop.',
+    title: "Today's deals",
+    blurb: 'Hand-picked tech on sale this week.',
     href: '/products?featured=true',
-    icon: <Sparkles className="w-5 h-5" />,
+    icon: <Zap className="w-5 h-5" />,
     span: 'sm:col-span-2',
     gradient: 'from-slate-500/20 to-orange-500/5',
   },

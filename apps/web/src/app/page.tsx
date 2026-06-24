@@ -32,21 +32,21 @@ export default async function HomePage() {
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-xs font-medium mb-6 animate-fade-up shadow-[0_0_24px_-8px_var(--glow)]">
               <Sparkles className="w-3.5 h-3.5 text-[color:var(--accent)]" />
-              <span>New: Aurelis Aether Pro is here</span>
+              <span>Genuine parts · Official warranty</span>
             </div>
 
             <h1 className="display text-5xl md:text-7xl lg:text-8xl animate-fade-up" style={{ animationDelay: '120ms' }}>
-              See it.<br />
+              Build it.<br />
               <span className="bg-gradient-to-r from-[#ef6a20] via-[#f9822f] to-[#14233f] bg-clip-text text-transparent">
-                Want it.
+                Power it.
               </span>
               <br />
-              Get it.
+              Game on.
             </h1>
 
             <p className="mt-6 max-w-xl text-lg text-[color:var(--fg-muted)] animate-fade-up" style={{ animationDelay: '240ms' }}>
-              {brandName} is a marketplace curated around taste — not algorithms. Every product is hand-picked,
-              every price is fair, every delivery is tracked end-to-end.
+              {brandName} is your one-stop tech shop — laptops, PC components, and peripherals
+              from the brands you trust, with genuine warranty and fast nationwide delivery.
             </p>
 
             <div className="mt-10 flex flex-wrap gap-3 animate-fade-up" style={{ animationDelay: '360ms' }}>
@@ -70,10 +70,10 @@ export default async function HomePage() {
       {/* ─── FEATURE STRIP ─── */}
       <section className="border-y border-[color:var(--border)] bg-[color:var(--bg-soft)]/30">
         <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-8">
-          <Feature icon={<ShieldCheck className="w-5 h-5" />} title="Buyer protection" body="Refund guarantee on every order" />
-          <Feature icon={<Truck className="w-5 h-5" />} title="Tracked delivery" body="End-to-end visibility in real time" />
-          <Feature icon={<Headphones className="w-5 h-5" />} title="Real humans" body="Support in your timezone" />
-          <Feature icon={<Sparkles className="w-5 h-5" />} title="Curated only" body="Edited by people, not robots" />
+          <Feature icon={<ShieldCheck className="w-5 h-5" />} title="100% genuine" body="Authentic products, official warranty" />
+          <Feature icon={<Truck className="w-5 h-5" />} title="Fast delivery" body="Tracked, nationwide shipping" />
+          <Feature icon={<Headphones className="w-5 h-5" />} title="Expert support" body="Real techs who know the gear" />
+          <Feature icon={<Sparkles className="w-5 h-5" />} title="Best prices" body="Fair pricing, regular deals" />
         </div>
       </section>
 
@@ -112,11 +112,11 @@ export default async function HomePage() {
         <Reveal className="relative overflow-hidden rounded-3xl bg-drikon-gradient p-10 md:p-16 text-white grain">
           <div className="relative z-10 max-w-2xl">
             <h3 className="display text-3xl md:text-5xl">
-              The marketplace, redrawn.
+              Build your dream setup.
             </h3>
             <p className="mt-4 text-white/80 max-w-lg">
-              {brandName} is built by engineers obsessed with craft — type-safe end to end, secure by default,
-              fast everywhere. Open source, opinionated, and shipping today.
+              From the first boot to the last frame — {brandName} stocks the components, laptops, and
+              peripherals to build, upgrade, and power your rig. Genuine gear, expert advice.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/register" className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-[#06070d] font-semibold hover:bg-white/90 transition-colors">

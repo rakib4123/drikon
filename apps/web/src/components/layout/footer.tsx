@@ -19,9 +19,9 @@ export function Footer({ brand }: { brand: BrandInfo }) {
           <div className="text-sm font-semibold mb-3">Shop</div>
           <ul className="space-y-2 text-sm text-[color:var(--fg-muted)]">
             <li><Link href="/products" className="hover:text-[color:var(--fg)]">All products</Link></li>
-            <li><Link href="/products?featured=true" className="hover:text-[color:var(--fg)]">Featured</Link></li>
-            <li><Link href="/products?category=electronics" className="hover:text-[color:var(--fg)]">Electronics</Link></li>
-            <li><Link href="/products?category=fashion" className="hover:text-[color:var(--fg)]">Fashion</Link></li>
+            <li><Link href="/products?category=laptops-pcs" className="hover:text-[color:var(--fg)]">Laptops &amp; PCs</Link></li>
+            <li><Link href="/products?category=components" className="hover:text-[color:var(--fg)]">Components</Link></li>
+            <li><Link href="/products?category=peripherals" className="hover:text-[color:var(--fg)]">Peripherals</Link></li>
           </ul>
         </div>
       </div>
