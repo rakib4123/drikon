@@ -8,8 +8,10 @@ import { useAuthStore, useIsAdmin } from '@/store/auth-store';
 import { useCartStore } from '@/store/cart-store';
 import { useWishlistStore } from '@/store/wishlist-store';
 import { SearchCommand } from '@/components/shop/search-command';
+import { BrandMark } from '@/components/layout/brand-mark';
+import type { BrandInfo } from '@/lib/settings';
 
-export function Navbar() {
+export function Navbar({ brand }: { brand: BrandInfo }) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const user = useAuthStore((s) => s.user);
@@ -34,17 +36,7 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-40 backdrop-blur-xl bg-[color:var(--bg)]/70 border-b border-[color:var(--border)]">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group">
-          <span
-            className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#e2683c] to-[#f0a830]
-                       grid place-items-center text-white font-bold shadow-lg shadow-[#e2683c]/30
-                       transition-transform group-hover:scale-110"
-            aria-hidden
-          >
-            দ
-          </span>
-          <span className="font-display text-xl tracking-tight">Drikon</span>
-        </Link>
+        <BrandMark brand={brand} />
 
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
           <Link href="/products" className="hover:text-[color:var(--accent)] transition-colors">

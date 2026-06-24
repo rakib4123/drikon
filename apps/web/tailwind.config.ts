@@ -20,13 +20,10 @@ const config: Config = {
           900: '#16192a',
           950: '#0c0e1a',
         },
-        terracotta: {
-          DEFAULT: '#e2683c',
-          deep:    '#3d1e0a',
-        },
-        amber: {
-          DEFAULT: '#f0a830',
-          glow:    '#f7c052',
+        electric: {
+          cyan:   '#22d3ee',
+          violet: '#a855f7',
+          deep:   '#06070d',
         },
       },
       fontFamily: {
@@ -36,9 +33,9 @@ const config: Config = {
         mono:    ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       backgroundImage: {
-        'drikon-gradient': 'linear-gradient(135deg, #3d1e0a 0%, #e2683c 50%, #f0a830 100%)',
+        'drikon-gradient': 'linear-gradient(135deg, #0e7490 0%, #22d3ee 45%, #a855f7 100%)',
         'drikon-mesh':
-          'radial-gradient(at 20% 10%, rgba(226,104,60,0.18) 0px, transparent 50%), radial-gradient(at 80% 90%, rgba(240,168,48,0.18) 0px, transparent 50%)',
+          'radial-gradient(at 18% 12%, rgba(34,211,238,0.16) 0px, transparent 50%), radial-gradient(at 82% 88%, rgba(168,85,247,0.16) 0px, transparent 50%)',
       },
       keyframes: {
         'fade-up': {

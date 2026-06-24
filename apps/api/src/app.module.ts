@@ -14,6 +14,7 @@ import { BrandsModule } from './modules/brands/brands.module';
 import { WishlistModule } from './modules/wishlist/wishlist.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { OrdersModule } from './modules/orders/orders.module';
+import { SettingsModule } from './modules/settings/settings.module';
 import { HealthModule } from './modules/health/health.module';
 import { MailModule } from './modules/mail/mail.module';
 
@@ -71,6 +72,7 @@ import { MailModule } from './modules/mail/mail.module';
     WishlistModule,
     ReviewsModule,
     OrdersModule,
+    SettingsModule,
     HealthModule,
   ],
   providers: [

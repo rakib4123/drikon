@@ -6,6 +6,7 @@ import { ProductGrid } from '@/components/shop/product-grid';
 import { CategoryShowcase } from '@/components/shop/category-showcase';
 import { Reveal } from '@/components/ui/reveal';
 import { apiGet } from '@/lib/api-client';
+import { getSettings } from '@/lib/settings';
 import type { ProductListResponse } from '@drikon/shared-types';
 
 // Fetch on the server — RSC means no API key/token leaks to client.
@@ -18,7 +19,8 @@ async function getFeatured(): Promise<ProductListResponse | null> {
 }
 
 export default async function HomePage() {
-  const featured = await getFeatured();
+  const [featured, settings] = await Promise.all([getFeatured(), getSettings()]);
+  const brandName = settings.siteName;
 
   return (
     <>
@@ -34,7 +36,7 @@ export default async function HomePage() {
 
             <h1 className="display text-5xl md:text-7xl lg:text-8xl animate-fade-up" style={{ animationDelay: '120ms' }}>
               See it.<br />
-              <span className="bg-gradient-to-r from-[#e2683c] via-[#e87b46] to-[#f0a830] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#22d3ee] via-[#5cc8ea] to-[#a855f7] bg-clip-text text-transparent">
                 Want it.
               </span>
               <br />
@@ -42,7 +44,7 @@ export default async function HomePage() {
             </h1>
 
             <p className="mt-6 max-w-xl text-lg text-[color:var(--fg-muted)] animate-fade-up" style={{ animationDelay: '240ms' }}>
-              Drikon is a marketplace curated around taste — not algorithms. Every product is hand-picked,
+              {brandName} is a marketplace curated around taste — not algorithms. Every product is hand-picked,
               every price is fair, every delivery is tracked end-to-end.
             </p>
 
@@ -58,7 +60,7 @@ export default async function HomePage() {
 
           {/* Asymmetric decoration */}
           <div
-            className="hidden md:block absolute right-[-80px] top-24 w-[420px] h-[420px] rounded-full bg-gradient-to-br from-[#e2683c]/30 to-[#f0a830]/20 blur-3xl"
+            className="hidden md:block absolute right-[-80px] top-24 w-[420px] h-[420px] rounded-full bg-gradient-to-br from-[#22d3ee]/30 to-[#a855f7]/20 blur-3xl"
             aria-hidden
           />
         </div>
@@ -109,11 +111,11 @@ export default async function HomePage() {
               The marketplace, redrawn.
             </h3>
             <p className="mt-4 text-white/80 max-w-lg">
-              Drikon is built by engineers obsessed with craft — type-safe end to end, secure by default,
+              {brandName} is built by engineers obsessed with craft — type-safe end to end, secure by default,
               fast everywhere. Open source, opinionated, and shipping today.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/register" className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-[#3d1e0a] font-semibold hover:bg-white/90 transition-colors">
+              <Link href="/register" className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-[#06070d] font-semibold hover:bg-white/90 transition-colors">
                 Create your account <ArrowRight className="w-4 h-4" />
               </Link>
             </div>

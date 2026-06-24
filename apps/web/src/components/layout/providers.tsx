@@ -4,8 +4,16 @@ import { ThemeProvider } from 'next-themes';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Toaster } from 'sonner';
+import type { SiteSettings } from '@drikon/shared-types';
+import { SettingsProvider } from '@/components/layout/settings-context';
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({
+  children,
+  settings,
+}: {
+  children: React.ReactNode;
+  settings: SiteSettings;
+}) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -25,7 +33,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <SettingsProvider settings={settings}>
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      </SettingsProvider>
       <Toaster
         theme="system"
         position="bottom-right"
