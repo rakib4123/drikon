@@ -9,9 +9,11 @@ import { useCartStore } from '@/store/cart-store';
 import { useWishlistStore } from '@/store/wishlist-store';
 import { SearchCommand } from '@/components/shop/search-command';
 import { BrandMark } from '@/components/layout/brand-mark';
+import { MegaMenu } from '@/components/layout/mega-menu';
 import type { BrandInfo } from '@/lib/settings';
+import type { NavCategory } from '@/lib/catalog';
 
-export function Navbar({ brand }: { brand: BrandInfo }) {
+export function Navbar({ brand, categories }: { brand: BrandInfo; categories: NavCategory[] }) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const user = useAuthStore((s) => s.user);
@@ -39,17 +41,12 @@ export function Navbar({ brand }: { brand: BrandInfo }) {
         <BrandMark brand={brand} />
 
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-          <Link href="/products" className="hover:text-[color:var(--accent)] transition-colors">
-            Shop
-          </Link>
+          <MegaMenu categories={categories} />
           <Link href="/products?featured=true" className="hover:text-[color:var(--accent)] transition-colors">
             Featured
           </Link>
-          <Link href="/products?category=electronics" className="hover:text-[color:var(--accent)] transition-colors">
-            Electronics
-          </Link>
-          <Link href="/products?category=fashion" className="hover:text-[color:var(--accent)] transition-colors">
-            Fashion
+          <Link href="/products" className="hover:text-[color:var(--accent)] transition-colors">
+            All products
           </Link>
           {isAdmin && (
             <Link href="/admin" className="text-[color:var(--accent)] hover:underline transition-colors">

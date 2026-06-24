@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from 'next';
 import '../styles/globals.css';
 import { Providers } from '@/components/layout/providers';
+import { TopBar } from '@/components/layout/top-bar';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { getSettings } from '@/lib/settings';
+import { getCategories } from '@/lib/catalog';
 
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();
@@ -34,7 +36,7 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const s = await getSettings();
+  const [s, categories] = await Promise.all([getSettings(), getCategories()]);
   const brand = { siteName: s.siteName, logoUrl: s.logoUrl ?? null, tagline: s.tagline ?? null };
 
   // Runtime accent override from admin branding — applies across light + dark.
@@ -48,7 +50,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="min-h-screen flex flex-col">
         {accentCss && <style dangerouslySetInnerHTML={{ __html: accentCss }} />}
         <Providers settings={s}>
-          <Navbar brand={brand} />
+          <TopBar supportEmail={s.supportEmail} facebook={s.socialFacebook} instagram={s.socialInstagram} />
+          <Navbar brand={brand} categories={categories} />
           <main className="flex-1">{children}</main>
           <Footer brand={brand} />
         </Providers>

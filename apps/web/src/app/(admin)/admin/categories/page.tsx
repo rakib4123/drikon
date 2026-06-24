@@ -15,8 +15,8 @@ interface Category {
   _count: { products: number };
 }
 
-type Draft = { name: string; slug: string; description: string; imageUrl: string };
-const EMPTY: Draft = { name: '', slug: '', description: '', imageUrl: '' };
+type Draft = { name: string; slug: string; description: string; imageUrl: string; parentId: string };
+const EMPTY: Draft = { name: '', slug: '', description: '', imageUrl: '', parentId: '' };
 
 export default function AdminCategoriesPage() {
   const [items, setItems] = useState<Category[]>([]);
@@ -40,7 +40,7 @@ export default function AdminCategoriesPage() {
 
   const startEdit = (c: Category) => {
     setEditingId(c.id);
-    setDraft({ name: c.name, slug: c.slug, description: c.description ?? '', imageUrl: c.imageUrl ?? '' });
+    setDraft({ name: c.name, slug: c.slug, description: c.description ?? '', imageUrl: c.imageUrl ?? '', parentId: c.parentId ?? '' });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   const reset = () => {
@@ -57,6 +57,7 @@ export default function AdminCategoriesPage() {
       slug: draft.slug.trim() || undefined,
       description: draft.description.trim(),
       imageUrl: draft.imageUrl.trim(),
+      parentId: draft.parentId,
     };
     try {
       if (editingId) {
@@ -105,6 +106,16 @@ export default function AdminCategoriesPage() {
           </div>
           <input className="input" placeholder="Name" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
           <input className="input font-mono text-xs" placeholder="slug (optional)" value={draft.slug} onChange={(e) => setDraft({ ...draft, slug: e.target.value })} />
+          <select className="input" value={draft.parentId} onChange={(e) => setDraft({ ...draft, parentId: e.target.value })}>
+            <option value="">No parent (top level)</option>
+            {items
+              .filter((c) => c.id !== editingId && !c.parentId)
+              .map((c) => (
+                <option key={c.id} value={c.id}>
+                  Under: {c.name}
+                </option>
+              ))}
+          </select>
           <textarea className="input" rows={2} placeholder="Description (optional)" value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} />
           <input className="input text-xs" placeholder="Image URL (optional)" value={draft.imageUrl} onChange={(e) => setDraft({ ...draft, imageUrl: e.target.value })} />
           <button type="submit" disabled={saving} className="btn-primary w-full">
