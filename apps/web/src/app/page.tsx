@@ -5,9 +5,11 @@ import { ArrowRight, Sparkles, ShieldCheck, Truck, Headphones } from 'lucide-rea
 import { ProductGrid } from '@/components/shop/product-grid';
 import { CategoryShowcase } from '@/components/shop/category-showcase';
 import { FlashSaleSection } from '@/components/shop/flash-sale-section';
+import { HeroSlider } from '@/components/shop/hero-slider';
 import { Reveal } from '@/components/ui/reveal';
 import { apiGet } from '@/lib/api-client';
 import { getSettings } from '@/lib/settings';
+import { getBanners } from '@/lib/banners';
 import type { ProductListResponse } from '@drikon/shared-types';
 
 // Fetch on the server — RSC means no API key/token leaks to client.
@@ -20,12 +22,15 @@ async function getFeatured(): Promise<ProductListResponse | null> {
 }
 
 export default async function HomePage() {
-  const [featured, settings] = await Promise.all([getFeatured(), getSettings()]);
+  const [featured, settings, banners] = await Promise.all([getFeatured(), getSettings(), getBanners()]);
   const brandName = settings.siteName;
 
   return (
     <>
-      {/* ─── HERO ─── */}
+      {/* ─── HERO: admin-managed slider, with the static hero as fallback ─── */}
+      {banners.length > 0 ? (
+        <HeroSlider slides={banners} />
+      ) : (
       <section className="relative overflow-hidden grain aurora grid-overlay">
         <div className="absolute inset-0 bg-drikon-mesh" aria-hidden />
         <div className="relative z-10 max-w-7xl mx-auto px-6 pt-20 pb-28 md:pt-32 md:pb-40">
@@ -66,6 +71,7 @@ export default async function HomePage() {
           />
         </div>
       </section>
+      )}
 
       {/* ─── FEATURE STRIP ─── */}
       <section className="border-y border-[color:var(--border)] bg-[color:var(--bg-soft)]/30">
