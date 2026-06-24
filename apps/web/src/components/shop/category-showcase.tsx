@@ -23,7 +23,7 @@ const TILES: Tile[] = [
     href: '/products?category=electronics',
     icon: <Cpu className="w-5 h-5" />,
     span: 'sm:col-span-2 sm:row-span-2',
-    gradient: 'from-cyan-500/25 to-blue-500/10',
+    gradient: 'from-blue-500/20 to-sky-500/5',
   },
   {
     title: 'Fashion',
@@ -31,7 +31,7 @@ const TILES: Tile[] = [
     href: '/products?category=fashion',
     icon: <Shirt className="w-5 h-5" />,
     span: '',
-    gradient: 'from-violet-500/25 to-fuchsia-500/10',
+    gradient: 'from-indigo-500/20 to-blue-500/5',
   },
   {
     title: 'Home & Living',
@@ -39,7 +39,7 @@ const TILES: Tile[] = [
     href: '/products?category=home-living',
     icon: <Sofa className="w-5 h-5" />,
     span: '',
-    gradient: 'from-sky-500/25 to-cyan-500/10',
+    gradient: 'from-sky-500/20 to-cyan-500/5',
   },
   {
     title: 'Featured',
@@ -47,7 +47,7 @@ const TILES: Tile[] = [
     href: '/products?featured=true',
     icon: <Sparkles className="w-5 h-5" />,
     span: 'sm:col-span-2',
-    gradient: 'from-fuchsia-500/25 to-violet-500/10',
+    gradient: 'from-slate-500/20 to-blue-500/5',
   },
 ];
 
@@ -73,7 +73,7 @@ export function CategoryShowcase() {
           >
             <Link
               href={tile.href}
-              className="group relative h-full w-full overflow-hidden rounded-2xl border border-[color:var(--border)] glass p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:border-[color:var(--accent)] hover:shadow-[0_24px_60px_-30px_rgba(34,211,238,0.45)]"
+              className="group relative h-full w-full overflow-hidden rounded-2xl border border-[color:var(--border)] glass p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:border-[color:var(--accent)] hover:shadow-[0_24px_60px_-30px_rgba(37,99,235,0.45)]"
             >
               {/* Hover gradient wash */}
               <div

@@ -32,7 +32,7 @@ export function Providers({
       }),
   );
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
       <SettingsProvider settings={settings}>
         <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
       </SettingsProvider>

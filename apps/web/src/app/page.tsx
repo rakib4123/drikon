@@ -37,7 +37,7 @@ export default async function HomePage() {
 
             <h1 className="display text-5xl md:text-7xl lg:text-8xl animate-fade-up" style={{ animationDelay: '120ms' }}>
               See it.<br />
-              <span className="bg-gradient-to-r from-[#22d3ee] via-[#5cc8ea] to-[#a855f7] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#2563eb] via-[#3b82f6] to-[#1e3a8a] bg-clip-text text-transparent">
                 Want it.
               </span>
               <br />
@@ -61,7 +61,7 @@ export default async function HomePage() {
 
           {/* Asymmetric decoration */}
           <div
-            className="hidden md:block absolute right-[-80px] top-24 w-[420px] h-[420px] rounded-full bg-gradient-to-br from-[#22d3ee]/30 to-[#a855f7]/20 blur-3xl"
+            className="hidden md:block absolute right-[-80px] top-24 w-[420px] h-[420px] rounded-full bg-gradient-to-br from-[#2563eb]/30 to-[#1e3a8a]/20 blur-3xl"
             aria-hidden
           />
         </div>

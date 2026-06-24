@@ -108,7 +108,7 @@ export default function AdminSettingsPage() {
         <section className="card space-y-5">
           <h2 className="font-semibold">Theme accent</h2>
           <p className="text-xs text-[color:var(--fg-muted)] -mt-3">
-            Overrides the neon accent across the whole storefront.
+            Overrides the accent colour across the whole storefront.
           </p>
           <div className="grid sm:grid-cols-2 gap-5">
             <ColorField
@@ -184,12 +184,12 @@ function ColorField({
       <div className="flex items-center gap-2">
         <input
           type="color"
-          value={/^#[0-9a-fA-F]{6}$/.test(value ?? '') ? value : '#22d3ee'}
+          value={/^#[0-9a-fA-F]{6}$/.test(value ?? '') ? value : '#2563eb'}
           onChange={(e) => onPick(e.target.value)}
           className="w-10 h-10 rounded-lg border border-[color:var(--border)] bg-transparent cursor-pointer shrink-0"
           aria-label={`${label} colour picker`}
         />
-        <input className="input font-mono" placeholder="#22d3ee" {...register} />
+        <input className="input font-mono" placeholder="#2563eb" {...register} />
       </div>
       {error && <span className="block text-xs text-red-400 mt-1">{error}</span>}
     </label>
