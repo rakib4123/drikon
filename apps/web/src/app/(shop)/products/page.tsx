@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { apiGet } from '@/lib/api-client';
-import { ProductCard } from '@/components/shop/product-card';
+import { ProductGrid } from '@/components/shop/product-grid';
 import type { ProductListResponse } from '@drikon/shared-types';
 
 interface PageProps {
@@ -73,11 +73,10 @@ export default async function ProductsPage({ searchParams }: PageProps) {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {data.items.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
+          <ProductGrid
+            products={data.items}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          />
 
           {data.pagination.totalPages > 1 && (
             <div className="mt-12 flex items-center justify-center gap-2">
