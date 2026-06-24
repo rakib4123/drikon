@@ -1,9 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
-import { Moon, Sun, ShoppingBag, User, Heart } from 'lucide-react';
+import { ShoppingBag, User, Heart } from 'lucide-react';
 import { useAuthStore, useIsAdmin } from '@/store/auth-store';
 import { useCartStore } from '@/store/cart-store';
 import { useWishlistStore } from '@/store/wishlist-store';
@@ -14,7 +13,6 @@ import type { BrandInfo } from '@/lib/settings';
 import type { NavCategory } from '@/lib/catalog';
 
 export function Navbar({ brand, categories }: { brand: BrandInfo; categories: NavCategory[] }) {
-  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const user = useAuthStore((s) => s.user);
   const isAdmin = useIsAdmin();
@@ -57,17 +55,6 @@ export function Navbar({ brand, categories }: { brand: BrandInfo; categories: Na
 
         <div className="flex items-center gap-2">
           <SearchCommand />
-
-          {mounted && (
-            <button
-              type="button"
-              aria-label="Toggle theme"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="p-2 rounded-lg hover:bg-[color:var(--bg-soft)] transition-colors"
-            >
-              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
-          )}
 
           <Link
             href="/wishlist"

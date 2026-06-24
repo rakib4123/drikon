@@ -20,21 +20,6 @@
   --shadow:    rgba(20,35,63,0.08);
 }
 
-.dark {
-  --bg:        #0c1322;
-  --bg-soft:   #141d30;
-  --fg:        #e9edf4;
-  --fg-muted:  #95a1b6;
-  --border:    #25304a;
-  --accent:    #f9822f;
-  --accent-2:  #f5a524;
-  --ring:      #f9822f;
-  --glow:      rgba(249,130,47,0.24);
-  --glass:     rgba(20,29,48,0.80);
-  --grid-line: rgba(149,161,182,0.06);
-  --shadow:    rgba(0,0,0,0.4);
-}
-
 * { border-color: var(--border); }
 
 html, body {

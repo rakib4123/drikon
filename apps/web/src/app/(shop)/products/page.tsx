@@ -57,9 +57,9 @@ export default async function ProductsPage({ searchParams }: PageProps) {
       {/* ─── Quick category chips ─── */}
       <div className="flex flex-wrap gap-2 mb-10">
         <CategoryChip active={!currentCategory} href="/products">All</CategoryChip>
-        <CategoryChip active={currentCategory === 'electronics'} href="/products?category=electronics">Electronics</CategoryChip>
-        <CategoryChip active={currentCategory === 'fashion'} href="/products?category=fashion">Fashion</CategoryChip>
-        <CategoryChip active={currentCategory === 'home-living'} href="/products?category=home-living">Home & Living</CategoryChip>
+        <CategoryChip active={currentCategory === 'laptops-pcs'} href="/products?category=laptops-pcs">Laptops &amp; PCs</CategoryChip>
+        <CategoryChip active={currentCategory === 'components'} href="/products?category=components">Components</CategoryChip>
+        <CategoryChip active={currentCategory === 'peripherals'} href="/products?category=peripherals">Peripherals</CategoryChip>
       </div>
 
       {error ? (
