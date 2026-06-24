@@ -25,11 +25,11 @@ export default async function HomePage() {
   return (
     <>
       {/* ─── HERO ─── */}
-      <section className="relative overflow-hidden grain">
+      <section className="relative overflow-hidden grain aurora grid-overlay">
         <div className="absolute inset-0 bg-drikon-mesh" aria-hidden />
-        <div className="relative max-w-7xl mx-auto px-6 pt-20 pb-28 md:pt-32 md:pb-40">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 pt-20 pb-28 md:pt-32 md:pb-40">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[color:var(--border)] bg-[color:var(--bg-soft)]/70 backdrop-blur-sm text-xs font-medium mb-6 animate-fade-up">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-xs font-medium mb-6 animate-fade-up shadow-[0_0_24px_-8px_var(--glow)]">
               <Sparkles className="w-3.5 h-3.5 text-[color:var(--accent-2)]" />
               <span>New: Aurelis Aether Pro is here</span>
             </div>
