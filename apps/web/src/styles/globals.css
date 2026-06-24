@@ -6,32 +6,32 @@
    Clean, light-first, trustworthy. --accent / --accent-2 are overridable
    at runtime by the brand settings. */
 :root {
-  --bg:        #f4f6fb;
+  --bg:        #f5f6f9;
   --bg-soft:   #ffffff;
-  --fg:        #0f172a;
-  --fg-muted:  #64748b;
-  --border:    #e2e8f0;
-  --accent:    #2563eb;
-  --accent-2:  #1e3a8a;
-  --ring:      #2563eb;
-  --glow:      rgba(37,99,235,0.18);
+  --fg:        #14233f;
+  --fg-muted:  #5c6678;
+  --border:    #e3e6ec;
+  --accent:    #ef6a20;
+  --accent-2:  #f5a524;
+  --ring:      #ef6a20;
+  --glow:      rgba(239,106,32,0.20);
   --glass:     rgba(255,255,255,0.82);
-  --grid-line: rgba(15,23,42,0.04);
-  --shadow:    rgba(15,23,42,0.08);
+  --grid-line: rgba(20,35,63,0.04);
+  --shadow:    rgba(20,35,63,0.08);
 }
 
 .dark {
-  --bg:        #0b1220;
-  --bg-soft:   #131c2e;
-  --fg:        #e6ebf5;
-  --fg-muted:  #94a3b8;
-  --border:    #243049;
-  --accent:    #3b82f6;
-  --accent-2:  #60a5fa;
-  --ring:      #3b82f6;
-  --glow:      rgba(59,130,246,0.22);
-  --glass:     rgba(19,28,46,0.78);
-  --grid-line: rgba(148,163,184,0.06);
+  --bg:        #0c1322;
+  --bg-soft:   #141d30;
+  --fg:        #e9edf4;
+  --fg-muted:  #95a1b6;
+  --border:    #25304a;
+  --accent:    #f9822f;
+  --accent-2:  #f5a524;
+  --ring:      #f9822f;
+  --glow:      rgba(249,130,47,0.24);
+  --glass:     rgba(20,29,48,0.80);
+  --grid-line: rgba(149,161,182,0.06);
   --shadow:    rgba(0,0,0,0.4);
 }
 

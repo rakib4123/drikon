@@ -184,12 +184,12 @@ function ColorField({
       <div className="flex items-center gap-2">
         <input
           type="color"
-          value={/^#[0-9a-fA-F]{6}$/.test(value ?? '') ? value : '#2563eb'}
+          value={/^#[0-9a-fA-F]{6}$/.test(value ?? '') ? value : '#ef6a20'}
           onChange={(e) => onPick(e.target.value)}
           className="w-10 h-10 rounded-lg border border-[color:var(--border)] bg-transparent cursor-pointer shrink-0"
           aria-label={`${label} colour picker`}
         />
-        <input className="input font-mono" placeholder="#2563eb" {...register} />
+        <input className="input font-mono" placeholder="#ef6a20" {...register} />
       </div>
       {error && <span className="block text-xs text-red-400 mt-1">{error}</span>}
     </label>
