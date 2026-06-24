@@ -6,7 +6,7 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-6 py-14 grid gap-10 md:grid-cols-3">
         <div className="md:col-span-2">
           <div className="flex items-center gap-2 mb-3">
-            <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-500 grid place-items-center text-white font-bold">দ</span>
+            <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#e2683c] to-[#f0a830] grid place-items-center text-white font-bold">দ</span>
             <span className="font-display text-xl">Drikon</span>
           </div>
           <p className="text-sm text-[color:var(--fg-muted)] max-w-sm">

@@ -1,26 +1,26 @@
 @import 'tailwindcss';
 
-/* ─── Drikon design tokens ─── */
+/* ─── Drikon design tokens — warm editorial (amber & terracotta) ─── */
 :root {
-  --bg:        #ffffff;
-  --bg-soft:   #f5f6fa;
-  --fg:        #0c0e1a;
-  --fg-muted:  #4d5572;
-  --border:    #e6e8ee;
-  --accent:    #6366f1;
-  --accent-2:  #06b6d4;
-  --ring:      #6366f1;
+  --bg:        #fdfaf5;
+  --bg-soft:   #f4ece1;
+  --fg:        #1c1408;
+  --fg-muted:  #6b5d4d;
+  --border:    #e8dccb;
+  --accent:    #d2552a;
+  --accent-2:  #d9941a;
+  --ring:      #d2552a;
 }
 
 .dark {
-  --bg:        #0c0e1a;
-  --bg-soft:   #16192a;
-  --fg:        #e6e8ee;
-  --fg-muted:  #8590a8;
-  --border:    #232842;
-  --accent:    #818cf8;
-  --accent-2:  #22d3ee;
-  --ring:      #818cf8;
+  --bg:        #14100c;
+  --bg-soft:   #1f1813;
+  --fg:        #f3ede4;
+  --fg-muted:  #ab9a8a;
+  --border:    #2e2519;
+  --accent:    #e2683c;
+  --accent-2:  #f0a830;
+  --ring:      #e2683c;
 }
 
 * { border-color: var(--border); }
@@ -73,12 +73,12 @@ html, body {
   gap: 0.5rem;
   padding: 0.7rem 1.3rem;
   border-radius: 12px;
-  background: linear-gradient(135deg, #6366f1, #06b6d4);
+  background: linear-gradient(135deg, #e2683c, #f0a830);
   color: white;
   font-weight: 600;
   font-size: 0.95rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-  box-shadow: 0 10px 30px -10px rgba(99,102,241,0.5);
+  box-shadow: 0 10px 30px -10px rgba(226,104,60,0.5);
 }
 .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.05); }
 .btn-primary:active { transform: translateY(0); }
@@ -106,7 +106,7 @@ html, body {
 .card:hover {
   transform: translateY(-3px);
   border-color: var(--accent);
-  box-shadow: 0 14px 40px -20px rgba(99,102,241,0.3);
+  box-shadow: 0 14px 40px -20px rgba(226,104,60,0.3);
 }
 
 /* ─── Display heading ─── */
