@@ -6,6 +6,7 @@ import { apiGet, ApiError } from '@/lib/api-client';
 import { ProductGrid } from '@/components/shop/product-grid';
 import { AddToCart } from '@/components/shop/add-to-cart';
 import { WishlistButton } from '@/components/shop/wishlist-button';
+import { CompareButton } from '@/components/shop/compare-button';
 import { ProductReviews } from '@/components/shop/product-reviews';
 import { formatPrice } from '@/lib/utils';
 import type { ProductSummary } from '@drikon/shared-types';
@@ -172,6 +173,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
               variant="inline"
               className="self-start"
             />
+            <CompareButton product={product} variant="inline" className="self-start" />
           </div>
 
           {/* Trust signals */}

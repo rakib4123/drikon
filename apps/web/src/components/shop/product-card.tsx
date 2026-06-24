@@ -8,6 +8,7 @@ import type { ProductSummary } from '@drikon/shared-types';
 import { formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/store/cart-store';
 import { WishlistButton } from './wishlist-button';
+import { CompareButton } from './compare-button';
 
 export function ProductCard({ product }: { product: ProductSummary }) {
   const add = useCartStore((s) => s.add);
@@ -51,6 +52,11 @@ export function ProductCard({ product }: { product: ProductSummary }) {
           productName={product.name}
           variant="overlay"
           className="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 aria-[pressed=true]:opacity-100 transition-opacity"
+        />
+        <CompareButton
+          product={product}
+          variant="overlay"
+          className="absolute top-[3.4rem] right-2.5 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 aria-[pressed=true]:opacity-100 transition-opacity"
         />
       </div>
 
