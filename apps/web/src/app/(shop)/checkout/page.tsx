@@ -197,7 +197,7 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={() => { setCoupon(null); setCouponInput(''); }}
-                  className="text-[color:var(--fg-muted)] hover:text-red-400"
+                  className="text-[color:var(--fg-muted)] hover:text-red-600"
                   aria-label="Remove coupon"
                 >
                   <X className="w-3.5 h-3.5" />
@@ -256,7 +256,7 @@ function Field({
     <label className="block">
       <span className="block text-xs font-medium text-[color:var(--fg-muted)] mb-1.5">{label}</span>
       {children}
-      {error && <span className="block text-xs text-red-400 mt-1">{error}</span>}
+      {error && <span className="block text-xs text-red-600 mt-1">{error}</span>}
     </label>
   );
 }

@@ -242,7 +242,7 @@ export function ProductReviews({
                           {r.user.name}
                           {r.isVerified && (
                             <span
-                              className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-emerald-500"
+                              className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-emerald-600"
                               title="Verified purchase"
                             >
                               <BadgeCheck className="w-3.5 h-3.5" /> Verified

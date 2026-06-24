@@ -97,7 +97,7 @@ export default function RegisterPage() {
               />
               <ul className="mt-2 grid grid-cols-2 gap-1 text-xs">
                 {rules.map((r) => (
-                  <li key={r.label} className={`flex items-center gap-1 ${r.ok ? 'text-[color:var(--accent-2)]' : 'text-[color:var(--fg-muted)]'}`}>
+                  <li key={r.label} className={`flex items-center gap-1 ${r.ok ? 'text-emerald-600' : 'text-[color:var(--fg-muted)]'}`}>
                     <Check className={`w-3 h-3 ${r.ok ? 'opacity-100' : 'opacity-30'}`} />
                     {r.label}
                   </li>
@@ -106,7 +106,7 @@ export default function RegisterPage() {
             </Field>
 
             {serverError && (
-              <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-sm text-red-400">
+              <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-sm text-red-600">
                 {serverError}
               </div>
             )}
@@ -148,7 +148,7 @@ function Field({ label, error, children }: { label: string; error?: string; chil
     <label className="block">
       <span className="block text-sm font-medium mb-1.5">{label}</span>
       {children}
-      {error && <span className="block text-xs text-red-400 mt-1">{error}</span>}
+      {error && <span className="block text-xs text-red-600 mt-1">{error}</span>}
     </label>
   );
 }

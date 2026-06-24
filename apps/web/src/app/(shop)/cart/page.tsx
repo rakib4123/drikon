@@ -54,7 +54,7 @@ export default function CartPage() {
                       <Plus className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                  <button type="button" onClick={() => remove(item.productId, item.variantId)} className="text-xs text-[color:var(--fg-muted)] hover:text-red-400 inline-flex items-center gap-1">
+                  <button type="button" onClick={() => remove(item.productId, item.variantId)} className="text-xs text-[color:var(--fg-muted)] hover:text-red-600 inline-flex items-center gap-1">
                     <X className="w-3 h-3" /> Remove
                   </button>
                 </div>

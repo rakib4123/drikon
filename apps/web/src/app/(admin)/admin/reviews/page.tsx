@@ -84,8 +84,8 @@ export default function AdminReviewsPage() {
                           <Star key={n} className={`w-3.5 h-3.5 ${n <= r.rating ? 'fill-[color:var(--accent-2)] text-[color:var(--accent-2)]' : 'text-[color:var(--border)]'}`} />
                         ))}
                       </div>
-                      {r.isVerified && <span className="text-[10px] text-emerald-500 font-semibold">Verified</span>}
-                      {r.isHidden && <span className="text-[10px] text-red-400 font-semibold">Hidden</span>}
+                      {r.isVerified && <span className="text-[10px] text-emerald-600 font-semibold">Verified</span>}
+                      {r.isHidden && <span className="text-[10px] text-red-600 font-semibold">Hidden</span>}
                     </div>
                     {r.title && <div className="font-medium text-sm">{r.title}</div>}
                     {r.body && <p className="text-sm text-[color:var(--fg-muted)] line-clamp-2">{r.body}</p>}

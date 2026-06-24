@@ -85,7 +85,7 @@ function LoginForm() {
 
 
             {serverError && (
-              <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-sm text-red-400">
+              <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-sm text-red-600">
                 {serverError}
               </div>
             )}
@@ -162,7 +162,7 @@ function Field({
     <label className="block">
       <span className="block text-sm font-medium mb-1.5">{label}</span>
       {children}
-      {error && <span className="block text-xs text-red-400 mt-1">{error}</span>}
+      {error && <span className="block text-xs text-red-600 mt-1">{error}</span>}
     </label>
   );
 }

@@ -134,7 +134,7 @@ export default function AdminUsersPage() {
                       <td className="px-3 py-3 text-[color:var(--fg-muted)]">{dateFmt.format(new Date(u.createdAt))}</td>
                       <td className="px-3 py-3">
                         {u.twoFactorEnabled ? (
-                          <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                          <ShieldCheck className="w-4 h-4 text-emerald-600" />
                         ) : (
                           <span className="text-xs text-[color:var(--fg-muted)]">—</span>
                         )}

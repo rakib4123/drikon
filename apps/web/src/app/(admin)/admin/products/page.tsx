@@ -55,7 +55,7 @@ export default function AdminProductsPage() {
       </div>
 
       {error && (
-        <div className="card text-red-400 text-sm mb-6 max-w-6xl">{error}</div>
+        <div className="card text-red-600 text-sm mb-6 max-w-6xl">{error}</div>
       )}
 
       {!products ? (
@@ -98,9 +98,9 @@ export default function AdminProductsPage() {
                   <td className="px-4 py-3">{p.currency} {Number(p.price).toLocaleString()}</td>
                   <td className="px-4 py-3">
                     {p.stock > 0 ? (
-                      <span className={p.stock <= 5 ? 'text-amber-400' : ''}>{p.stock}</span>
+                      <span className={p.stock <= 5 ? 'text-amber-600' : ''}>{p.stock}</span>
                     ) : (
-                      <span className="text-red-400">Out</span>
+                      <span className="text-red-600">Out</span>
                     )}
                   </td>
                   <td className="px-4 py-3">
@@ -109,11 +109,11 @@ export default function AdminProductsPage() {
                   <td className="px-4 py-3 text-right">
                     {confirmId === p.id ? (
                       <div className="flex gap-2 justify-end items-center">
-                        <span className="text-xs text-red-400">Delete?</span>
+                        <span className="text-xs text-red-600">Delete?</span>
                         <button
                           onClick={() => handleDelete(p.id)}
                           disabled={deletingId === p.id}
-                          className="px-2 py-1 text-xs rounded bg-red-500/15 border border-red-500/40 text-red-400 hover:bg-red-500/25"
+                          className="px-2 py-1 text-xs rounded bg-red-500/15 border border-red-500/40 text-red-600 hover:bg-red-500/25"
                         >
                           {deletingId === p.id ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Yes'}
                         </button>
@@ -135,7 +135,7 @@ export default function AdminProductsPage() {
                         </Link>
                         <button
                           onClick={() => setConfirmId(p.id)}
-                          className="p-2 rounded-md hover:bg-red-500/10 text-[color:var(--fg-muted)] hover:text-red-400"
+                          className="p-2 rounded-md hover:bg-red-500/10 text-[color:var(--fg-muted)] hover:text-red-600"
                           title="Delete"
                         >
                           <Trash2 className="w-4 h-4" />

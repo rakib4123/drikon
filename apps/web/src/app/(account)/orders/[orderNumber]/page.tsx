@@ -121,7 +121,7 @@ export default function OrderDetailPage({
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 260, damping: 18, delay: 0.1 }}
           >
-            <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+            <CheckCircle2 className="w-10 h-10 text-emerald-600" />
           </motion.div>
           <div>
             <div className="display text-xl">Thank you — your order is in!</div>

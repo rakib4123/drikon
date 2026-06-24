@@ -38,7 +38,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
           )}
         </Link>
         {onSale && (
-          <span className="absolute top-3 left-3 px-2 py-1 text-[10px] font-bold rounded-md bg-[color:var(--accent-2)] text-white">
+          <span className="absolute top-3 left-3 px-2 py-1 text-[10px] font-bold rounded-md bg-[color:var(--accent)] text-white">
             −{discount}%
           </span>
         )}

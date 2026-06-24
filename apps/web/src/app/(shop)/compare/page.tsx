@@ -111,7 +111,7 @@ export default function ComparePage() {
                       <button
                         onClick={() => remove(p.id)}
                         aria-label="Remove"
-                        className="absolute -top-1 -right-1 z-10 w-6 h-6 rounded-full bg-[color:var(--bg-soft)] border border-[color:var(--border)] grid place-items-center text-[color:var(--fg-muted)] hover:text-red-400"
+                        className="absolute -top-1 -right-1 z-10 w-6 h-6 rounded-full bg-[color:var(--bg-soft)] border border-[color:var(--border)] grid place-items-center text-[color:var(--fg-muted)] hover:text-red-600"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
@@ -148,8 +148,8 @@ export default function ComparePage() {
               </span>
             ) : <span className="text-[color:var(--fg-muted)]">—</span>} />
             <Row label="Availability" render={(p) => p.stock > 0
-              ? <span className="text-emerald-500">In stock</span>
-              : <span className="text-red-400">Out of stock</span>} />
+              ? <span className="text-emerald-600">In stock</span>
+              : <span className="text-red-600">Out of stock</span>} />
             <Row label="Brand" render={(p) => p.brand?.name ?? <span className="text-[color:var(--fg-muted)]">—</span>} />
             <Row label="Category" render={(p) => p.category.name} />
 
