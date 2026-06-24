@@ -23,8 +23,8 @@ const NAV = [
   { href: '/admin/brands', label: 'Brands', icon: Tag },
   { href: '/admin/reviews', label: 'Reviews', icon: Star },
   { href: '/admin/users', label: 'Users', icon: Users },
-  { href: '/admin/coupons', label: 'Coupons', icon: Ticket },
-  { href: '/admin/flash-sales', label: 'Flash sales', icon: Zap },
+  { href: '/admin/coupons', label: 'Coupons', icon: Ticket, soon: true },
+  { href: '/admin/flash-sales', label: 'Flash sales', icon: Zap, soon: true },
   { href: '/admin/settings', label: 'Settings', icon: SettingsIcon },
 ];
 
@@ -43,6 +43,19 @@ export function AdminSidebar() {
             const active = item.exact
               ? pathname === item.href
               : pathname.startsWith(item.href);
+            if (item.soon) {
+              return (
+                <span
+                  key={item.href}
+                  title="Coming soon"
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-[color:var(--fg-muted)] opacity-50 cursor-not-allowed"
+                >
+                  <Icon className="w-4 h-4" />
+                  {item.label}
+                  <span className="ml-auto text-[10px]">soon</span>
+                </span>
+              );
+            }
             return (
               <Link
                 key={item.href}
