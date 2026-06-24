@@ -160,7 +160,7 @@ function Field({ label, error, children }: { label: string; error?: string; chil
     <label className="block">
       <span className="block text-xs font-medium text-[color:var(--fg-muted)] mb-1.5">{label}</span>
       {children}
-      {error && <span className="block text-xs text-red-400 mt-1">{error}</span>}
+      {error && <span className="block text-xs text-red-600 mt-1">{error}</span>}
     </label>
   );
 }
@@ -191,7 +191,7 @@ function ColorField({
         />
         <input className="input font-mono" placeholder="#ef6a20" {...register} />
       </div>
-      {error && <span className="block text-xs text-red-400 mt-1">{error}</span>}
+      {error && <span className="block text-xs text-red-600 mt-1">{error}</span>}
     </label>
   );
 }

@@ -89,7 +89,7 @@ export function Navbar({ brand, categories }: { brand: BrandInfo; categories: Na
           >
             <ShoppingBag className="w-5 h-5" />
             {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[color:var(--accent-2)] text-[10px] font-bold text-white grid place-items-center">
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[color:var(--accent)] text-[10px] font-bold text-white grid place-items-center">
                 {cartCount}
               </span>
             )}

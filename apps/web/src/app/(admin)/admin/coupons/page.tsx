@@ -176,7 +176,7 @@ export default function AdminCouponsPage() {
                   <button onClick={() => startEdit(c)} className="p-2 rounded-lg hover:bg-[color:var(--bg)] text-[color:var(--fg-muted)] hover:text-[color:var(--accent)]" aria-label="Edit">
                     <Pencil className="w-4 h-4" />
                   </button>
-                  <button onClick={() => remove(c)} className="p-2 rounded-lg hover:bg-red-500/10 text-[color:var(--fg-muted)] hover:text-red-400" aria-label="Delete">
+                  <button onClick={() => remove(c)} className="p-2 rounded-lg hover:bg-red-500/10 text-[color:var(--fg-muted)] hover:text-red-600" aria-label="Delete">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </li>

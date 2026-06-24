@@ -97,7 +97,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
             <div className="w-full h-full bg-drikon-mesh" />
           )}
           {onSale && (
-            <span className="absolute top-4 left-4 px-3 py-1.5 text-xs font-bold rounded-md bg-[color:var(--accent-2)] text-white">
+            <span className="absolute top-4 left-4 px-3 py-1.5 text-xs font-bold rounded-md bg-[color:var(--accent)] text-white">
               −{discount}% OFF
             </span>
           )}
@@ -138,15 +138,15 @@ export default async function ProductDetailPage({ params }: PageProps) {
           {/* Stock */}
           <div className="mb-6 text-sm">
             {product.stock === 0 ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/30">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/10 text-red-600 border border-red-500/30">
                 Out of stock
               </span>
             ) : product.stock <= 5 ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/30">
                 Only {product.stock} left in stock
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/30">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/10 text-green-600 border border-green-500/30">
                 In stock
               </span>
             )}

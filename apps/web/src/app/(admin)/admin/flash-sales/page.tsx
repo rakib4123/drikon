@@ -196,7 +196,7 @@ function SaleCard({
         <label className="flex items-center gap-1.5 text-xs text-[color:var(--fg-muted)]">
           <input type="checkbox" checked={sale.isActive} onChange={onToggle} /> Active
         </label>
-        <button onClick={onDelete} className="p-2 rounded-lg hover:bg-red-500/10 text-[color:var(--fg-muted)] hover:text-red-400" aria-label="Delete sale">
+        <button onClick={onDelete} className="p-2 rounded-lg hover:bg-red-500/10 text-[color:var(--fg-muted)] hover:text-red-600" aria-label="Delete sale">
           <Trash2 className="w-4 h-4" />
         </button>
       </div>
@@ -211,7 +211,7 @@ function SaleCard({
                 <span className="flex-1 min-w-0 line-clamp-1">{p.product.name}</span>
                 <span className="text-[color:var(--fg-muted)] line-through text-xs">{formatPrice(p.product.price, p.product.currency)}</span>
                 <span className="font-semibold text-[color:var(--accent)]">{formatPrice(p.salePrice, p.product.currency)}</span>
-                <button onClick={() => removeProduct(p.productId)} className="p-1 rounded text-[color:var(--fg-muted)] hover:text-red-400" aria-label="Remove">
+                <button onClick={() => removeProduct(p.productId)} className="p-1 rounded text-[color:var(--fg-muted)] hover:text-red-600" aria-label="Remove">
                   <X className="w-3.5 h-3.5" />
                 </button>
               </li>

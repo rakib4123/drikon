@@ -163,7 +163,7 @@ function StatCard({
       <div
         className={`w-8 h-8 rounded-lg grid place-items-center mb-3 ${
           warn
-            ? 'bg-amber-500/15 text-amber-400'
+            ? 'bg-amber-500/15 text-amber-600'
             : highlight
               ? 'bg-[color:var(--accent)]/15 text-[color:var(--accent)]'
               : 'bg-[color:var(--bg)] text-[color:var(--fg-muted)] border border-[color:var(--border)]'

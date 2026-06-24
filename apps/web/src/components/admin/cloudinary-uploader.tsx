@@ -43,7 +43,7 @@ export function CloudinaryUploader({ value, onChange, label = 'Product image' }:
           <button
             type="button"
             onClick={() => onChange(null)}
-            className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-[color:var(--bg)] border border-[color:var(--border)] grid place-items-center hover:bg-red-500/10 hover:border-red-500/40 hover:text-red-400 transition-colors"
+            className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-[color:var(--bg)] border border-[color:var(--border)] grid place-items-center hover:bg-red-500/10 hover:border-red-500/40 hover:text-red-600 transition-colors"
             aria-label="Remove image"
           >
             <X className="w-3.5 h-3.5" />
@@ -81,7 +81,7 @@ export function CloudinaryUploader({ value, onChange, label = 'Product image' }:
       />
 
       {error && (
-        <div className="text-xs text-red-400 mt-1">{error}</div>
+        <div className="text-xs text-red-600 mt-1">{error}</div>
       )}
     </div>
   );

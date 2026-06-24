@@ -294,7 +294,7 @@ export function ProductForm({ mode, productId, initial }: ProductFormProps) {
       </div>
 
       {serverError && (
-        <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-sm text-red-400">
+        <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-sm text-red-600">
           {serverError}
         </div>
       )}
@@ -324,7 +324,7 @@ function Field({ label, required, children }: { label: string; required?: boolea
     <label className="block">
       <span className="block text-sm font-medium mb-1.5">
         {label}
-        {required && <span className="text-red-400 ml-0.5">*</span>}
+        {required && <span className="text-red-600 ml-0.5">*</span>}
       </span>
       {children}
     </label>

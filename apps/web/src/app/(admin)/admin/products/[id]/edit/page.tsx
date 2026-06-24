@@ -29,7 +29,7 @@ export default function AdminProductEditPage({ params }: PageProps) {
         <Link href="/admin/products" className="inline-flex items-center gap-1.5 text-sm text-[color:var(--fg-muted)] hover:text-[color:var(--fg)] mb-6">
           <ArrowLeft className="w-4 h-4" /> All products
         </Link>
-        <div className="card text-red-400">{error}</div>
+        <div className="card text-red-600">{error}</div>
       </div>
     );
   }
