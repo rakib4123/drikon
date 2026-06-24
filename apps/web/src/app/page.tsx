@@ -2,7 +2,8 @@ export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import { ArrowRight, Sparkles, ShieldCheck, Truck, Headphones } from 'lucide-react';
-import { ProductCard } from '@/components/shop/product-card';
+import { ProductGrid } from '@/components/shop/product-grid';
+import { Reveal } from '@/components/ui/reveal';
 import { apiGet } from '@/lib/api-client';
 import type { ProductListResponse } from '@drikon/shared-types';
 
@@ -87,11 +88,7 @@ export default async function HomePage() {
         </div>
 
         {featured && featured.items.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featured.items.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
+          <ProductGrid products={featured.items} />
         ) : (
           <div className="card text-center py-16 text-[color:var(--fg-muted)]">
             <p>The API isn&apos;t reachable yet.</p>
@@ -102,7 +99,7 @@ export default async function HomePage() {
 
       {/* ─── EDITORIAL CTA ─── */}
       <section className="max-w-7xl mx-auto px-6 pb-24">
-        <div className="relative overflow-hidden rounded-3xl bg-drikon-gradient p-10 md:p-16 text-white grain">
+        <Reveal className="relative overflow-hidden rounded-3xl bg-drikon-gradient p-10 md:p-16 text-white grain">
           <div className="relative z-10 max-w-2xl">
             <h3 className="display text-3xl md:text-5xl">
               The marketplace, redrawn.
@@ -117,7 +114,7 @@ export default async function HomePage() {
               </Link>
             </div>
           </div>
-        </div>
+        </Reveal>
       </section>
     </>
   );

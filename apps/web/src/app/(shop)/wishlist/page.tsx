@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Heart, ArrowRight } from 'lucide-react';
 import type { WishlistEntry } from '@drikon/shared-types';
 import { apiGet } from '@/lib/api-client';
-import { ProductCard } from '@/components/shop/product-card';
+import { ProductGrid } from '@/components/shop/product-grid';
 import { useAuthStore } from '@/store/auth-store';
 import { useWishlistStore } from '@/store/wishlist-store';
 
@@ -92,11 +92,10 @@ export default function WishlistPage() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {visible.map((e) => (
-            <ProductCard key={e.id} product={e.product} />
-          ))}
-        </div>
+        <ProductGrid
+          products={visible.map((e) => e.product)}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+        />
       )}
     </div>
   );

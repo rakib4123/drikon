@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Star, ShieldCheck, Truck, RefreshCw } from 'lucide-react';
 import { apiGet, ApiError } from '@/lib/api-client';
-import { ProductCard } from '@/components/shop/product-card';
+import { ProductGrid } from '@/components/shop/product-grid';
 import { AddToCart } from '@/components/shop/add-to-cart';
 import { WishlistButton } from '@/components/shop/wishlist-button';
 import { ProductReviews } from '@/components/shop/product-reviews';
@@ -224,9 +224,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
       {related.length > 0 && (
         <section>
           <h2 className="display text-2xl mb-6">You might also like</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {related.map((p) => <ProductCard key={p.id} product={p} />)}
-          </div>
+          <ProductGrid products={related} />
         </section>
       )}
     </div>
