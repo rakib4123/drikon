@@ -106,6 +106,51 @@ export class ReviewsService {
   }
 
   // ─────────────────────────────────────────────────────────────────
+  // ADMIN — moderation
+  // ─────────────────────────────────────────────────────────────────
+  async listAll(page = 1, limit = 20) {
+    const skip = (page - 1) * limit;
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.review.findMany({
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+        include: {
+          user: { select: { id: true, name: true, email: true } },
+          product: { select: { id: true, name: true, slug: true } },
+        },
+      }),
+      this.prisma.review.count(),
+    ]);
+    return {
+      items,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: skip + items.length < total,
+        hasPrev: page > 1,
+      },
+    };
+  }
+
+  async setHidden(id: string, isHidden: boolean) {
+    const review = await this.prisma.review.findUnique({
+      where: { id },
+      select: { id: true, productId: true },
+    });
+    if (!review) throw new NotFoundException('Review not found');
+    const updated = await this.prisma.review.update({
+      where: { id },
+      data: { isHidden },
+    });
+    // Hidden reviews are excluded from aggregates — keep them in sync.
+    await this.recomputeAggregates(review.productId);
+    return updated;
+  }
+
+  // ─────────────────────────────────────────────────────────────────
   // Keep the denormalized Product.averageRating / reviewCount in sync.
   // ─────────────────────────────────────────────────────────────────
   private async recomputeAggregates(productId: string) {
