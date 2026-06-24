@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { ArrowRight, Sparkles, ShieldCheck, Truck, Headphones } from 'lucide-react';
 import { ProductGrid } from '@/components/shop/product-grid';
+import { CategoryShowcase } from '@/components/shop/category-showcase';
 import { Reveal } from '@/components/ui/reveal';
 import { apiGet } from '@/lib/api-client';
 import type { ProductListResponse } from '@drikon/shared-types';
@@ -72,6 +73,9 @@ export default async function HomePage() {
           <Feature icon={<Sparkles className="w-5 h-5" />} title="Curated only" body="Edited by people, not robots" />
         </div>
       </section>
+
+      {/* ─── SHOP BY CATEGORY ─── */}
+      <CategoryShowcase />
 
       {/* ─── FEATURED PRODUCTS ─── */}
       <section className="max-w-7xl mx-auto px-6 py-20">
