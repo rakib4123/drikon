@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import type { ProductSummary } from '@drikon/shared-types';
 import { formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/store/cart-store';
+import { WishlistButton } from './wishlist-button';
 
 export function ProductCard({ product }: { product: ProductSummary }) {
   const add = useCartStore((s) => s.add);
@@ -21,29 +22,37 @@ export function ProductCard({ product }: { product: ProductSummary }) {
 
   return (
     <article className="group card !p-0 overflow-hidden flex flex-col">
-      <Link href={`/products/${product.slug}`} className="relative aspect-[4/5] bg-[color:var(--bg)] overflow-hidden">
-        {product.images?.[0]?.url ? (
-          <Image
-            src={product.images[0].url}
-            alt={product.images[0].alt ?? product.name}
-            fill
-            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        ) : (
-          <div className="w-full h-full bg-drikon-mesh" />
-        )}
+      <div className="relative aspect-[4/5] bg-[color:var(--bg)] overflow-hidden">
+        <Link href={`/products/${product.slug}`} className="absolute inset-0">
+          {product.images?.[0]?.url ? (
+            <Image
+              src={product.images[0].url}
+              alt={product.images[0].alt ?? product.name}
+              fill
+              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div className="w-full h-full bg-drikon-mesh" />
+          )}
+        </Link>
         {onSale && (
           <span className="absolute top-3 left-3 px-2 py-1 text-[10px] font-bold rounded-md bg-[color:var(--accent-2)] text-white">
             −{discount}%
           </span>
         )}
         {product.stock === 0 && (
-          <span className="absolute top-3 right-3 px-2 py-1 text-[10px] font-bold rounded-md bg-black/70 text-white">
+          <span className="absolute bottom-3 left-3 px-2 py-1 text-[10px] font-bold rounded-md bg-black/70 text-white">
             SOLD OUT
           </span>
         )}
-      </Link>
+        <WishlistButton
+          productId={product.id}
+          productName={product.name}
+          variant="overlay"
+          className="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 aria-[pressed=true]:opacity-100 transition-opacity"
+        />
+      </div>
 
       <div className="p-4 flex-1 flex flex-col">
         <div className="text-[11px] font-mono uppercase tracking-wider text-[color:var(--fg-muted)] mb-1">

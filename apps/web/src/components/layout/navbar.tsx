@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
-import { Moon, Sun, ShoppingBag, User } from 'lucide-react';
+import { Moon, Sun, ShoppingBag, User, Heart } from 'lucide-react';
 import { useAuthStore, useIsAdmin } from '@/store/auth-store';
 import { useCartStore } from '@/store/cart-store';
+import { useWishlistStore } from '@/store/wishlist-store';
 import { SearchCommand } from '@/components/shop/search-command';
 
 export function Navbar() {
@@ -15,11 +16,20 @@ export function Navbar() {
   const isAdmin = useIsAdmin();
   const fetchMe = useAuthStore((s) => s.fetchMe);
   const cartCount = useCartStore((s) => s.items.reduce((n, i) => n + i.quantity, 0));
+  const wishlistCount = useWishlistStore((s) => s.ids.length);
+  const fetchWishlist = useWishlistStore((s) => s.fetch);
+  const resetWishlist = useWishlistStore((s) => s.reset);
 
   useEffect(() => {
     setMounted(true);
     fetchMe();
   }, [fetchMe]);
+
+  // Hydrate / clear the wishlist as auth state changes.
+  useEffect(() => {
+    if (user) fetchWishlist();
+    else resetWishlist();
+  }, [user, fetchWishlist, resetWishlist]);
 
   return (
     <header className="sticky top-0 z-40 backdrop-blur-xl bg-[color:var(--bg)]/70 border-b border-[color:var(--border)]">
@@ -69,6 +79,19 @@ export function Navbar() {
               {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
           )}
+
+          <Link
+            href="/wishlist"
+            aria-label="Wishlist"
+            className="p-2 rounded-lg hover:bg-[color:var(--bg-soft)] transition-colors relative hidden sm:inline-flex"
+          >
+            <Heart className="w-5 h-5" />
+            {mounted && wishlistCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-[10px] font-bold text-white grid place-items-center">
+                {wishlistCount}
+              </span>
+            )}
+          </Link>
 
           <Link
             href="/cart"
