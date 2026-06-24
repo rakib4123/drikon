@@ -6,6 +6,7 @@ import { apiGet, ApiError } from '@/lib/api-client';
 import { ProductCard } from '@/components/shop/product-card';
 import { AddToCart } from '@/components/shop/add-to-cart';
 import { WishlistButton } from '@/components/shop/wishlist-button';
+import { ProductReviews } from '@/components/shop/product-reviews';
 import { formatPrice } from '@/lib/utils';
 import type { ProductSummary } from '@drikon/shared-types';
 
@@ -215,6 +216,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
           </dl>
         </section>
       )}
+
+      {/* Reviews */}
+      <ProductReviews productId={product.id} productName={product.name} />
 
       {/* Related */}
       {related.length > 0 && (
