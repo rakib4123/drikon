@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
-import { Moon, Sun, ShoppingBag, User, Search } from 'lucide-react';
+import { Moon, Sun, ShoppingBag, User } from 'lucide-react';
 import { useAuthStore, useIsAdmin } from '@/store/auth-store';
 import { useCartStore } from '@/store/cart-store';
+import { SearchCommand } from '@/components/shop/search-command';
 
 export function Navbar() {
   const { theme, setTheme } = useTheme();
@@ -56,13 +57,7 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            aria-label="Search"
-            className="p-2 rounded-lg hover:bg-[color:var(--bg-soft)] transition-colors"
-          >
-            <Search className="w-5 h-5" />
-          </button>
+          <SearchCommand />
 
           {mounted && (
             <button
