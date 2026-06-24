@@ -15,6 +15,7 @@ import { WishlistModule } from './modules/wishlist/wishlist.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { SettingsModule } from './modules/settings/settings.module';
+import { AdminModule } from './modules/admin/admin.module';
 import { HealthModule } from './modules/health/health.module';
 import { MailModule } from './modules/mail/mail.module';
 
@@ -73,6 +74,7 @@ import { MailModule } from './modules/mail/mail.module';
     ReviewsModule,
     OrdersModule,
     SettingsModule,
+    AdminModule,
     HealthModule,
   ],
   providers: [
