@@ -34,7 +34,7 @@ export default async function HomePage() {
 
             <h1 className="display text-5xl md:text-7xl lg:text-8xl animate-fade-up" style={{ animationDelay: '120ms' }}>
               See it.<br />
-              <span className="bg-gradient-to-r from-indigo-400 via-indigo-500 to-cyan-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#e2683c] via-[#e87b46] to-[#f0a830] bg-clip-text text-transparent">
                 Want it.
               </span>
               <br />
@@ -58,7 +58,7 @@ export default async function HomePage() {
 
           {/* Asymmetric decoration */}
           <div
-            className="hidden md:block absolute right-[-80px] top-24 w-[420px] h-[420px] rounded-full bg-gradient-to-br from-indigo-500/30 to-cyan-500/20 blur-3xl"
+            className="hidden md:block absolute right-[-80px] top-24 w-[420px] h-[420px] rounded-full bg-gradient-to-br from-[#e2683c]/30 to-[#f0a830]/20 blur-3xl"
             aria-hidden
           />
         </div>
@@ -113,7 +113,7 @@ export default async function HomePage() {
               fast everywhere. Open source, opinionated, and shipping today.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/register" className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-indigo-950 font-semibold hover:bg-white/90 transition-colors">
+              <Link href="/register" className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-[#3d1e0a] font-semibold hover:bg-white/90 transition-colors">
                 Create your account <ArrowRight className="w-4 h-4" />
               </Link>
             </div>

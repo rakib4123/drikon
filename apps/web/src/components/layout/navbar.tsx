@@ -36,8 +36,8 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
           <span
-            className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-500
-                       grid place-items-center text-white font-bold shadow-lg shadow-indigo-500/30
+            className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#e2683c] to-[#f0a830]
+                       grid place-items-center text-white font-bold shadow-lg shadow-[#e2683c]/30
                        transition-transform group-hover:scale-110"
             aria-hidden
           >
