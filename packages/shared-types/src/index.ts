@@ -134,3 +134,111 @@ export interface ProductListResponse {
   items: ProductSummary[];
   pagination: Pagination;
 }
+
+// ────────────────────────────────────────────────────────────────────────────
+// REVIEWS
+// ────────────────────────────────────────────────────────────────────────────
+
+export const CreateReviewSchema = z.object({
+  rating: z.coerce.number().int().min(1, 'Pick a rating').max(5),
+  title: z.string().max(120).trim().optional(),
+  body: z.string().max(2000).trim().optional(),
+});
+export type CreateReviewInput = z.infer<typeof CreateReviewSchema>;
+
+export interface ReviewSummary {
+  id: string;
+  rating: number;
+  title?: string | null;
+  body?: string | null;
+  isVerified: boolean;
+  createdAt: string;
+  user: { id: string; name: string; avatarUrl?: string | null };
+}
+
+export interface ReviewListResponse {
+  items: ReviewSummary[];
+  averageRating: number;
+  reviewCount: number;
+  /** Count of reviews at each star level, index 0 = 1★ … index 4 = 5★. */
+  distribution: [number, number, number, number, number];
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// WISHLIST
+// ────────────────────────────────────────────────────────────────────────────
+
+export interface WishlistEntry {
+  id: string;
+  productId: string;
+  createdAt: string;
+  product: ProductSummary;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// ORDERS & CHECKOUT
+// ────────────────────────────────────────────────────────────────────────────
+
+export const ShippingAddressSchema = z.object({
+  fullName: z.string().min(2, 'Required').max(120).trim(),
+  phone: z.string().min(5, 'Required').max(30).trim(),
+  line1: z.string().min(2, 'Required').max(200).trim(),
+  line2: z.string().max(200).trim().optional(),
+  city: z.string().min(1, 'Required').max(120).trim(),
+  state: z.string().max(120).trim().optional(),
+  postalCode: z.string().min(1, 'Required').max(20).trim(),
+  country: z.string().min(2).max(60).default('BD'),
+});
+export type ShippingAddressInput = z.infer<typeof ShippingAddressSchema>;
+
+export const CheckoutItemSchema = z.object({
+  productId: z.string().min(1),
+  variantId: z.string().min(1).optional(),
+  quantity: z.coerce.number().int().positive().max(99),
+});
+
+export const CreateOrderSchema = z.object({
+  items: z.array(CheckoutItemSchema).min(1, 'Your cart is empty').max(50),
+  shippingAddress: ShippingAddressSchema,
+  notes: z.string().max(500).trim().optional(),
+});
+export type CreateOrderInput = z.infer<typeof CreateOrderSchema>;
+
+export type OrderStatus =
+  | 'PENDING'
+  | 'PAID'
+  | 'PROCESSING'
+  | 'SHIPPED'
+  | 'DELIVERED'
+  | 'CANCELLED'
+  | 'REFUNDED';
+
+export interface OrderItemSummary {
+  id: string;
+  productId: string;
+  slug?: string | null;
+  productName: string;
+  productImage?: string | null;
+  unitPrice: string | number;
+  quantity: number;
+  lineTotal: string | number;
+}
+
+export interface OrderSummary {
+  id: string;
+  orderNumber: string;
+  status: OrderStatus;
+  subtotal: string | number;
+  shipping: string | number;
+  tax: string | number;
+  discount: string | number;
+  total: string | number;
+  currency: string;
+  createdAt: string;
+  items: OrderItemSummary[];
+}
+
+export interface OrderListResponse {
+  items: OrderSummary[];
+  pagination: Pagination;
+}
