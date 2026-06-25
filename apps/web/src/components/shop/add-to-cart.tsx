@@ -16,7 +16,16 @@ export interface AddToCartProduct {
   stock: number;
 }
 
-export function AddToCart({ product, className }: { product: AddToCartProduct; className?: string }) {
+export function AddToCart({
+  product,
+  className,
+  compact,
+}: {
+  product: AddToCartProduct;
+  className?: string;
+  /** Button-only (no quantity stepper) — for tight spots like sticky headers. */
+  compact?: boolean;
+}) {
   const add = useCartStore((s) => s.add);
   const [qty, setQty] = useState(1);
   const soldOut = product.stock === 0;
@@ -36,6 +45,21 @@ export function AddToCart({ product, className }: { product: AddToCartProduct; c
     );
     toast.success(`Added ${qty} to cart`, { description: product.name });
   };
+
+  if (compact) {
+    return (
+      <motion.button
+        type="button"
+        disabled={soldOut}
+        onClick={handleAdd}
+        whileTap={{ scale: 0.97 }}
+        className={`btn-primary whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed ${className ?? ''}`}
+      >
+        <ShoppingBag className="w-4 h-4 shrink-0" />
+        {soldOut ? 'Sold out' : 'Add to cart'}
+      </motion.button>
+    );
+  }
 
   return (
     <div className={`flex flex-col sm:flex-row gap-3 ${className ?? ''}`}>

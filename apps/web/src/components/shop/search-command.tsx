@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'motion/react';
@@ -15,7 +16,10 @@ export function SearchCommand() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ProductSummary[]>([]);
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => setMounted(true), []);
 
   // ⌘K / Ctrl+K to open, Esc handled by the panel below.
   useEffect(() => {
@@ -101,8 +105,10 @@ export function SearchCommand() {
         <Search className="w-5 h-5" />
       </button>
 
-      <AnimatePresence>
-        {open && (
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {open && (
           <motion.div
             className="fixed inset-0 z-[60] flex items-start justify-center px-4 pt-[12vh]"
             initial={{ opacity: 0 }}
@@ -211,8 +217,10 @@ export function SearchCommand() {
               </div>
             </motion.div>
           </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body,
         )}
-      </AnimatePresence>
     </>
   );
 }
