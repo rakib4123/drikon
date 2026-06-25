@@ -158,7 +158,7 @@ export class ProductsService {
           videoUrl: dto.videoUrl || null,
           metaTitle: dto.metaTitle,
           metaDescription: dto.metaDescription,
-          images: { create: dto.images },
+          images: { create: dto.images ?? [] },
         },
         include: { images: true, category: true, brand: true },
       });

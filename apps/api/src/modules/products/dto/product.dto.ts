@@ -20,6 +20,8 @@ export const CreateProductSchema = z.object({
   videoUrl: z.string().url().optional().or(z.literal('')),
   metaTitle: z.string().max(160).optional(),
   metaDescription: z.string().max(320).optional(),
+  // Images are optional — a product can be created now and have photos added
+  // later. A placeholder is shown in the storefront when there are none.
   images: z
     .array(
       z.object({
@@ -28,8 +30,9 @@ export const CreateProductSchema = z.object({
         position: z.number().int().nonnegative().default(0),
       }),
     )
-    .min(1)
-    .max(10),
+    .max(10)
+    .optional()
+    .default([]),
 });
 export class CreateProductDto extends createZodDto(CreateProductSchema) {}
 
