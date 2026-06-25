@@ -63,19 +63,18 @@ export function PremiumProductPage({ product, related }: PremiumProductPageProps
             <span className="text-lg font-bold text-white hidden sm:block">
               {formatPrice(price, product.currency)}
             </span>
-            <div className="w-32">
-              <AddToCart
-                product={{
-                  id: product.id,
-                  name: product.name,
-                  slug: product.slug,
-                  image: product.images?.[0]?.url,
-                  price,
-                  currency: product.currency,
-                  stock: product.stock,
-                }}
-              />
-            </div>
+            <AddToCart
+              compact
+              product={{
+                id: product.id,
+                name: product.name,
+                slug: product.slug,
+                image: product.images?.[0]?.url,
+                price,
+                currency: product.currency,
+                stock: product.stock,
+              }}
+            />
           </div>
         </div>
       </motion.header>
@@ -146,19 +145,19 @@ export function PremiumProductPage({ product, related }: PremiumProductPageProps
             >
               Discover Engineering
             </button>
-            <div className="w-40">
-              <AddToCart
-                product={{
-                  id: product.id,
-                  name: product.name,
-                  slug: product.slug,
-                  image: product.images?.[0]?.url,
-                  price,
-                  currency: product.currency,
-                  stock: product.stock,
-                }}
-              />
-            </div>
+            <AddToCart
+              compact
+              className="!px-8 !py-4 !rounded-full text-base"
+              product={{
+                id: product.id,
+                name: product.name,
+                slug: product.slug,
+                image: product.images?.[0]?.url,
+                price,
+                currency: product.currency,
+                stock: product.stock,
+              }}
+            />
           </motion.div>
         </motion.div>
 
