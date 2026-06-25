@@ -378,6 +378,8 @@ export function PremiumProductPage({ product, related }: PremiumProductPageProps
                   </div>
                 </div>
                 <AddToCart
+                  compact
+                  className="w-full h-14"
                   product={{
                     id: product.id,
                     name: product.name,
@@ -387,7 +389,6 @@ export function PremiumProductPage({ product, related }: PremiumProductPageProps
                     currency: product.currency,
                     stock: product.stock,
                   }}
-                  className="w-full h-14 text-lg bg-[#d4af37] hover:bg-[#b5952f] text-black border-none rounded-xl font-bold"
                 />
               </div>
 
