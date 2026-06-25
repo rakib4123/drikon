@@ -10,6 +10,7 @@ import { Reveal } from '@/components/ui/reveal';
 import { apiGet } from '@/lib/api-client';
 import { getSettings } from '@/lib/settings';
 import { getBanners } from '@/lib/banners';
+import { getCategories } from '@/lib/catalog';
 import type { ProductListResponse } from '@drikon/shared-types';
 
 // Fetch on the server — RSC means no API key/token leaks to client.
@@ -22,7 +23,12 @@ async function getFeatured(): Promise<ProductListResponse | null> {
 }
 
 export default async function HomePage() {
-  const [featured, settings, banners] = await Promise.all([getFeatured(), getSettings(), getBanners()]);
+  const [featured, settings, banners, categories] = await Promise.all([
+    getFeatured(),
+    getSettings(),
+    getBanners(),
+    getCategories(),
+  ]);
   const brandName = settings.siteName;
 
   return (
@@ -87,7 +93,7 @@ export default async function HomePage() {
       <FlashSaleSection />
 
       {/* ─── SHOP BY CATEGORY ─── */}
-      <CategoryShowcase />
+      <CategoryShowcase categories={categories} />
 
       {/* ─── FEATURED PRODUCTS ─── */}
       <section className="max-w-7xl mx-auto px-6 py-20">

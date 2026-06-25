@@ -54,7 +54,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <TopBar supportEmail={s.supportEmail} facebook={s.socialFacebook} instagram={s.socialInstagram} />
           <Navbar brand={brand} categories={categories} />
           <main className="flex-1">{children}</main>
-          <Footer brand={brand} />
+          <Footer brand={brand} categories={categories} />
           <CompareTray />
         </Providers>
       </body>

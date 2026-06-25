@@ -2,56 +2,51 @@
 
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { ArrowUpRight, Laptop, Cpu, Keyboard, Zap } from 'lucide-react';
+import { ArrowUpRight, LayoutGrid, Zap } from 'lucide-react';
 import type { ReactNode } from 'react';
+import type { NavCategory } from '@/lib/catalog';
 
 interface Tile {
   title: string;
   blurb: string;
   href: string;
   icon: ReactNode;
-  /** Tailwind grid span classes for the bento layout. */
   span: string;
-  /** Accent gradient for the hover wash. */
   gradient: string;
 }
 
-const TILES: Tile[] = [
-  {
-    title: 'Laptops & PCs',
-    blurb: 'Laptops, desktops, workstations, and mini PCs.',
-    href: '/products?category=laptops-pcs',
-    icon: <Laptop className="w-5 h-5" />,
-    span: 'sm:col-span-2 sm:row-span-2',
-    gradient: 'from-orange-500/20 to-amber-500/5',
-  },
-  {
-    title: 'Components',
-    blurb: 'CPUs, GPUs, motherboards, memory & storage.',
-    href: '/products?category=components',
-    icon: <Cpu className="w-5 h-5" />,
-    span: '',
-    gradient: 'from-amber-500/20 to-orange-500/5',
-  },
-  {
-    title: 'Peripherals',
-    blurb: 'Keyboards, mice, monitors, and headsets.',
-    href: '/products?category=peripherals',
-    icon: <Keyboard className="w-5 h-5" />,
-    span: '',
-    gradient: 'from-orange-600/20 to-red-500/5',
-  },
-  {
-    title: "Today's deals",
-    blurb: 'Hand-picked tech on sale this week.',
-    href: '/products?featured=true',
-    icon: <Zap className="w-5 h-5" />,
-    span: 'sm:col-span-2',
-    gradient: 'from-slate-500/20 to-orange-500/5',
-  },
+const GRADIENTS = [
+  'from-orange-500/20 to-amber-500/5',
+  'from-amber-500/20 to-orange-500/5',
+  'from-orange-600/20 to-red-500/5',
+  'from-sky-500/20 to-cyan-500/5',
+  'from-violet-500/20 to-fuchsia-500/5',
+  'from-emerald-500/20 to-teal-500/5',
 ];
 
-export function CategoryShowcase() {
+export function CategoryShowcase({ categories }: { categories: NavCategory[] }) {
+  const cats = (categories ?? []).filter((c) => !c.parentId).slice(0, 5);
+  if (cats.length === 0) return null;
+
+  const tiles: Tile[] = [
+    ...cats.map((c, i) => ({
+      title: c.name,
+      blurb: c.description || `${c._count?.products ?? 0} product${(c._count?.products ?? 0) === 1 ? '' : 's'}`,
+      href: `/products?category=${c.slug}`,
+      icon: <LayoutGrid className="w-5 h-5" />,
+      span: i === 0 ? 'sm:col-span-2 sm:row-span-2' : '',
+      gradient: GRADIENTS[i % GRADIENTS.length],
+    })),
+    {
+      title: "Today's deals",
+      blurb: 'Hand-picked tech on sale this week.',
+      href: '/products?featured=true',
+      icon: <Zap className="w-5 h-5" />,
+      span: 'sm:col-span-2',
+      gradient: 'from-slate-500/20 to-orange-500/5',
+    },
+  ];
+
   return (
     <section className="max-w-7xl mx-auto px-6 py-20">
       <div className="mb-10">
@@ -62,9 +57,9 @@ export function CategoryShowcase() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 auto-rows-[180px]">
-        {TILES.map((tile, i) => (
+        {tiles.map((tile, i) => (
           <motion.div
-            key={tile.title}
+            key={tile.href}
             className={tile.span}
             initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -75,7 +70,6 @@ export function CategoryShowcase() {
               href={tile.href}
               className="group relative h-full w-full overflow-hidden rounded-2xl border border-[color:var(--border)] glass p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:border-[color:var(--accent)] hover:shadow-[0_24px_60px_-30px_rgba(239,106,32,0.45)]"
             >
-              {/* Hover gradient wash */}
               <div
                 className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${tile.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
                 aria-hidden

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { apiGet } from '@/lib/api-client';
+import { getCategories } from '@/lib/catalog';
 import { ProductGrid } from '@/components/shop/product-grid';
 import type { ProductListResponse } from '@drikon/shared-types';
 
@@ -23,6 +24,9 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   } catch (e: any) {
     error = e?.message ?? 'Failed to load products';
   }
+
+  const allCats = await getCategories();
+  const topCats = allCats.filter((c) => !c.parentId).slice(0, 8);
 
   const page = parseInt((params.page as string) ?? '1', 10);
   const currentSort = (params.sort as string) ?? 'newest';
@@ -57,9 +61,11 @@ export default async function ProductsPage({ searchParams }: PageProps) {
       {/* ─── Quick category chips ─── */}
       <div className="flex flex-wrap gap-2 mb-10">
         <CategoryChip active={!currentCategory} href="/products">All</CategoryChip>
-        <CategoryChip active={currentCategory === 'laptops-pcs'} href="/products?category=laptops-pcs">Laptops &amp; PCs</CategoryChip>
-        <CategoryChip active={currentCategory === 'components'} href="/products?category=components">Components</CategoryChip>
-        <CategoryChip active={currentCategory === 'peripherals'} href="/products?category=peripherals">Peripherals</CategoryChip>
+        {topCats.map((c) => (
+          <CategoryChip key={c.id} active={currentCategory === c.slug} href={`/products?category=${c.slug}`}>
+            {c.name}
+          </CategoryChip>
+        ))}
       </div>
 
       {error ? (
