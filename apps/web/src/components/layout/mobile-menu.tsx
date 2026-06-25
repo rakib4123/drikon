@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'motion/react';
 import { Menu, X, ChevronRight, Heart, ShoppingBag, LayoutDashboard, Sparkles, Package } from 'lucide-react';
@@ -12,9 +13,12 @@ import type { NavCategory } from '@/lib/catalog';
 
 export function MobileMenu({ brand, categories }: { brand: BrandInfo; categories: NavCategory[] }) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const user = useAuthStore((s) => s.user);
   const isAdmin = useIsAdmin();
   const wishlistCount = useWishlistStore((s) => s.ids.length);
+
+  useEffect(() => setMounted(true), []);
 
   const topLevel = (categories ?? []).filter((c) => !c.parentId);
   const childrenOf = (id: string) => (categories ?? []).filter((c) => c.parentId === id);
@@ -39,10 +43,12 @@ export function MobileMenu({ brand, categories }: { brand: BrandInfo; categories
         <Menu className="w-6 h-6" />
       </button>
 
-      <AnimatePresence>
-        {open && (
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {open && (
           <motion.div
-            className="fixed inset-0 z-[70] md:hidden"
+            className="fixed inset-0 z-[80] md:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -53,7 +59,7 @@ export function MobileMenu({ brand, categories }: { brand: BrandInfo; categories
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', stiffness: 320, damping: 34 }}
-              className="absolute left-0 top-0 h-full w-[84%] max-w-sm bg-[color:var(--bg)] border-r border-[color:var(--border)] flex flex-col"
+              className="absolute left-0 top-0 bottom-0 w-[84%] max-w-sm bg-[color:var(--bg)] border-r border-[color:var(--border)] flex flex-col shadow-2xl"
             >
               <div className="flex items-center justify-between px-4 h-16 border-b border-[color:var(--border)]">
                 <BrandMark brand={brand} href="/" />
@@ -112,8 +118,10 @@ export function MobileMenu({ brand, categories }: { brand: BrandInfo; categories
               </div>
             </motion.aside>
           </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body,
         )}
-      </AnimatePresence>
     </>
   );
 }
