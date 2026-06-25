@@ -63,7 +63,7 @@ export default function AdminReviewsPage() {
   };
 
   return (
-    <div className="px-8 py-12 max-w-5xl">
+    <div className="px-4 sm:px-8 py-8 sm:py-12 max-w-5xl">
       <h1 className="display text-3xl mb-1">Reviews</h1>
       <p className="text-[color:var(--fg-muted)] mb-8">Moderate customer reviews. Hidden reviews drop out of product ratings.</p>
 

@@ -81,7 +81,7 @@ export default function AdminBrandsPage() {
   };
 
   return (
-    <div className="px-8 py-12 max-w-5xl">
+    <div className="px-4 sm:px-8 py-8 sm:py-12 max-w-5xl">
       <h1 className="display text-3xl mb-1">Brands</h1>
       <p className="text-[color:var(--fg-muted)] mb-8">Manage the labels you stock.</p>
 

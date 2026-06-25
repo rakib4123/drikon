@@ -9,6 +9,7 @@ import { useWishlistStore } from '@/store/wishlist-store';
 import { SearchCommand } from '@/components/shop/search-command';
 import { BrandMark } from '@/components/layout/brand-mark';
 import { MegaMenu } from '@/components/layout/mega-menu';
+import { MobileMenu } from '@/components/layout/mobile-menu';
 import type { BrandInfo } from '@/lib/settings';
 import type { NavCategory } from '@/lib/catalog';
 
@@ -35,8 +36,11 @@ export function Navbar({ brand, categories }: { brand: BrandInfo; categories: Na
 
   return (
     <header className="sticky top-0 z-40 backdrop-blur-xl bg-[color:var(--bg)]/70 border-b border-[color:var(--border)]">
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <BrandMark brand={brand} />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1">
+          <MobileMenu brand={brand} categories={categories} />
+          <BrandMark brand={brand} />
+        </div>
 
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
           <MegaMenu categories={categories} />

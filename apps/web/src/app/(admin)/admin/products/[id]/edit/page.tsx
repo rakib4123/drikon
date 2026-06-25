@@ -25,7 +25,7 @@ export default function AdminProductEditPage({ params }: PageProps) {
 
   if (error) {
     return (
-      <div className="px-8 py-12">
+      <div className="px-4 sm:px-8 py-8 sm:py-12">
         <Link href="/admin/products" className="inline-flex items-center gap-1.5 text-sm text-[color:var(--fg-muted)] hover:text-[color:var(--fg)] mb-6">
           <ArrowLeft className="w-4 h-4" /> All products
         </Link>
@@ -36,14 +36,14 @@ export default function AdminProductEditPage({ params }: PageProps) {
 
   if (!product) {
     return (
-      <div className="px-8 py-12">
+      <div className="px-4 sm:px-8 py-8 sm:py-12">
         <Loader2 className="w-5 h-5 animate-spin text-[color:var(--accent)]" />
       </div>
     );
   }
 
   return (
-    <div className="px-8 py-12">
+    <div className="px-4 sm:px-8 py-8 sm:py-12">
       <Link href="/admin/products" className="inline-flex items-center gap-1.5 text-sm text-[color:var(--fg-muted)] hover:text-[color:var(--fg)] mb-6">
         <ArrowLeft className="w-4 h-4" /> All products
       </Link>
