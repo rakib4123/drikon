@@ -68,7 +68,7 @@ export default function AdminSettingsPage() {
   }
 
   return (
-    <div className="px-8 py-12 max-w-3xl">
+    <div className="px-4 sm:px-8 py-8 sm:py-12 max-w-3xl">
       <h1 className="display text-3xl mb-1">Branding &amp; settings</h1>
       <p className="text-[color:var(--fg-muted)] mb-8">
         White-label your store. These drive the logo, name, colours, and metadata everywhere.

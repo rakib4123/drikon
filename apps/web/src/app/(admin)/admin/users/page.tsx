@@ -75,7 +75,7 @@ export default function AdminUsersPage() {
   };
 
   return (
-    <div className="px-8 py-12 max-w-6xl">
+    <div className="px-4 sm:px-8 py-8 sm:py-12 max-w-6xl">
       <h1 className="display text-3xl mb-1">Users</h1>
       <p className="text-[color:var(--fg-muted)] mb-8">Manage customer accounts and admin access.</p>
 

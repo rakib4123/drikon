@@ -110,7 +110,7 @@ export default function AdminCouponsPage() {
   };
 
   return (
-    <div className="px-8 py-12 max-w-5xl">
+    <div className="px-4 sm:px-8 py-8 sm:py-12 max-w-5xl">
       <h1 className="display text-3xl mb-1">Coupons</h1>
       <p className="text-[color:var(--fg-muted)] mb-8">Create discount codes customers apply at checkout.</p>
 

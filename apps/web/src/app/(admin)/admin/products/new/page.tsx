@@ -6,7 +6,7 @@ import { ProductForm } from '@/components/admin/product-form';
 
 export default function AdminProductNewPage() {
   return (
-    <div className="px-8 py-12">
+    <div className="px-4 sm:px-8 py-8 sm:py-12">
       <Link href="/admin/products" className="inline-flex items-center gap-1.5 text-sm text-[color:var(--fg-muted)] hover:text-[color:var(--fg)] mb-6">
         <ArrowLeft className="w-4 h-4" /> All products
       </Link>

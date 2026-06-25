@@ -40,7 +40,7 @@ export default function AdminProductsPage() {
   }
 
   return (
-    <div className="px-8 py-12">
+    <div className="px-4 sm:px-8 py-8 sm:py-12">
       <div className="flex items-end justify-between mb-8 max-w-6xl">
         <div>
           <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">

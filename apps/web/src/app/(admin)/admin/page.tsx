@@ -66,7 +66,7 @@ export default function AdminHomePage() {
   const t = stats?.totals;
 
   return (
-    <div className="px-8 py-12 max-w-6xl">
+    <div className="px-4 sm:px-8 py-8 sm:py-12 max-w-6xl">
       <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
         Welcome back
       </div>
