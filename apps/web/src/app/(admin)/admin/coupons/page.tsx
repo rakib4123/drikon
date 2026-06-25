@@ -5,6 +5,7 @@ import { Loader2, Plus, Pencil, Trash2, X, Percent, DollarSign } from 'lucide-re
 import { toast } from 'sonner';
 import { apiGet, apiPost, apiPatch, apiDelete, ApiError } from '@/lib/api-client';
 
+interface Cat { id: string; name: string; slug: string }
 interface Coupon {
   id: string;
   code: string;
@@ -16,6 +17,10 @@ interface Coupon {
   redemptionCount: number;
   expiresAt: string | null;
   isActive: boolean;
+  freeShipping: boolean;
+  isPublic: boolean;
+  categoryId: string | null;
+  category?: { name: string } | null;
 }
 
 type Draft = {
@@ -26,11 +31,15 @@ type Draft = {
   maxRedemptions: string;
   expiresAt: string;
   isActive: boolean;
+  freeShipping: boolean;
+  isPublic: boolean;
+  categoryId: string;
 };
-const EMPTY: Draft = { code: '', isPercentage: true, value: '', minOrderAmount: '', maxRedemptions: '', expiresAt: '', isActive: true };
+const EMPTY: Draft = { code: '', isPercentage: true, value: '', minOrderAmount: '', maxRedemptions: '', expiresAt: '', isActive: true, freeShipping: false, isPublic: false, categoryId: '' };
 
 export default function AdminCouponsPage() {
   const [items, setItems] = useState<Coupon[]>([]);
+  const [cats, setCats] = useState<Cat[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Draft>(EMPTY);
@@ -38,7 +47,12 @@ export default function AdminCouponsPage() {
 
   const load = async () => {
     try {
-      setItems(await apiGet<Coupon[]>('/api/v1/coupons'));
+      const [c, cat] = await Promise.all([
+        apiGet<Coupon[]>('/api/v1/coupons'),
+        apiGet<Cat[]>('/api/v1/categories').catch(() => []),
+      ]);
+      setItems(c);
+      setCats(cat);
     } catch {
       toast.error('Failed to load coupons');
     } finally {
@@ -59,6 +73,9 @@ export default function AdminCouponsPage() {
       maxRedemptions: c.maxRedemptions != null ? String(c.maxRedemptions) : '',
       expiresAt: c.expiresAt ? c.expiresAt.slice(0, 10) : '',
       isActive: c.isActive,
+      freeShipping: c.freeShipping,
+      isPublic: c.isPublic,
+      categoryId: c.categoryId ?? '',
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -69,13 +86,17 @@ export default function AdminCouponsPage() {
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!draft.code.trim() || !draft.value) return toast.error('Code and value are required');
+    if (!draft.code.trim()) return toast.error('Code is required');
+    if (!draft.value && !draft.freeShipping) return toast.error('Enter a value or enable free shipping');
     setSaving(true);
     const body: Record<string, unknown> = {
       code: draft.code.trim(),
       isPercentage: draft.isPercentage,
-      value: Number(draft.value),
+      value: Number(draft.value || 0),
       isActive: draft.isActive,
+      freeShipping: draft.freeShipping,
+      isPublic: draft.isPublic,
+      categoryId: draft.categoryId,
     };
     if (draft.minOrderAmount) body.minOrderAmount = Number(draft.minOrderAmount);
     if (draft.maxRedemptions) body.maxRedemptions = Number(draft.maxRedemptions);
@@ -141,13 +162,32 @@ export default function AdminCouponsPage() {
           <input className="input" type="number" placeholder="Min order amount (optional)" value={draft.minOrderAmount} onChange={(e) => setDraft({ ...draft, minOrderAmount: e.target.value })} />
           <input className="input" type="number" placeholder="Max redemptions (optional)" value={draft.maxRedemptions} onChange={(e) => setDraft({ ...draft, maxRedemptions: e.target.value })} />
           <label className="block text-xs text-[color:var(--fg-muted)]">
+            Restrict to category (optional)
+            <select className="input mt-1" value={draft.categoryId} onChange={(e) => setDraft({ ...draft, categoryId: e.target.value })}>
+              <option value="">Any product</option>
+              {cats.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-xs text-[color:var(--fg-muted)]">
             Expires
             <input className="input mt-1" type="date" value={draft.expiresAt} onChange={(e) => setDraft({ ...draft, expiresAt: e.target.value })} />
           </label>
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" checked={draft.isActive} onChange={(e) => setDraft({ ...draft, isActive: e.target.checked })} />
-            Active
-          </label>
+          <div className="grid grid-cols-1 gap-2 pt-1">
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={draft.freeShipping} onChange={(e) => setDraft({ ...draft, freeShipping: e.target.checked })} />
+              Also give free shipping
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={draft.isPublic} onChange={(e) => setDraft({ ...draft, isPublic: e.target.checked })} />
+              Advertise as a public offer
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={draft.isActive} onChange={(e) => setDraft({ ...draft, isActive: e.target.checked })} />
+              Active
+            </label>
+          </div>
           <button type="submit" disabled={saving} className="btn-primary w-full">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Plus className="w-4 h-4" /> {editingId ? 'Save changes' : 'Add coupon'}</>}
           </button>
@@ -163,12 +203,15 @@ export default function AdminCouponsPage() {
               {items.map((c) => (
                 <li key={c.id} className="flex items-center gap-3 px-5 py-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 flex-wrap">
                       <span className="font-mono font-semibold">{c.code}</span>
                       {!c.isActive && <span className="text-[10px] text-[color:var(--fg-muted)] border border-[color:var(--border)] rounded px-1.5">off</span>}
+                      {c.freeShipping && <span className="text-[10px] text-emerald-600 border border-emerald-600/30 rounded px-1.5">free ship</span>}
+                      {c.isPublic && <span className="text-[10px] text-[color:var(--accent)] border border-[color:var(--accent)]/30 rounded px-1.5">public</span>}
+                      {c.category && <span className="text-[10px] text-[color:var(--fg-muted)] border border-[color:var(--border)] rounded px-1.5">{c.category.name}</span>}
                     </div>
                     <div className="text-xs text-[color:var(--fg-muted)]">
-                      {c.isPercentage ? `${c.value}% off` : `${c.value} off`}
+                      {Number(c.value) > 0 ? (c.isPercentage ? `${c.value}% off` : `${c.value} off`) : 'free shipping'}
                       {c.minOrderAmount ? ` · min ${c.minOrderAmount}` : ''}
                       {' · '}{c.redemptionCount}{c.maxRedemptions ? `/${c.maxRedemptions}` : ''} used
                     </div>

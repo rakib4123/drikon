@@ -6,25 +6,44 @@ import {
   Param,
   Patch,
   Post,
-  Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 
 import { CouponsService } from './coupons.service';
-import { CreateCouponDto, UpdateCouponDto } from './dto/coupon.dto';
-import { Roles } from '../../common/decorators';
+import {
+  CreateCouponDto,
+  UpdateCouponDto,
+  ValidateCouponDto,
+  BestCouponDto,
+} from './dto/coupon.dto';
+import { Public, Roles } from '../../common/decorators';
 
 @ApiTags('coupons')
 @Controller({ path: 'coupons', version: '1' })
 export class CouponsController {
   constructor(private readonly coupons: CouponsService) {}
 
-  // Authenticated (any signed-in user) — used by checkout to apply a code.
-  @Get('validate')
-  @ApiOperation({ summary: 'Validate a coupon code against a subtotal' })
-  validate(@Query('code') code: string, @Query('subtotal') subtotal?: string) {
-    return this.coupons.validate(code ?? '', subtotal ? parseFloat(subtotal) : 0);
+  // ─── Storefront (public — guests can apply coupons in the cart) ───
+  @Public()
+  @Post('validate')
+  @ApiOperation({ summary: 'Validate a coupon against a cart' })
+  validate(@Body() dto: ValidateCouponDto) {
+    return this.coupons.validate(dto.code, dto.subtotal, dto.items);
+  }
+
+  @Public()
+  @Post('best')
+  @ApiOperation({ summary: 'Best eligible coupon for a cart (auto-apply)' })
+  best(@Body() dto: BestCouponDto) {
+    return this.coupons.best(dto.subtotal, dto.items);
+  }
+
+  @Public()
+  @Get('offers')
+  @ApiOperation({ summary: 'Public, currently-valid coupon offers' })
+  offers() {
+    return this.coupons.offers();
   }
 
   // ─── Admin CRUD ───

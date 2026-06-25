@@ -1,13 +1,24 @@
 'use client';
 
+import { useCallback, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCartStore } from '@/store/cart-store';
 import { formatPrice } from '@/lib/utils';
-import { Minus, Plus, X, ArrowRight, ShoppingBag } from 'lucide-react';
+import { CouponField, type CouponState } from '@/components/shop/coupon-field';
+import { Minus, Plus, X, ArrowRight, ShoppingBag, Truck } from 'lucide-react';
+
+const FREE_SHIPPING_THRESHOLD = 3000;
+const FLAT_SHIPPING_FEE = 60;
 
 export default function CartPage() {
   const { items, updateQty, remove, subtotal } = useCartStore();
+  const [coupon, setCoupon] = useState<CouponState>({ code: null, discount: 0, freeShipping: false });
+  const lines = useMemo(
+    () => items.map((i) => ({ productId: i.productId, quantity: i.quantity, unitPrice: i.unitPrice })),
+    [items],
+  );
+  const onCoupon = useCallback((s: CouponState) => setCoupon(s), []);
 
   if (items.length === 0) {
     return (
@@ -22,7 +33,11 @@ export default function CartPage() {
     );
   }
 
-  const total = subtotal();
+  const sub = subtotal();
+  const discount = Math.min(coupon.discount, sub);
+  const freeShip = coupon.freeShipping || sub >= FREE_SHIPPING_THRESHOLD;
+  const shipping = freeShip ? 0 : FLAT_SHIPPING_FEE;
+  const total = Math.max(0, sub + shipping - discount);
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-14">
@@ -68,14 +83,26 @@ export default function CartPage() {
 
         <aside className="card h-fit lg:sticky lg:top-24">
           <div className="font-semibold mb-4">Summary</div>
+
+          <CouponField subtotal={sub} items={lines} onChange={onCoupon} />
+
+          <div className="h-px bg-[color:var(--border)] my-4" />
           <div className="flex justify-between text-sm mb-2">
             <span className="text-[color:var(--fg-muted)]">Subtotal</span>
-            <span>{formatPrice(total)}</span>
+            <span>{formatPrice(sub)}</span>
           </div>
           <div className="flex justify-between text-sm mb-2">
             <span className="text-[color:var(--fg-muted)]">Shipping</span>
-            <span>Calculated at checkout</span>
+            <span className={freeShip ? 'text-emerald-600 inline-flex items-center gap-1' : ''}>
+              {freeShip ? (<><Truck className="w-3.5 h-3.5" /> Free</>) : formatPrice(shipping)}
+            </span>
           </div>
+          {discount > 0 && (
+            <div className="flex justify-between text-sm mb-2 text-[color:var(--accent)]">
+              <span>Discount {coupon.code ? `(${coupon.code})` : ''}</span>
+              <span>− {formatPrice(discount)}</span>
+            </div>
+          )}
           <div className="h-px bg-[color:var(--border)] my-4" />
           <div className="flex justify-between font-semibold">
             <span>Total</span>
@@ -85,7 +112,7 @@ export default function CartPage() {
             Proceed to checkout <ArrowRight className="w-4 h-4" />
           </Link>
           <p className="text-[11px] text-[color:var(--fg-muted)] mt-3 text-center">
-            Secure payment via Stripe. Cards never touch our servers.
+            Coupons carry over to checkout. Demo checkout — no payment taken.
           </p>
         </aside>
       </div>

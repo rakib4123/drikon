@@ -77,18 +77,23 @@ export class OrdersService {
       (acc, l) => acc.add(l.lineTotal),
       new Prisma.Decimal(0),
     );
-    const shipping = subtotal.greaterThanOrEqualTo(FREE_SHIPPING_THRESHOLD)
+    let shipping = subtotal.greaterThanOrEqualTo(FREE_SHIPPING_THRESHOLD)
       ? new Prisma.Decimal(0)
       : FLAT_SHIPPING_FEE;
     const tax = new Prisma.Decimal(0);
 
-    // Apply a coupon if one was supplied (server-validated).
+    // Apply a coupon if one was supplied (server-validated against trusted prices).
     let discount = new Prisma.Decimal(0);
     let couponId: string | null = null;
     if (dto.couponCode) {
-      const resolved = await this.coupons.resolveForOrder(dto.couponCode, subtotal.toNumber());
+      const resolved = await this.coupons.resolveForOrder(
+        dto.couponCode,
+        subtotal.toNumber(),
+        lines.map((l) => ({ productId: l.productId, quantity: l.quantity, unitPrice: l.unitPrice.toNumber() })),
+      );
       discount = resolved.discount;
       couponId = resolved.couponId;
+      if (resolved.freeShipping) shipping = new Prisma.Decimal(0);
     }
 
     const total = subtotal.add(shipping).add(tax).sub(discount);
