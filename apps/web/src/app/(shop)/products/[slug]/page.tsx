@@ -11,6 +11,7 @@ import { ProductReviews } from '@/components/shop/product-reviews';
 import { VideoEmbed } from '@/components/shop/video-embed';
 import { PremiumProductPage } from '@/components/shop/premium-product-page';
 import { formatPrice } from '@/lib/utils';
+import { getSettings, resolveContent } from '@/lib/settings';
 import type { ProductSummary } from '@drikon/shared-types';
 
 export const dynamic = 'force-dynamic';
@@ -67,6 +68,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const discount = onSale && compareAt ? Math.round(((compareAt - price) / compareAt) * 100) : 0;
 
   const related = await getRelated(product.category.slug, product.id);
+  const content = resolveContent(await getSettings());
 
   const isPremium = product.attributes && typeof product.attributes === 'object' && 'template' in product.attributes && product.attributes.template === 'premium';
 
@@ -189,15 +191,15 @@ export default async function ProductDetailPage({ params }: PageProps) {
           <div className="grid grid-cols-3 gap-3 text-xs text-[color:var(--fg-muted)] border-t border-[color:var(--border)] pt-6">
             <div className="flex items-start gap-2">
               <Truck className="w-4 h-4 text-[color:var(--accent)] shrink-0 mt-0.5" />
-              <span>Free shipping over ৳3,000</span>
+              <span>{content.shippingNote}</span>
             </div>
             <div className="flex items-start gap-2">
               <RefreshCw className="w-4 h-4 text-[color:var(--accent)] shrink-0 mt-0.5" />
-              <span>14-day returns</span>
+              <span>{content.returnsNote}</span>
             </div>
             <div className="flex items-start gap-2">
               <ShieldCheck className="w-4 h-4 text-[color:var(--accent)] shrink-0 mt-0.5" />
-              <span>Authentic guaranteed</span>
+              <span>{content.warrantyNote}</span>
             </div>
           </div>
         </div>

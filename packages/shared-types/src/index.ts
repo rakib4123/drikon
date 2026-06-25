@@ -247,6 +247,12 @@ export interface OrderListResponse {
 // SITE SETTINGS (white-label branding)
 // ────────────────────────────────────────────────────────────────────────────
 
+/** One card in the homepage feature strip. */
+export interface SiteFeature {
+  title: string;
+  body: string;
+}
+
 export interface SiteSettings {
   id: string;
   siteName: string;
@@ -258,8 +264,39 @@ export interface SiteSettings {
   supportEmail?: string | null;
   socialFacebook?: string | null;
   socialInstagram?: string | null;
+
+  // ── Editable storefront content (null → falls back to built-in defaults) ──
+  heroBadge?: string | null;
+  heroTitle?: string | null;
+  heroHighlight?: string | null;
+  heroSubtitle?: string | null;
+  heroCtaLabel?: string | null;
+  heroCtaHref?: string | null;
+  heroCtaAltLabel?: string | null;
+  heroCtaAltHref?: string | null;
+  features?: SiteFeature[] | null;
+  ctaHeading?: string | null;
+  ctaBody?: string | null;
+  ctaButtonLabel?: string | null;
+  ctaButtonHref?: string | null;
+  dealsTitle?: string | null;
+  dealsBlurb?: string | null;
+  topbarPromo?: string | null;
+  footerNote?: string | null;
+  shippingNote?: string | null;
+  returnsNote?: string | null;
+  warrantyNote?: string | null;
+  seoKeywords?: string | null;
+
   updatedAt?: string;
 }
+
+const emptyableText = (max: number) => z.string().max(max).trim().optional().or(z.literal(''));
+
+export const SiteFeatureSchema = z.object({
+  title: z.string().max(60).trim(),
+  body: z.string().max(160).trim(),
+});
 
 export const UpdateSettingsSchema = z.object({
   siteName: z.string().min(1, 'Required').max(60).trim(),
@@ -271,5 +308,28 @@ export const UpdateSettingsSchema = z.object({
   supportEmail: z.string().email().optional().or(z.literal('')),
   socialFacebook: z.string().url().optional().or(z.literal('')),
   socialInstagram: z.string().url().optional().or(z.literal('')),
+
+  // Content (all optional; empty string clears back to the built-in default)
+  heroBadge: emptyableText(120),
+  heroTitle: emptyableText(120),
+  heroHighlight: emptyableText(60),
+  heroSubtitle: emptyableText(400),
+  heroCtaLabel: emptyableText(40),
+  heroCtaHref: emptyableText(200),
+  heroCtaAltLabel: emptyableText(40),
+  heroCtaAltHref: emptyableText(200),
+  features: z.array(SiteFeatureSchema).max(8).optional(),
+  ctaHeading: emptyableText(120),
+  ctaBody: emptyableText(400),
+  ctaButtonLabel: emptyableText(40),
+  ctaButtonHref: emptyableText(200),
+  dealsTitle: emptyableText(60),
+  dealsBlurb: emptyableText(160),
+  topbarPromo: emptyableText(160),
+  footerNote: emptyableText(120),
+  shippingNote: emptyableText(80),
+  returnsNote: emptyableText(80),
+  warrantyNote: emptyableText(80),
+  seoKeywords: emptyableText(300),
 });
 export type UpdateSettingsInput = z.infer<typeof UpdateSettingsSchema>;

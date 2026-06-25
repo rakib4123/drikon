@@ -3,7 +3,7 @@ import { BrandMark } from '@/components/layout/brand-mark';
 import type { BrandInfo } from '@/lib/settings';
 import type { NavCategory } from '@/lib/catalog';
 
-export function Footer({ brand, categories = [] }: { brand: BrandInfo; categories?: NavCategory[] }) {
+export function Footer({ brand, categories = [], note }: { brand: BrandInfo; categories?: NavCategory[]; note?: string }) {
   const topCats = categories.filter((c) => !c.parentId).slice(0, 5);
   return (
     <footer className="mt-24 border-t border-[color:var(--border)]">
@@ -34,7 +34,7 @@ export function Footer({ brand, categories = [] }: { brand: BrandInfo; categorie
       <div className="border-t border-[color:var(--border)] py-6">
         <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between gap-2 text-xs text-[color:var(--fg-muted)]">
           <span>© {new Date().getFullYear()} {brand.siteName}. All rights reserved.</span>
-          <span>Made with care in Dhaka.</span>
+          {note && <span>{note}</span>}
         </div>
       </div>
     </footer>
