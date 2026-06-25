@@ -1,0 +1,34 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Drikon API (NestJS) — production image
+# Build context MUST be the monorepo root (so pnpm can link @drikon/shared-types).
+#   docker build -f deploy/Dockerfile.api -t drikon-api .
+# ─────────────────────────────────────────────────────────────────────────────
+FROM node:22-slim
+
+# OpenSSL is required by Prisma's query engine.
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends openssl ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN corepack enable
+WORKDIR /app
+
+# 1) Install deps with the lockfile. Copy every workspace manifest first so the
+#    layer is cached until a package.json actually changes.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+COPY apps/api/package.json apps/api/package.json
+COPY apps/web/package.json apps/web/package.json
+COPY packages/shared-types/package.json packages/shared-types/package.json
+RUN pnpm install --frozen-lockfile
+
+# 2) Copy the source the API needs and build.
+COPY apps/api apps/api
+COPY packages/shared-types packages/shared-types
+RUN pnpm --filter @drikon/api db:generate \
+  && pnpm --filter @drikon/api build
+
+ENV NODE_ENV=production
+EXPOSE 4000
+
+# Apply pending migrations, then start. (Safe to run every boot — no-op if none.)
+CMD ["sh", "-c", "pnpm --filter @drikon/api db:migrate:deploy && node apps/api/dist/main.js"]

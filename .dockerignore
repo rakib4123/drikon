@@ -1,0 +1,15 @@
+**/node_modules
+**/.next
+**/dist
+**/.turbo
+**/coverage
+**/.git
+**/.env
+**/.env.*
+!**/.env.example
+**/*.log
+**/.DS_Store
+**/test-results
+**/playwright-report
+apps/api/tsconfig.tsbuildinfo
+apps/web/tsconfig.tsbuildinfo

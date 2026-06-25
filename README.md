@@ -5,14 +5,14 @@ It has a customer storefront (browse, search, cart, wishlist, reviews, checkout)
 complete admin panel to run the store (products, orders, customers, coupons, flash sales,
 hero banners, and white-label branding).
 
-## 🔗 Live demo
-
-**https://drikon-web.vercel.app**
-
 ## 🧰 Built with
 
 - **Next.js 15** + **React 19** + **TypeScript** (storefront)
 - **NestJS 11** + **Prisma** + **PostgreSQL** + **Redis** (API)
 - **Tailwind CSS** + **Motion** (UI & animation)
 - **Cloudinary** (image uploads)
-- Deployed on **Vercel** (web) and **Render** (API)
+
+## 🚀 Self-hosting
+
+The whole stack runs on a single VPS with Docker + Caddy (automatic HTTPS).
+See **[deploy/DEPLOY.md](deploy/DEPLOY.md)** — `docker compose up -d --build`.
