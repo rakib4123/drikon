@@ -16,6 +16,8 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 # (TypeScript, etc.), which Next needs at build time to resolve tsconfig paths.
 # `next build` already produces a production build on its own.
 ENV NEXT_TELEMETRY_DISABLED=1
+# Emit the standalone server (gated in next.config.mjs so Vercel is unaffected).
+ENV BUILD_STANDALONE=1
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 COPY apps/web/package.json apps/web/package.json
