@@ -1,3 +1,8 @@
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 const isDev = process.env.NODE_ENV !== 'production';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -24,6 +29,11 @@ const csp = [
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // Self-contained server build for Docker (only traces files it actually uses).
+  // outputFileTracingRoot points at the monorepo root so workspace deps
+  // (e.g. @drikon/shared-types) are bundled correctly.
+  output: 'standalone',
+  outputFileTracingRoot: path.join(__dirname, '../../'),
   // Product images can come from any CDN an admin pastes in, so allow any
   // HTTPS host (Next still optimizes + proxies them).
   images: {

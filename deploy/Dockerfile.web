@@ -1,0 +1,45 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Drikon storefront (Next.js) — production image (standalone output)
+# Build context MUST be the monorepo root.
+#   docker build -f deploy/Dockerfile.web --build-arg NEXT_PUBLIC_API_URL=https://api.example.com -t drikon-web .
+#
+# NOTE: NEXT_PUBLIC_API_URL is baked in at BUILD time (it ends up in the client
+# bundle and the CSP connect-src), so it must be passed as a build arg.
+# ─────────────────────────────────────────────────────────────────────────────
+FROM node:22-slim AS build
+RUN corepack enable
+WORKDIR /app
+
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+# NOTE: do NOT set NODE_ENV=production here — pnpm would skip devDependencies
+# (TypeScript, etc.), which Next needs at build time to resolve tsconfig paths.
+# `next build` already produces a production build on its own.
+ENV NEXT_TELEMETRY_DISABLED=1
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+COPY apps/web/package.json apps/web/package.json
+COPY apps/api/package.json apps/api/package.json
+COPY packages/shared-types/package.json packages/shared-types/package.json
+RUN pnpm install --frozen-lockfile
+
+COPY apps/web apps/web
+COPY packages/shared-types packages/shared-types
+RUN pnpm --filter @drikon/web build
+
+# ── Runtime: copy only the self-contained standalone server ──
+FROM node:22-slim AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+
+# Standalone output is rooted at the monorepo root (outputFileTracingRoot),
+# so server.js lives at apps/web/server.js and node_modules at the root.
+COPY --from=build /app/apps/web/.next/standalone ./
+COPY --from=build /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=build /app/apps/web/public ./apps/web/public
+
+EXPOSE 3000
+CMD ["node", "apps/web/server.js"]
