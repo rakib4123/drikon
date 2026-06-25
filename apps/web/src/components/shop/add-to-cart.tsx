@@ -16,7 +16,7 @@ export interface AddToCartProduct {
   stock: number;
 }
 
-export function AddToCart({ product }: { product: AddToCartProduct }) {
+export function AddToCart({ product, className }: { product: AddToCartProduct; className?: string }) {
   const add = useCartStore((s) => s.add);
   const [qty, setQty] = useState(1);
   const soldOut = product.stock === 0;
@@ -38,7 +38,7 @@ export function AddToCart({ product }: { product: AddToCartProduct }) {
   };
 
   return (
-    <div className="flex flex-col sm:flex-row gap-3">
+    <div className={`flex flex-col sm:flex-row gap-3 ${className ?? ''}`}>
       {/* Quantity stepper */}
       <div className="inline-flex items-center border border-[color:var(--border)] rounded-xl overflow-hidden shrink-0 self-start">
         <button

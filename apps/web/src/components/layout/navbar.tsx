@@ -40,7 +40,7 @@ export function Navbar({ brand, categories }: { brand: BrandInfo; categories: Na
 
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
           <MegaMenu categories={categories} />
-          <Link href="/products?featured=true" className="hover:text-[color:var(--accent)] transition-colors">
+          <Link href="/showcase" className="hover:text-[color:var(--accent)] transition-colors">
             Featured
           </Link>
           <Link href="/products" className="hover:text-[color:var(--accent)] transition-colors">
