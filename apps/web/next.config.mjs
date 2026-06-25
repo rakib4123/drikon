@@ -2,12 +2,10 @@
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  // Allow images from Cloudinary + Unsplash (seed data)
+  // Product images can come from any CDN an admin pastes in, so allow any
+  // HTTPS host (Next still optimizes + proxies them).
   images: {
-    remotePatterns: [
-      { protocol: 'https', hostname: 'res.cloudinary.com' },
-      { protocol: 'https', hostname: 'images.unsplash.com' },
-    ],
+    remotePatterns: [{ protocol: 'https', hostname: '**' }],
   },
   experimental: {
     optimizePackageImports: ['lucide-react', 'motion'],
