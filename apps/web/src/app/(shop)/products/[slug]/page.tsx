@@ -8,6 +8,7 @@ import { AddToCart } from '@/components/shop/add-to-cart';
 import { WishlistButton } from '@/components/shop/wishlist-button';
 import { CompareButton } from '@/components/shop/compare-button';
 import { ProductReviews } from '@/components/shop/product-reviews';
+import { PremiumProductPage } from '@/components/shop/premium-product-page';
 import { formatPrice } from '@/lib/utils';
 import type { ProductSummary } from '@drikon/shared-types';
 
@@ -64,6 +65,12 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const discount = onSale && compareAt ? Math.round(((compareAt - price) / compareAt) * 100) : 0;
 
   const related = await getRelated(product.category.slug, product.id);
+
+  const isPremium = product.attributes && typeof product.attributes === 'object' && 'template' in product.attributes && product.attributes.template === 'premium';
+
+  if (isPremium) {
+    return <PremiumProductPage product={product} related={related} />;
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
