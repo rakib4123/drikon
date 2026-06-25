@@ -5,6 +5,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const isDev = process.env.NODE_ENV !== 'production';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+// Only emit the self-contained "standalone" server for the Docker/self-host
+// build (Dockerfile.web sets BUILD_STANDALONE=1). On Vercel this stays off so
+// the platform uses its own default build output.
+const standalone = process.env.BUILD_STANDALONE === '1';
 
 // Content-Security-Policy. Next.js needs inline scripts/styles for hydration;
 // dev additionally needs eval + websockets for HMR. Everything else is locked
@@ -31,9 +35,10 @@ const nextConfig = {
   poweredByHeader: false,
   // Self-contained server build for Docker (only traces files it actually uses).
   // outputFileTracingRoot points at the monorepo root so workspace deps
-  // (e.g. @drikon/shared-types) are bundled correctly.
-  output: 'standalone',
-  outputFileTracingRoot: path.join(__dirname, '../../'),
+  // (e.g. @drikon/shared-types) are bundled correctly. Off on Vercel.
+  ...(standalone
+    ? { output: 'standalone', outputFileTracingRoot: path.join(__dirname, '../../') }
+    : {}),
   // Product images can come from any CDN an admin pastes in, so allow any
   // HTTPS host (Next still optimizes + proxies them).
   images: {
