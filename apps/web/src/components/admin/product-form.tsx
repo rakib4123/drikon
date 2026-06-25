@@ -29,6 +29,7 @@ interface ProductFormState {
   brandId: string;
   imageUrl: string;
   imageAlt: string;
+  videoUrl: string;
 }
 
 interface ProductFormProps {
@@ -54,6 +55,7 @@ const emptyState: ProductFormState = {
   brandId: '',
   imageUrl: '',
   imageAlt: '',
+  videoUrl: '',
 };
 
 export function ProductForm({ mode, productId, initial }: ProductFormProps) {
@@ -97,6 +99,7 @@ export function ProductForm({ mode, productId, initial }: ProductFormProps) {
       if (state.shortDescription.trim()) payload.shortDescription = state.shortDescription.trim();
       if (state.compareAtPrice.trim()) payload.compareAtPrice = parseFloat(state.compareAtPrice);
       if (state.brandId) payload.brandId = state.brandId;
+      payload.videoUrl = state.videoUrl.trim();
 
       // Only include images array on create (UpdateProductDto is partial — backend handles separately)
       if (mode === 'create') {
@@ -271,6 +274,16 @@ export function ProductForm({ mode, productId, initial }: ProductFormProps) {
           )}
         </>
       )}
+
+      <Field label="Product video URL (optional)">
+        <input
+          type="url"
+          value={state.videoUrl}
+          onChange={(e) => update('videoUrl', e.target.value)}
+          placeholder="YouTube, Vimeo, or .mp4 link"
+          className="input"
+        />
+      </Field>
 
       <div className="flex items-center gap-6 pt-2">
         <label className="flex items-center gap-2 text-sm">

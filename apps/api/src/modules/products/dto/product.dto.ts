@@ -17,6 +17,7 @@ export const CreateProductSchema = z.object({
   categoryId: z.string().min(1),
   brandId: z.string().min(1).optional(),
   attributes: z.record(z.any()).optional(),
+  videoUrl: z.string().url().optional().or(z.literal('')),
   metaTitle: z.string().max(160).optional(),
   metaDescription: z.string().max(320).optional(),
   images: z
