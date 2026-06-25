@@ -101,12 +101,12 @@ export function ProductForm({ mode, productId, initial }: ProductFormProps) {
       if (state.brandId) payload.brandId = state.brandId;
       payload.videoUrl = state.videoUrl.trim();
 
-      // Only include images array on create (UpdateProductDto is partial — backend handles separately)
+      // Image is optional — create the product with it if provided, otherwise
+      // with none (a placeholder shows; photos can be added later via edit).
       if (mode === 'create') {
-        if (!state.imageUrl) throw new Error('Please upload a product image first.');
-        payload.images = [
-          { url: state.imageUrl, alt: state.imageAlt || state.name, position: 0 },
-        ];
+        payload.images = state.imageUrl
+          ? [{ url: state.imageUrl, alt: state.imageAlt || state.name, position: 0 }]
+          : [];
       }
 
       if (mode === 'create') {
