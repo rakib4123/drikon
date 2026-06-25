@@ -202,14 +202,22 @@ export class ProductsService {
   }
 
   // ─────────────────────────────────────────────────────────────────
-  // DELETE (admin) — soft delete: isActive = false
+  // DELETE (admin)
+  // Never-ordered products are removed completely (images, variants, cart,
+  // wishlist, reviews, flash-sale entries all cascade). Products with order
+  // history are archived (isActive = false) instead, so past orders stay intact.
   // ─────────────────────────────────────────────────────────────────
   async remove(id: string) {
     await this.findById(id);
-    return this.prisma.product.update({
-      where: { id },
-      data: { isActive: false },
-    });
+    const orderCount = await this.prisma.orderItem.count({ where: { productId: id } });
+    if (orderCount > 0) {
+      return this.prisma.product.update({
+        where: { id },
+        data: { isActive: false },
+      });
+    }
+    await this.prisma.product.delete({ where: { id } });
+    return { id, deleted: true };
   }
 
   // ─────────────────────────────────────────────────────────────────
