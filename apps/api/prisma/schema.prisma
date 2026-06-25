@@ -533,6 +533,37 @@ model SiteSettings {
   supportEmail String?
   socialFacebook  String?
   socialInstagram String?
+
+  // ── Editable storefront content (white-label; null falls back to defaults) ──
+  // Hero (used as the home hero when no Banner slides are active)
+  heroBadge       String?
+  heroTitle       String? // line breaks with \n
+  heroHighlight   String? // the gradient-highlighted phrase
+  heroSubtitle    String?
+  heroCtaLabel    String?
+  heroCtaHref     String?
+  heroCtaAltLabel String?
+  heroCtaAltHref  String?
+  // Feature strip — JSON array of { title, body }
+  features        Json?
+  // Editorial CTA band
+  ctaHeading      String?
+  ctaBody         String?
+  ctaButtonLabel  String?
+  ctaButtonHref   String?
+  // Category showcase "deals" tile
+  dealsTitle      String?
+  dealsBlurb      String?
+  // Chrome
+  topbarPromo     String?
+  footerNote      String?
+  // Product page trust badges
+  shippingNote    String?
+  returnsNote     String?
+  warrantyNote    String?
+  // SEO
+  seoKeywords     String? // comma-separated
+
   updatedAt    DateTime @updatedAt @default(now())
 }
 

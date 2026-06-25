@@ -2,6 +2,8 @@ import { cache } from 'react';
 import type { SiteSettings } from '@drikon/shared-types';
 import { apiGet } from './api-client';
 
+export { CONTENT_DEFAULTS, resolveContent, type ResolvedContent } from './content';
+
 export interface BrandInfo {
   siteName: string;
   logoUrl: string | null;

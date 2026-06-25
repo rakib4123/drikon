@@ -8,10 +8,18 @@ import { FlashSaleSection } from '@/components/shop/flash-sale-section';
 import { HeroSlider } from '@/components/shop/hero-slider';
 import { Reveal } from '@/components/ui/reveal';
 import { apiGet } from '@/lib/api-client';
-import { getSettings } from '@/lib/settings';
+import { getSettings, resolveContent } from '@/lib/settings';
 import { getBanners } from '@/lib/banners';
 import { getCategories } from '@/lib/catalog';
 import type { ProductListResponse } from '@drikon/shared-types';
+
+// Rotating icon set for the (editable) feature strip cards.
+const FEATURE_ICONS = [
+  <ShieldCheck className="w-5 h-5" key="shield" />,
+  <Truck className="w-5 h-5" key="truck" />,
+  <Headphones className="w-5 h-5" key="headphones" />,
+  <Sparkles className="w-5 h-5" key="sparkles" />,
+];
 
 // Fetch on the server — RSC means no API key/token leaks to client.
 async function getFeatured(): Promise<ProductListResponse | null> {
@@ -29,7 +37,7 @@ export default async function HomePage() {
     getBanners(),
     getCategories(),
   ]);
-  const brandName = settings.siteName;
+  const c = resolveContent(settings);
 
   return (
     <>
@@ -43,29 +51,37 @@ export default async function HomePage() {
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-xs font-medium mb-6 animate-fade-up shadow-[0_0_24px_-8px_var(--glow)]">
               <Sparkles className="w-3.5 h-3.5 text-[color:var(--accent)]" />
-              <span>Genuine parts · Official warranty</span>
+              <span>{c.heroBadge}</span>
             </div>
 
             <h1 className="display text-5xl md:text-7xl lg:text-8xl animate-fade-up" style={{ animationDelay: '120ms' }}>
-              Build it.<br />
-              <span className="bg-gradient-to-r from-[#ef6a20] via-[#f9822f] to-[#14233f] bg-clip-text text-transparent">
-                Power it.
-              </span>
-              <br />
-              Game on.
+              {c.heroTitle.split('\n').map((line, i, arr) => {
+                const isHighlight = line.trim() === c.heroHighlight.trim();
+                return (
+                  <span key={i}>
+                    {isHighlight ? (
+                      <span className="bg-gradient-to-r from-[#ef6a20] via-[#f9822f] to-[#14233f] bg-clip-text text-transparent">
+                        {line}
+                      </span>
+                    ) : (
+                      line
+                    )}
+                    {i < arr.length - 1 && <br />}
+                  </span>
+                );
+              })}
             </h1>
 
             <p className="mt-6 max-w-xl text-lg text-[color:var(--fg-muted)] animate-fade-up" style={{ animationDelay: '240ms' }}>
-              {brandName} is your one-stop tech shop — laptops, PC components, and peripherals
-              from the brands you trust, with genuine warranty and fast nationwide delivery.
+              {c.heroSubtitle}
             </p>
 
             <div className="mt-10 flex flex-wrap gap-3 animate-fade-up" style={{ animationDelay: '360ms' }}>
-              <Link href="/products" className="btn-primary">
-                Browse the shop <ArrowRight className="w-4 h-4" />
+              <Link href={c.heroCtaHref} className="btn-primary">
+                {c.heroCtaLabel} <ArrowRight className="w-4 h-4" />
               </Link>
-              <Link href="/products?featured=true" className="btn-ghost">
-                View featured
+              <Link href={c.heroCtaAltHref} className="btn-ghost">
+                {c.heroCtaAltLabel}
               </Link>
             </div>
           </div>
@@ -80,20 +96,21 @@ export default async function HomePage() {
       )}
 
       {/* ─── FEATURE STRIP ─── */}
-      <section className="border-y border-[color:var(--border)] bg-[color:var(--bg-soft)]/30">
-        <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-8">
-          <Feature icon={<ShieldCheck className="w-5 h-5" />} title="100% genuine" body="Authentic products, official warranty" />
-          <Feature icon={<Truck className="w-5 h-5" />} title="Fast delivery" body="Tracked, nationwide shipping" />
-          <Feature icon={<Headphones className="w-5 h-5" />} title="Expert support" body="Real techs who know the gear" />
-          <Feature icon={<Sparkles className="w-5 h-5" />} title="Best prices" body="Fair pricing, regular deals" />
-        </div>
-      </section>
+      {c.features.length > 0 && (
+        <section className="border-y border-[color:var(--border)] bg-[color:var(--bg-soft)]/30">
+          <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-8">
+            {c.features.map((f, i) => (
+              <Feature key={i} icon={FEATURE_ICONS[i % FEATURE_ICONS.length]} title={f.title} body={f.body} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ─── FLASH SALE (only renders when one is live) ─── */}
       <FlashSaleSection />
 
       {/* ─── SHOP BY CATEGORY ─── */}
-      <CategoryShowcase categories={categories} />
+      <CategoryShowcase categories={categories} dealsTitle={c.dealsTitle} dealsBlurb={c.dealsBlurb} />
 
       {/* ─── FEATURED PRODUCTS ─── */}
       <section className="max-w-7xl mx-auto px-6 py-20">
@@ -124,15 +141,14 @@ export default async function HomePage() {
         <Reveal className="relative overflow-hidden rounded-3xl bg-drikon-gradient p-10 md:p-16 text-white grain">
           <div className="relative z-10 max-w-2xl">
             <h3 className="display text-3xl md:text-5xl">
-              Build your dream setup.
+              {c.ctaHeading}
             </h3>
             <p className="mt-4 text-white/80 max-w-lg">
-              From the first boot to the last frame — {brandName} stocks the components, laptops, and
-              peripherals to build, upgrade, and power your rig. Genuine gear, expert advice.
+              {c.ctaBody}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/register" className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-[#06070d] font-semibold hover:bg-white/90 transition-colors">
-                Create your account <ArrowRight className="w-4 h-4" />
+              <Link href={c.ctaButtonHref} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-[#06070d] font-semibold hover:bg-white/90 transition-colors">
+                {c.ctaButtonLabel} <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>

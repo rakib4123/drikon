@@ -24,7 +24,15 @@ const GRADIENTS = [
   'from-emerald-500/20 to-teal-500/5',
 ];
 
-export function CategoryShowcase({ categories }: { categories: NavCategory[] }) {
+export function CategoryShowcase({
+  categories,
+  dealsTitle = "Today's deals",
+  dealsBlurb = 'Hand-picked tech on sale this week.',
+}: {
+  categories: NavCategory[];
+  dealsTitle?: string;
+  dealsBlurb?: string;
+}) {
   const cats = (categories ?? []).filter((c) => !c.parentId).slice(0, 5);
   if (cats.length === 0) return null;
 
@@ -38,8 +46,8 @@ export function CategoryShowcase({ categories }: { categories: NavCategory[] }) 
       gradient: GRADIENTS[i % GRADIENTS.length],
     })),
     {
-      title: "Today's deals",
-      blurb: 'Hand-picked tech on sale this week.',
+      title: dealsTitle,
+      blurb: dealsBlurb,
       href: '/products?featured=true',
       icon: <Zap className="w-5 h-5" />,
       span: 'sm:col-span-2',

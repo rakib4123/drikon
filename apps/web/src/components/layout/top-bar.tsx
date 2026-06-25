@@ -5,17 +5,19 @@ export function TopBar({
   supportEmail,
   facebook,
   instagram,
+  promo,
 }: {
   supportEmail?: string | null;
   facebook?: string | null;
   instagram?: string | null;
+  promo: string;
 }) {
   return (
     <div className="hidden sm:block border-b border-[color:var(--border)] bg-[color:var(--bg-soft)]/40 text-xs">
       <div className="max-w-7xl mx-auto px-6 h-9 flex items-center justify-between">
         <div className="flex items-center gap-2 text-[color:var(--fg-muted)]">
           <Truck className="w-3.5 h-3.5 text-[color:var(--accent)]" />
-          <span>Free shipping over ৳3,000 · Authenticity guaranteed</span>
+          <span>{promo}</span>
         </div>
 
         <div className="flex items-center gap-4 text-[color:var(--fg-muted)]">
