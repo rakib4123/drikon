@@ -188,6 +188,7 @@ model Category {
   parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children    Category[] @relation("CategoryHierarchy")
   products    Product[]
+  coupons     Coupon[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
@@ -452,6 +453,13 @@ model Coupon {
   startsAt        DateTime  @default(now())
   expiresAt       DateTime?
   isActive        Boolean   @default(true)
+  // Also waive shipping when applied
+  freeShipping    Boolean   @default(false)
+  // Advertise this code in the public "offers" list
+  isPublic        Boolean   @default(false)
+  // If set, the discount only applies to items in this category
+  categoryId      String?
+  category        Category? @relation(fields: [categoryId], references: [id])
   orders          Order[]
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt

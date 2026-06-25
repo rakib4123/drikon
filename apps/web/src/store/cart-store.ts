@@ -14,9 +14,12 @@ export interface CartItem {
 
 interface CartState {
   items: CartItem[];
+  /** Coupon code applied in the cart; carries through to checkout. */
+  couponCode: string | null;
   add: (item: Omit<CartItem, 'quantity'>, qty?: number) => void;
   remove: (productId: string, variantId?: string) => void;
   updateQty: (productId: string, qty: number, variantId?: string) => void;
+  setCoupon: (code: string | null) => void;
   clear: () => void;
   subtotal: () => number;
 }
@@ -28,6 +31,9 @@ export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      couponCode: null,
+
+      setCoupon(code) { set({ couponCode: code }); },
 
       add(item, qty = 1) {
         set((state) => {
@@ -57,7 +63,7 @@ export const useCartStore = create<CartState>()(
         }));
       },
 
-      clear() { set({ items: [] }); },
+      clear() { set({ items: [], couponCode: null }); },
 
       subtotal() {
         return get().items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
@@ -66,8 +72,8 @@ export const useCartStore = create<CartState>()(
     {
       name: 'drikon-cart',
       storage: createJSONStorage(() => (typeof window !== 'undefined' ? localStorage : (undefined as any))),
-      // Only persist items array
-      partialize: (state) => ({ items: state.items }),
+      // Persist the cart items + applied coupon
+      partialize: (state) => ({ items: state.items, couponCode: state.couponCode }),
     },
   ),
 );
