@@ -61,14 +61,36 @@ export class CategoriesService {
   async remove(id: string) {
     const category = await this.prisma.category.findUnique({
       where: { id },
-      select: { id: true, _count: { select: { products: true } } },
+      select: { id: true },
     });
     if (!category) throw new NotFoundException('Category not found');
-    if (category._count.products > 0) {
-      throw new BadRequestException(
-        'This category still has products. Reassign or remove them first.',
-      );
+
+    const products = await this.prisma.product.findMany({
+      where: { categoryId: id },
+      select: { id: true, isActive: true },
+    });
+
+    if (products.length > 0) {
+      // Active products must be moved/removed first — they're live in the store.
+      if (products.some((p) => p.isActive)) {
+        throw new BadRequestException(
+          'This category still has active products. Remove or reassign them first.',
+        );
+      }
+      // Only archived products remain. Any tied to past orders must stay (history).
+      const ids = products.map((p) => p.id);
+      const withOrders = await this.prisma.orderItem.count({
+        where: { productId: { in: ids } },
+      });
+      if (withOrders > 0) {
+        throw new BadRequestException(
+          'This category has archived products linked to past orders, so it can’t be deleted.',
+        );
+      }
+      // Safe: archived and never ordered → remove them (children cascade).
+      await this.prisma.product.deleteMany({ where: { id: { in: ids } } });
     }
+
     await this.prisma.category.delete({ where: { id } });
     return { id, deleted: true };
   }
