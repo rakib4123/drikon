@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Loader2, Plus, Pencil, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { apiGet, apiPost, apiPatch, apiDelete, ApiError } from '@/lib/api-client';
+import { CloudinaryUploader } from '@/components/admin/cloudinary-uploader';
 
 interface Category {
   id: string;
@@ -51,6 +52,10 @@ export default function AdminCategoriesPage() {
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!draft.name.trim()) return toast.error('Name is required');
+    const img = draft.imageUrl.trim();
+    if (img && !/^https?:\/\//i.test(img)) {
+      return toast.error('Image must be a full URL (https://…) — or use Upload above');
+    }
     setSaving(true);
     const body = {
       name: draft.name.trim(),
@@ -117,7 +122,12 @@ export default function AdminCategoriesPage() {
               ))}
           </select>
           <textarea className="input" rows={2} placeholder="Description (optional)" value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} />
-          <input className="input text-xs" placeholder="Image URL (optional)" value={draft.imageUrl} onChange={(e) => setDraft({ ...draft, imageUrl: e.target.value })} />
+          <CloudinaryUploader
+            label="Category image (optional)"
+            value={draft.imageUrl || null}
+            onChange={(url) => setDraft({ ...draft, imageUrl: url ?? '' })}
+          />
+          <input className="input text-xs" placeholder="…or paste image URL" value={draft.imageUrl} onChange={(e) => setDraft({ ...draft, imageUrl: e.target.value })} />
           <button type="submit" disabled={saving} className="btn-primary w-full">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Plus className="w-4 h-4" /> {editingId ? 'Save changes' : 'Add category'}</>}
           </button>
