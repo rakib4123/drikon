@@ -95,14 +95,14 @@ export function Navbar({ brand, categories }: { brand: BrandInfo; categories: Na
               <span className="hidden md:inline">{user.name?.split(' ')[0]}</span>
             </Link>
           ) : (
-            <>
+            <div className="hidden sm:flex items-center gap-2">
               <Link href="/login" className="btn-ghost text-sm py-2 px-3">
                 Sign in
               </Link>
-              <Link href="/register" className="btn-primary text-sm py-2 px-3 hidden sm:inline-flex">
+              <Link href="/register" className="btn-primary text-sm py-2 px-3">
                 Get started
               </Link>
-            </>
+            </div>
           )}
         </div>
       </div>

@@ -131,7 +131,7 @@ function SortLinks({
     { value: 'rating', label: 'Top rated' },
   ];
   return (
-    <div className="flex flex-wrap gap-1.5 text-sm">
+    <div className="flex gap-1.5 text-sm overflow-x-auto scrollbar-none max-w-full [&>*]:shrink-0">
       {options.map((o) => {
         const next = new URLSearchParams();
         for (const [k, v] of Object.entries(params)) {
