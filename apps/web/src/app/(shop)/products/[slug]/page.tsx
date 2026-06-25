@@ -8,6 +8,7 @@ import { AddToCart } from '@/components/shop/add-to-cart';
 import { WishlistButton } from '@/components/shop/wishlist-button';
 import { CompareButton } from '@/components/shop/compare-button';
 import { ProductReviews } from '@/components/shop/product-reviews';
+import { VideoEmbed } from '@/components/shop/video-embed';
 import { PremiumProductPage } from '@/components/shop/premium-product-page';
 import { formatPrice } from '@/lib/utils';
 import type { ProductSummary } from '@drikon/shared-types';
@@ -24,6 +25,7 @@ interface ProductDetail extends ProductSummary {
   attributes?: Record<string, any> | null;
   brandId?: string | null;
   categoryId: string;
+  videoUrl?: string | null;
 }
 
 interface ProductListResponse {
@@ -208,6 +210,16 @@ export default async function ProductDetailPage({ params }: PageProps) {
           {product.description}
         </p>
       </section>
+
+      {/* Video (if any) */}
+      {product.videoUrl && (
+        <section className="mb-16">
+          <h2 className="display text-2xl mb-4">Watch it in action</h2>
+          <div className="max-w-3xl">
+            <VideoEmbed url={product.videoUrl} />
+          </div>
+        </section>
+      )}
 
       {/* Attributes (if any) */}
       {product.attributes && Object.keys(product.attributes).length > 0 && (

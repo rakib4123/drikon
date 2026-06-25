@@ -225,6 +225,8 @@ model Product {
   isFeatured      Boolean  @default(false)
   // Flexible attributes (color options, sizes, specs)
   attributes      Json?
+  // Optional product video (YouTube/Vimeo/MP4 URL)
+  videoUrl        String?
   // SEO
   metaTitle       String?
   metaDescription String?

@@ -155,6 +155,7 @@ export class ProductsService {
           categoryId: dto.categoryId,
           brandId: dto.brandId,
           attributes: dto.attributes as any,
+          videoUrl: dto.videoUrl || null,
           metaTitle: dto.metaTitle,
           metaDescription: dto.metaDescription,
           images: { create: dto.images },
@@ -175,7 +176,7 @@ export class ProductsService {
   async update(id: string, dto: UpdateProductDto) {
     await this.findById(id); // 404 if missing
 
-    const { images, price, compareAtPrice, ...rest } = dto;
+    const { images, price, compareAtPrice, videoUrl, ...rest } = dto;
 
     return this.prisma.$transaction(async (tx) => {
       if (images) {
@@ -189,6 +190,7 @@ export class ProductsService {
         where: { id },
         data: {
           ...rest,
+          ...(videoUrl !== undefined && { videoUrl: videoUrl || null }),
           ...(price !== undefined && { price: new Prisma.Decimal(price) }),
           ...(compareAtPrice !== undefined && {
             compareAtPrice: compareAtPrice === null ? null : new Prisma.Decimal(compareAtPrice),

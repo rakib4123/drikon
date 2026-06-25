@@ -70,6 +70,7 @@ export default function AdminProductEditPage({ params }: PageProps) {
           isFeatured: product.isFeatured,
           categoryId: product.categoryId,
           brandId: product.brandId ?? '',
+          videoUrl: product.videoUrl ?? '',
         }}
       />
     </div>
