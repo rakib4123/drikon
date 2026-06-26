@@ -143,6 +143,12 @@ export default function AdminCategoriesPage() {
             <ul className="divide-y divide-[color:var(--border)]">
               {items.map((c) => (
                 <li key={c.id} className="flex items-center gap-3 px-5 py-3">
+                  {c.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={c.imageUrl} alt={c.name} className="w-10 h-10 rounded-md object-cover border border-[color:var(--border)] shrink-0" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-md border border-[color:var(--border)] bg-[color:var(--bg-soft)] grid place-items-center text-[10px] text-[color:var(--fg-muted)] shrink-0">—</div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <div className="font-medium">{c.name}</div>
                     <div className="text-xs text-[color:var(--fg-muted)] font-mono">/{c.slug} · {c._count.products} products</div>

@@ -13,6 +13,7 @@ interface Tile {
   icon: ReactNode;
   span: string;
   gradient: string;
+  image?: string | null;
 }
 
 const GRADIENTS = [
@@ -44,6 +45,7 @@ export function CategoryShowcase({
       icon: <LayoutGrid className="w-5 h-5" />,
       span: i === 0 ? 'sm:col-span-2 sm:row-span-2' : '',
       gradient: GRADIENTS[i % GRADIENTS.length],
+      image: c.imageUrl,
     })),
     {
       title: dealsTitle,
@@ -78,6 +80,17 @@ export function CategoryShowcase({
               href={tile.href}
               className="group relative h-full w-full overflow-hidden rounded-2xl border border-[color:var(--border)] glass p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:border-[color:var(--accent)] hover:shadow-[0_24px_60px_-30px_rgba(239,106,32,0.45)]"
             >
+              {tile.image && (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={tile.image}
+                    alt=""
+                    className="pointer-events-none absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-85 group-hover:scale-105 transition-all duration-500"
+                  />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/10" aria-hidden />
+                </>
+              )}
               <div
                 className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${tile.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
                 aria-hidden
@@ -91,8 +104,8 @@ export function CategoryShowcase({
               </div>
 
               <div className="relative">
-                <div className="display text-xl mb-1">{tile.title}</div>
-                <p className="text-sm text-[color:var(--fg-muted)] max-w-[28ch]">{tile.blurb}</p>
+                <div className={`display text-xl mb-1 ${tile.image ? 'text-white' : ''}`}>{tile.title}</div>
+                <p className={`text-sm max-w-[28ch] ${tile.image ? 'text-white/85' : 'text-[color:var(--fg-muted)]'}`}>{tile.blurb}</p>
               </div>
             </Link>
           </motion.div>
