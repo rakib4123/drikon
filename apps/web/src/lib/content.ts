@@ -27,6 +27,7 @@ export interface ResolvedContent {
   ctaButtonHref: string;
   dealsTitle: string;
   dealsBlurb: string;
+  dealsImage: string;
   topbarPromo: string;
   footerNote: string;
   shippingNote: string;
@@ -59,6 +60,7 @@ export const CONTENT_DEFAULTS = {
   ctaButtonHref: '/register',
   dealsTitle: "Today's deals",
   dealsBlurb: 'Hand-picked tech on sale this week.',
+  dealsImage: '',
   topbarPromo: 'Free shipping over ৳3,000 · Authenticity guaranteed',
   footerNote: 'Made with care in Dhaka.',
   shippingNote: 'Free shipping over ৳3,000',
@@ -97,6 +99,7 @@ export function resolveContent(s: SiteSettings): ResolvedContent {
     ctaButtonHref: sub(s.ctaButtonHref, d.ctaButtonHref, brand),
     dealsTitle: sub(s.dealsTitle, d.dealsTitle, brand),
     dealsBlurb: sub(s.dealsBlurb, d.dealsBlurb, brand),
+    dealsImage: s.dealsImage || '',
     topbarPromo: sub(s.topbarPromo, d.topbarPromo, brand),
     footerNote: sub(s.footerNote, d.footerNote, brand),
     shippingNote: sub(s.shippingNote, d.shippingNote, brand),

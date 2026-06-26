@@ -110,7 +110,7 @@ export default async function HomePage() {
       <FlashSaleSection />
 
       {/* ─── SHOP BY CATEGORY ─── */}
-      <CategoryShowcase categories={categories} dealsTitle={c.dealsTitle} dealsBlurb={c.dealsBlurb} />
+      <CategoryShowcase categories={categories} dealsTitle={c.dealsTitle} dealsBlurb={c.dealsBlurb} dealsImage={c.dealsImage} />
 
       {/* ─── FEATURED PRODUCTS ─── */}
       <section className="max-w-7xl mx-auto px-6 py-20">

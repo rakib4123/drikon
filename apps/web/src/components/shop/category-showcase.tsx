@@ -29,10 +29,12 @@ export function CategoryShowcase({
   categories,
   dealsTitle = "Today's deals",
   dealsBlurb = 'Hand-picked tech on sale this week.',
+  dealsImage = '',
 }: {
   categories: NavCategory[];
   dealsTitle?: string;
   dealsBlurb?: string;
+  dealsImage?: string;
 }) {
   const cats = (categories ?? []).filter((c) => !c.parentId).slice(0, 5);
   if (cats.length === 0) return null;
@@ -54,6 +56,7 @@ export function CategoryShowcase({
       icon: <Zap className="w-5 h-5" />,
       span: 'sm:col-span-2',
       gradient: 'from-slate-500/20 to-orange-500/5',
+      image: dealsImage || null,
     },
   ];
 
