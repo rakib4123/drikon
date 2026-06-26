@@ -41,6 +41,7 @@ export const UpdateSettingsSchema = z.object({
   ctaButtonHref: text(200),
   dealsTitle: text(60),
   dealsBlurb: text(160),
+  dealsImage: z.string().url().optional().or(z.literal('')),
   topbarPromo: text(160),
   footerNote: text(120),
   shippingNote: text(80),

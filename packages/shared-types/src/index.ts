@@ -281,6 +281,7 @@ export interface SiteSettings {
   ctaButtonHref?: string | null;
   dealsTitle?: string | null;
   dealsBlurb?: string | null;
+  dealsImage?: string | null;
   topbarPromo?: string | null;
   footerNote?: string | null;
   shippingNote?: string | null;
@@ -325,6 +326,7 @@ export const UpdateSettingsSchema = z.object({
   ctaButtonHref: emptyableText(200),
   dealsTitle: emptyableText(60),
   dealsBlurb: emptyableText(160),
+  dealsImage: z.string().url().optional().or(z.literal('')),
   topbarPromo: emptyableText(160),
   footerNote: emptyableText(120),
   shippingNote: emptyableText(80),

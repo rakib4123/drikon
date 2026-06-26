@@ -57,6 +57,7 @@ export default function AdminSettingsPage() {
           ctaButtonHref: s.ctaButtonHref ?? '',
           dealsTitle: s.dealsTitle ?? '',
           dealsBlurb: s.dealsBlurb ?? '',
+          dealsImage: s.dealsImage ?? '',
           topbarPromo: s.topbarPromo ?? '',
           footerNote: s.footerNote ?? '',
           shippingNote: s.shippingNote ?? '',
@@ -72,6 +73,7 @@ export default function AdminSettingsPage() {
   const logoUrl = watch('logoUrl');
   const accent = watch('accentColor');
   const accent2 = watch('accentColor2');
+  const dealsImage = watch('dealsImage');
 
   const onSubmit = async (values: UpdateSettingsInput) => {
     try {
@@ -286,6 +288,15 @@ export default function AdminSettingsPage() {
             <Field label="Blurb" error={errors.dealsBlurb?.message}>
               <input className="input" {...register('dealsBlurb')} placeholder={CONTENT_DEFAULTS.dealsBlurb} />
             </Field>
+          </div>
+          <div>
+            <CloudinaryUploader
+              label="Tile image (optional)"
+              value={dealsImage || null}
+              onChange={(url) => setValue('dealsImage', url ?? '', { shouldDirty: true })}
+            />
+            <input className="input mt-2 text-xs" {...register('dealsImage')} placeholder="…or paste image URL" />
+            {errors.dealsImage?.message && <span className="block text-xs text-red-600 mt-1">{errors.dealsImage.message}</span>}
           </div>
         </section>
 
