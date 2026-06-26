@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { Prisma } from '@prisma/client';
+import { ZodValidationException } from 'nestjs-zod';
 
 /**
  * One filter to rule them all.
@@ -30,7 +31,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
     let message: string | object = 'Internal server error';
     let code = 'INTERNAL_ERROR';
 
-    if (exception instanceof HttpException) {
+    if (exception instanceof ZodValidationException) {
+      // Surface WHICH field failed instead of a generic "Validation failed".
+      status = HttpStatus.BAD_REQUEST;
+      code = 'VALIDATION_ERROR';
+      const issues = exception.getZodError().issues;
+      message = issues.length
+        ? issues.map((i) => `${i.path.join('.') || 'field'}: ${i.message}`).join('; ')
+        : 'Validation failed';
+    } else if (exception instanceof HttpException) {
       status = exception.getStatus();
       const body = exception.getResponse();
       message = typeof body === 'string' ? body : (body as any).message ?? body;
