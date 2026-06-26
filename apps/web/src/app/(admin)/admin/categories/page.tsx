@@ -109,9 +109,9 @@ export default function AdminCategoriesPage() {
               </button>
             )}
           </div>
-          <input className="input" placeholder="Name" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
-          <input className="input font-mono text-xs" placeholder="slug (optional)" value={draft.slug} onChange={(e) => setDraft({ ...draft, slug: e.target.value })} />
-          <select className="input" value={draft.parentId} onChange={(e) => setDraft({ ...draft, parentId: e.target.value })}>
+          <input className="input" aria-label="Category name" placeholder="Name" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
+          <input className="input font-mono text-xs" aria-label="Category slug" placeholder="slug (optional)" value={draft.slug} onChange={(e) => setDraft({ ...draft, slug: e.target.value })} />
+          <select className="input" aria-label="Parent category" value={draft.parentId} onChange={(e) => setDraft({ ...draft, parentId: e.target.value })}>
             <option value="">No parent (top level)</option>
             {items
               .filter((c) => c.id !== editingId && !c.parentId)
@@ -121,13 +121,13 @@ export default function AdminCategoriesPage() {
                 </option>
               ))}
           </select>
-          <textarea className="input" rows={2} placeholder="Description (optional)" value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} />
+          <textarea className="input" aria-label="Category description" rows={2} placeholder="Description (optional)" value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} />
           <CloudinaryUploader
             label="Category image (optional)"
             value={draft.imageUrl || null}
             onChange={(url) => setDraft({ ...draft, imageUrl: url ?? '' })}
           />
-          <input className="input text-xs" placeholder="…or paste image URL" value={draft.imageUrl} onChange={(e) => setDraft({ ...draft, imageUrl: e.target.value })} />
+          <input className="input text-xs" aria-label="Category image URL" placeholder="…or paste image URL" value={draft.imageUrl} onChange={(e) => setDraft({ ...draft, imageUrl: e.target.value })} />
           <button type="submit" disabled={saving} className="btn-primary w-full">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Plus className="w-4 h-4" /> {editingId ? 'Save changes' : 'Add category'}</>}
           </button>

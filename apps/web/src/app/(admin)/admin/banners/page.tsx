@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { Loader2, Plus, Pencil, Trash2, X, GripVertical } from 'lucide-react';
+import { Loader2, Plus, Pencil, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { apiGet, apiPost, apiPatch, apiDelete, ApiError } from '@/lib/api-client';
 import { CloudinaryUploader } from '@/components/admin/cloudinary-uploader';
@@ -78,6 +78,10 @@ export default function AdminBannersPage() {
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!draft.heading.trim()) return toast.error('Heading is required');
+    const bg = draft.imageUrl.trim();
+    if (bg && !/^https?:\/\//i.test(bg)) {
+      return toast.error('Background image must be a full URL (https://…) — or use Upload');
+    }
     setSaving(true);
     const body = {
       heading: draft.heading.trim(),
@@ -151,13 +155,13 @@ export default function AdminBannersPage() {
             value={draft.imageUrl || null}
             onChange={(url) => setDraft({ ...draft, imageUrl: url ?? '' })}
           />
-          <input className="input text-xs" placeholder="…or paste image URL" value={draft.imageUrl} onChange={(e) => setDraft({ ...draft, imageUrl: e.target.value })} />
+          <input className="input text-xs" aria-label="Banner background image URL" placeholder="…or paste image URL" value={draft.imageUrl} onChange={(e) => setDraft({ ...draft, imageUrl: e.target.value })} />
 
-          <input className="input" placeholder="Heading" value={draft.heading} onChange={(e) => setDraft({ ...draft, heading: e.target.value })} />
-          <textarea className="input" rows={2} placeholder="Subheading (optional)" value={draft.subheading} onChange={(e) => setDraft({ ...draft, subheading: e.target.value })} />
+          <input className="input" aria-label="Banner heading" placeholder="Heading" value={draft.heading} onChange={(e) => setDraft({ ...draft, heading: e.target.value })} />
+          <textarea className="input" aria-label="Banner subheading" rows={2} placeholder="Subheading (optional)" value={draft.subheading} onChange={(e) => setDraft({ ...draft, subheading: e.target.value })} />
           <div className="grid grid-cols-2 gap-3">
-            <input className="input" placeholder="CTA label" value={draft.ctaLabel} onChange={(e) => setDraft({ ...draft, ctaLabel: e.target.value })} />
-            <input className="input text-xs" placeholder="CTA link (/products)" value={draft.ctaHref} onChange={(e) => setDraft({ ...draft, ctaHref: e.target.value })} />
+            <input className="input" aria-label="CTA button label" placeholder="CTA label" value={draft.ctaLabel} onChange={(e) => setDraft({ ...draft, ctaLabel: e.target.value })} />
+            <input className="input text-xs" aria-label="CTA button link" placeholder="CTA link (/products)" value={draft.ctaHref} onChange={(e) => setDraft({ ...draft, ctaHref: e.target.value })} />
           </div>
           <div className="flex items-center gap-3">
             <label className="text-xs text-[color:var(--fg-muted)] flex items-center gap-1.5">
@@ -191,7 +195,6 @@ export default function AdminBannersPage() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0 p-4 flex items-center gap-3">
-                  <GripVertical className="w-4 h-4 text-[color:var(--fg-muted)] shrink-0" />
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold line-clamp-1">{b.heading}</div>
                     {b.subheading && <div className="text-xs text-[color:var(--fg-muted)] line-clamp-1">{b.subheading}</div>}

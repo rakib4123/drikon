@@ -40,6 +40,13 @@ export class ProductsController {
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Get('admin/all')
+  @ApiOperation({ summary: '(Admin) List ALL products incl. inactive, paginated' })
+  findAllAdmin(@Query() query: ProductQueryDto) {
+    return this.products.findAll(query, { admin: true });
+  }
+
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @Get(':id')
   @ApiOperation({ summary: '(Admin) Get a product by ID for editing' })
   findById(@Param('id') id: string) {

@@ -180,6 +180,25 @@ function SaleCard({
     }
   };
 
+  const [dates, setDates] = useState({ startsAt: dtLocal(sale.startsAt), endsAt: dtLocal(sale.endsAt) });
+  const [savingDates, setSavingDates] = useState(false);
+  const saveDates = async () => {
+    if (!dates.startsAt || !dates.endsAt) return toast.error('Both dates are required');
+    setSavingDates(true);
+    try {
+      await apiPatch(`/api/v1/flash-sales/${sale.id}`, {
+        startsAt: new Date(dates.startsAt).toISOString(),
+        endsAt: new Date(dates.endsAt).toISOString(),
+      });
+      toast.success('Schedule updated');
+      onChanged();
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Update failed');
+    } finally {
+      setSavingDates(false);
+    }
+  };
+
   return (
     <div className="card !p-0 overflow-hidden">
       <div className="flex items-center gap-3 px-5 py-4 border-b border-[color:var(--border)]">
@@ -202,6 +221,21 @@ function SaleCard({
       </div>
 
       <div className="px-5 py-4">
+        {/* Reschedule */}
+        <div className="flex flex-wrap items-end gap-2 mb-4 pb-4 border-b border-[color:var(--border)]">
+          <label className="text-xs text-[color:var(--fg-muted)]">
+            Starts
+            <input className="input text-sm mt-1" type="datetime-local" value={dates.startsAt} onChange={(e) => setDates({ ...dates, startsAt: e.target.value })} />
+          </label>
+          <label className="text-xs text-[color:var(--fg-muted)]">
+            Ends
+            <input className="input text-sm mt-1" type="datetime-local" value={dates.endsAt} onChange={(e) => setDates({ ...dates, endsAt: e.target.value })} />
+          </label>
+          <button onClick={saveDates} disabled={savingDates} className="btn-ghost !px-4 text-sm">
+            {savingDates ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save dates'}
+          </button>
+        </div>
+
         {sale.products.length === 0 ? (
           <p className="text-sm text-[color:var(--fg-muted)] mb-3">No products in this sale yet.</p>
         ) : (

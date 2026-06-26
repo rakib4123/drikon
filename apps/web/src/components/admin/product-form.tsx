@@ -101,13 +101,17 @@ export function ProductForm({ mode, productId, initial }: ProductFormProps) {
       if (state.brandId) payload.brandId = state.brandId;
       payload.videoUrl = state.videoUrl.trim();
 
-      // Image is optional — create the product with it if provided, otherwise
-      // with none (a placeholder shows; photos can be added later via edit).
-      if (mode === 'create') {
-        payload.images = state.imageUrl
-          ? [{ url: state.imageUrl, alt: state.imageAlt || state.name, position: 0 }]
-          : [];
+      // Image is optional and editable in both modes. Provided → set it;
+      // empty → clear it (placeholder shows). The API replaces the image set.
+      const img = state.imageUrl.trim();
+      if (img && !/^https?:\/\//i.test(img)) {
+        setServerError('Image must be a full URL (https://…) — or use Upload');
+        setSubmitting(false);
+        return;
       }
+      payload.images = img
+        ? [{ url: img, alt: state.imageAlt || state.name, position: 0 }]
+        : [];
 
       if (mode === 'create') {
         await apiPost('/api/v1/products', payload);
@@ -255,32 +259,31 @@ export function ProductForm({ mode, productId, initial }: ProductFormProps) {
         </Field>
       </div>
 
-      {mode === 'create' && (
-        <>
-          <CloudinaryUploader
-            value={state.imageUrl || null}
-            onChange={(url) => update('imageUrl', url ?? '')}
-          />
-          <input
-            type="text"
-            value={state.imageUrl}
-            onChange={(e) => update('imageUrl', e.target.value)}
-            placeholder="…or paste image URL (https://…)"
-            className="input text-xs"
-          />
-          {state.imageUrl && (
-            <Field label="Image alt text (for accessibility)">
-              <input
-                type="text"
-                value={state.imageAlt}
-                onChange={(e) => update('imageAlt', e.target.value)}
-                placeholder="e.g. Black backpack with chrome zippers"
-                className="input"
-              />
-            </Field>
-          )}
-        </>
-      )}
+      <div className="space-y-2">
+        <span className="block text-sm font-medium">Product image</span>
+        <CloudinaryUploader
+          value={state.imageUrl || null}
+          onChange={(url) => update('imageUrl', url ?? '')}
+        />
+        <input
+          type="text"
+          value={state.imageUrl}
+          onChange={(e) => update('imageUrl', e.target.value)}
+          placeholder="…or paste image URL (https://…)"
+          className="input text-xs"
+        />
+        {state.imageUrl && (
+          <Field label="Image alt text (for accessibility)">
+            <input
+              type="text"
+              value={state.imageAlt}
+              onChange={(e) => update('imageAlt', e.target.value)}
+              placeholder="e.g. Black backpack with chrome zippers"
+              className="input"
+            />
+          </Field>
+        )}
+      </div>
 
       <Field label="Product video URL (optional)">
         <input

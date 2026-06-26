@@ -56,7 +56,9 @@ export default function AdminUsersPage() {
   }, [page, search]);
 
   useEffect(() => {
-    load();
+    // Debounce so typing in search doesn't fire a request per keystroke.
+    const t = setTimeout(load, 350);
+    return () => clearTimeout(t);
   }, [load]);
 
   const changeRole = async (id: string, next: Role) => {

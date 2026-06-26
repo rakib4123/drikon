@@ -71,6 +71,8 @@ export default function AdminProductEditPage({ params }: PageProps) {
           categoryId: product.categoryId,
           brandId: product.brandId ?? '',
           videoUrl: product.videoUrl ?? '',
+          imageUrl: product.images?.[0]?.url ?? '',
+          imageAlt: product.images?.[0]?.alt ?? '',
         }}
       />
     </div>

@@ -59,7 +59,9 @@ export default function AdminOrdersPage() {
   }, [page, status, search]);
 
   useEffect(() => {
-    load();
+    // Debounce so typing in search doesn't fire a request per keystroke.
+    const t = setTimeout(load, 350);
+    return () => clearTimeout(t);
   }, [load]);
 
   const changeStatus = async (id: string, next: OrderStatus) => {
