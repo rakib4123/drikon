@@ -79,6 +79,18 @@ export function ProductForm({ mode, productId, initial }: ProductFormProps) {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setServerError(null);
+
+    // Every product must belong to a category — give a clear message instead
+    // of a raw "Validation failed" when none is chosen/available.
+    if (!state.categoryId) {
+      setServerError(
+        categories.length === 0
+          ? 'Create a category first — every product must belong to one (Admin → Categories).'
+          : 'Please choose a category.',
+      );
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -239,11 +251,16 @@ export function ProductForm({ mode, productId, initial }: ProductFormProps) {
             required
             className="input"
           >
-            <option value="">— Select category —</option>
+            <option value="">{categories.length === 0 ? '— No categories yet — create one first —' : '— Select category —'}</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </select>
+          {categories.length === 0 && (
+            <p className="text-xs text-amber-600 mt-1.5">
+              You have no categories. <a href="/admin/categories" className="underline">Create one first</a> — products must belong to a category.
+            </p>
+          )}
         </Field>
         <Field label="Brand (optional)">
           <select
