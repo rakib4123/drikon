@@ -261,6 +261,13 @@ export function ProductForm({ mode, productId, initial }: ProductFormProps) {
             value={state.imageUrl || null}
             onChange={(url) => update('imageUrl', url ?? '')}
           />
+          <input
+            type="text"
+            value={state.imageUrl}
+            onChange={(e) => update('imageUrl', e.target.value)}
+            placeholder="…or paste image URL (https://…)"
+            className="input text-xs"
+          />
           {state.imageUrl && (
             <Field label="Image alt text (for accessibility)">
               <input

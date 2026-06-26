@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Loader2, Plus, Pencil, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { apiGet, apiPost, apiPatch, apiDelete, ApiError } from '@/lib/api-client';
+import { CloudinaryUploader } from '@/components/admin/cloudinary-uploader';
 
 interface Brand {
   id: string;
@@ -49,8 +50,12 @@ export default function AdminBrandsPage() {
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!draft.name.trim()) return toast.error('Name is required');
+    const logo = draft.logoUrl.trim();
+    if (logo && !/^https?:\/\//i.test(logo)) {
+      return toast.error('Logo must be a full URL (https://…) — or use Upload above');
+    }
     setSaving(true);
-    const body = { name: draft.name.trim(), slug: draft.slug.trim() || undefined, logoUrl: draft.logoUrl.trim() };
+    const body = { name: draft.name.trim(), slug: draft.slug.trim() || undefined, logoUrl: logo };
     try {
       if (editingId) {
         await apiPatch(`/api/v1/brands/${editingId}`, body);
@@ -97,7 +102,12 @@ export default function AdminBrandsPage() {
           </div>
           <input className="input" placeholder="Name" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
           <input className="input font-mono text-xs" placeholder="slug (optional)" value={draft.slug} onChange={(e) => setDraft({ ...draft, slug: e.target.value })} />
-          <input className="input text-xs" placeholder="Logo URL (optional)" value={draft.logoUrl} onChange={(e) => setDraft({ ...draft, logoUrl: e.target.value })} />
+          <CloudinaryUploader
+            label="Brand logo (optional)"
+            value={draft.logoUrl || null}
+            onChange={(url) => setDraft({ ...draft, logoUrl: url ?? '' })}
+          />
+          <input className="input text-xs" placeholder="…or paste logo URL" value={draft.logoUrl} onChange={(e) => setDraft({ ...draft, logoUrl: e.target.value })} />
           <button type="submit" disabled={saving} className="btn-primary w-full">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Plus className="w-4 h-4" /> {editingId ? 'Save changes' : 'Add brand'}</>}
           </button>
