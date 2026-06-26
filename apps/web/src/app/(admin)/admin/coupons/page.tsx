@@ -88,6 +88,9 @@ export default function AdminCouponsPage() {
     e.preventDefault();
     if (!draft.code.trim()) return toast.error('Code is required');
     if (!draft.value && !draft.freeShipping) return toast.error('Enter a value or enable free shipping');
+    if (draft.isPercentage && Number(draft.value) > 100) {
+      return toast.error('Percentage discount can’t exceed 100%');
+    }
     setSaving(true);
     const body: Record<string, unknown> = {
       code: draft.code.trim(),
@@ -145,7 +148,7 @@ export default function AdminCouponsPage() {
               </button>
             )}
           </div>
-          <input className="input font-mono uppercase" placeholder="CODE" value={draft.code} onChange={(e) => setDraft({ ...draft, code: e.target.value.toUpperCase() })} />
+          <input className="input font-mono uppercase" aria-label="Coupon code" placeholder="CODE" value={draft.code} onChange={(e) => setDraft({ ...draft, code: e.target.value.toUpperCase() })} />
 
           <div className="flex rounded-xl border border-[color:var(--border)] overflow-hidden text-sm">
             <button type="button" onClick={() => setDraft({ ...draft, isPercentage: true })}
@@ -211,7 +214,7 @@ export default function AdminCouponsPage() {
                       {c.category && <span className="text-[10px] text-[color:var(--fg-muted)] border border-[color:var(--border)] rounded px-1.5">{c.category.name}</span>}
                     </div>
                     <div className="text-xs text-[color:var(--fg-muted)]">
-                      {Number(c.value) > 0 ? (c.isPercentage ? `${c.value}% off` : `${c.value} off`) : 'free shipping'}
+                      {Number(c.value) > 0 ? (c.isPercentage ? `${c.value}% off` : `৳${Number(c.value).toLocaleString()} off`) : 'free shipping'}
                       {c.minOrderAmount ? ` · min ${c.minOrderAmount}` : ''}
                       {' · '}{c.redemptionCount}{c.maxRedemptions ? `/${c.maxRedemptions}` : ''} used
                     </div>

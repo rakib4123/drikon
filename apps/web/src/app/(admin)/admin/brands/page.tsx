@@ -100,14 +100,14 @@ export default function AdminBrandsPage() {
               </button>
             )}
           </div>
-          <input className="input" placeholder="Name" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
-          <input className="input font-mono text-xs" placeholder="slug (optional)" value={draft.slug} onChange={(e) => setDraft({ ...draft, slug: e.target.value })} />
+          <input className="input" aria-label="Brand name" placeholder="Name" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
+          <input className="input font-mono text-xs" aria-label="Brand slug" placeholder="slug (optional)" value={draft.slug} onChange={(e) => setDraft({ ...draft, slug: e.target.value })} />
           <CloudinaryUploader
             label="Brand logo (optional)"
             value={draft.logoUrl || null}
             onChange={(url) => setDraft({ ...draft, logoUrl: url ?? '' })}
           />
-          <input className="input text-xs" placeholder="…or paste logo URL" value={draft.logoUrl} onChange={(e) => setDraft({ ...draft, logoUrl: e.target.value })} />
+          <input className="input text-xs" aria-label="Brand logo URL" placeholder="…or paste logo URL" value={draft.logoUrl} onChange={(e) => setDraft({ ...draft, logoUrl: e.target.value })} />
           <button type="submit" disabled={saving} className="btn-primary w-full">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Plus className="w-4 h-4" /> {editingId ? 'Save changes' : 'Add brand'}</>}
           </button>

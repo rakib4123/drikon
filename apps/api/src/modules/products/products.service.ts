@@ -21,12 +21,13 @@ export class ProductsService {
   // ─────────────────────────────────────────────────────────────────
   // LIST — filtering, sorting, pagination
   // ─────────────────────────────────────────────────────────────────
-  async findAll(query: ProductQueryDto) {
+  async findAll(query: ProductQueryDto, opts: { admin?: boolean } = {}) {
     const { page, limit, search, category, brand, minPrice, maxPrice, minRating, inStock, featured, sort } = query;
     const skip = (page - 1) * limit;
 
     const where: Prisma.ProductWhereInput = {
-      isActive: true,
+      // Admins see every product (incl. inactive) so they can manage/re-activate them.
+      ...(opts.admin ? {} : { isActive: true }),
       ...(search && {
         OR: [
           { name: { contains: search, mode: 'insensitive' } },
