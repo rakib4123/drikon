@@ -2,9 +2,22 @@
 
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { ArrowUpRight, LayoutGrid, Zap } from 'lucide-react';
+import { ArrowUpRight, LayoutGrid, Zap, Cpu, Radar, Cog, Bot, Plane, CircuitBoard, Wrench, Camera } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { NavCategory } from '@/lib/catalog';
+
+// Map known robotics category slugs to fitting icons (falls back to a grid).
+const CATEGORY_ICONS: Record<string, ReactNode> = {
+  'microcontrollers': <Cpu className="w-5 h-5" />,
+  'sensors-modules': <Radar className="w-5 h-5" />,
+  'motors-actuators': <Cog className="w-5 h-5" />,
+  'robotic-parts': <Bot className="w-5 h-5" />,
+  'drones-fpv': <Plane className="w-5 h-5" />,
+  'components': <CircuitBoard className="w-5 h-5" />,
+  'tools-gear': <Wrench className="w-5 h-5" />,
+  'gadgets': <Camera className="w-5 h-5" />,
+};
+const iconFor = (slug: string): ReactNode => CATEGORY_ICONS[slug] ?? <LayoutGrid className="w-5 h-5" />;
 
 interface Tile {
   title: string;
@@ -44,7 +57,7 @@ export function CategoryShowcase({
       title: c.name,
       blurb: c.description || `${c._count?.products ?? 0} product${(c._count?.products ?? 0) === 1 ? '' : 's'}`,
       href: `/products?category=${c.slug}`,
-      icon: <LayoutGrid className="w-5 h-5" />,
+      icon: iconFor(c.slug),
       span: i === 0 ? 'sm:col-span-2 sm:row-span-2' : '',
       gradient: GRADIENTS[i % GRADIENTS.length],
       image: c.imageUrl,
