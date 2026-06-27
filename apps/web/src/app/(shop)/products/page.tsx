@@ -1,7 +1,9 @@
 import Link from 'next/link';
+import { PackageX, SearchX } from 'lucide-react';
 import { apiGet } from '@/lib/api-client';
 import { getCategories } from '@/lib/catalog';
 import { ProductGrid } from '@/components/shop/product-grid';
+import { EmptyState } from '@/components/ui/empty-state';
 import type { ProductListResponse } from '@drikon/shared-types';
 
 interface PageProps {
@@ -69,13 +71,22 @@ export default async function ProductsPage({ searchParams }: PageProps) {
       </div>
 
       {error ? (
-        <div className="card text-center py-16 text-[color:var(--fg-muted)]">
-          <p className="font-semibold mb-1">Couldn&apos;t load products.</p>
-          <p className="text-xs">{error}</p>
+        <div className="card !p-0">
+          <EmptyState
+            icon={<PackageX className="w-6 h-6" />}
+            title="Couldn’t load products"
+            description={error}
+            action={<Link href="/products" className="btn-primary">Try again</Link>}
+          />
         </div>
       ) : !data || data.items.length === 0 ? (
-        <div className="card text-center py-16 text-[color:var(--fg-muted)]">
-          <p>No products match those filters yet.</p>
+        <div className="card !p-0">
+          <EmptyState
+            icon={<SearchX className="w-6 h-6" />}
+            title="No products match"
+            description={currentSearch || currentCategory ? 'Nothing here for those filters yet — try clearing them.' : 'No products have been added yet. Check back soon.'}
+            action={(currentSearch || currentCategory) && <Link href="/products" className="btn-primary">Clear filters</Link>}
+          />
         </div>
       ) : (
         <>

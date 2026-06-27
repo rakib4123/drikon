@@ -44,6 +44,7 @@ export function Providers({
             color: 'var(--fg)',
             border: '1px solid var(--border)',
             borderRadius: '14px',
+            boxShadow: '0 16px 40px -20px var(--glow), 0 2px 8px var(--shadow)',
           },
         }}
       />

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
 import { apiGet, apiDelete, ApiError } from '@/lib/api-client';
+import { EmptyState } from '@/components/ui/empty-state';
 import type { ProductListResponse, ProductSummary, Pagination } from '@drikon/shared-types';
 
 // The admin list endpoint returns inactive products + a couple of extra fields.
@@ -75,8 +76,13 @@ export default function AdminProductsPage() {
           <Loader2 className="w-5 h-5 animate-spin inline-block mr-2" />Loading…
         </div>
       ) : products.length === 0 ? (
-        <div className="card text-center py-16 max-w-6xl text-[color:var(--fg-muted)]">
-          No products yet. <Link href="/admin/products/new" className="text-[color:var(--accent)] hover:underline">Create your first one</Link>.
+        <div className="card !p-0 max-w-6xl">
+          <EmptyState
+            icon={<Plus className="w-6 h-6" />}
+            title="No products yet"
+            description="Add your first product to start building the catalog."
+            action={<Link href="/admin/products/new" className="btn-primary"><Plus className="w-4 h-4" /> New product</Link>}
+          />
         </div>
       ) : (
         <>
