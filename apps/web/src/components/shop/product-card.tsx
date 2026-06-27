@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { motion } from 'motion/react';
 import { ShoppingBag, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import type { ProductSummary } from '@drikon/shared-types';
@@ -37,6 +38,8 @@ export function ProductCard({ product }: { product: ProductSummary }) {
             <div className="w-full h-full bg-drikon-mesh" />
           )}
         </Link>
+        {/* Depth gradient on hover */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         {onSale && (
           <span className="absolute top-3 left-3 px-2 py-1 text-[10px] font-bold rounded-md bg-[color:var(--accent)] text-white">
             −{discount}%
@@ -87,9 +90,12 @@ export function ProductCard({ product }: { product: ProductSummary }) {
               </div>
             )}
           </div>
-          <button
+          <motion.button
             type="button"
             disabled={product.stock === 0}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.85 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 18 }}
             onClick={(e) => {
               e.preventDefault();
               add({
@@ -106,7 +112,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
             aria-label="Add to cart"
           >
             <ShoppingBag className="w-4 h-4" />
-          </button>
+          </motion.button>
         </div>
       </div>
     </article>

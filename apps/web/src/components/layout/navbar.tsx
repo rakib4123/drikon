@@ -10,6 +10,7 @@ import { SearchCommand } from '@/components/shop/search-command';
 import { BrandMark } from '@/components/layout/brand-mark';
 import { MegaMenu } from '@/components/layout/mega-menu';
 import { MobileMenu } from '@/components/layout/mobile-menu';
+import { CountBadge } from '@/components/layout/count-badge';
 import type { BrandInfo } from '@/lib/settings';
 import type { NavCategory } from '@/lib/catalog';
 
@@ -66,11 +67,7 @@ export function Navbar({ brand, categories }: { brand: BrandInfo; categories: Na
             className="p-2 rounded-lg hover:bg-[color:var(--bg-soft)] transition-colors relative hidden sm:inline-flex"
           >
             <Heart className="w-5 h-5" />
-            {mounted && wishlistCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-[10px] font-bold text-white grid place-items-center">
-                {wishlistCount}
-              </span>
-            )}
+            {mounted && <CountBadge count={wishlistCount} className="bg-rose-500" />}
           </Link>
 
           <Link
@@ -79,11 +76,7 @@ export function Navbar({ brand, categories }: { brand: BrandInfo; categories: Na
             className="p-2 rounded-lg hover:bg-[color:var(--bg-soft)] transition-colors relative"
           >
             <ShoppingBag className="w-5 h-5" />
-            {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[color:var(--accent)] text-[10px] font-bold text-white grid place-items-center">
-                {cartCount}
-              </span>
-            )}
+            {mounted && <CountBadge count={cartCount} className="bg-[color:var(--accent)]" />}
           </Link>
 
           {user ? (

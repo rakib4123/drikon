@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useReducedMotion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import type { Banner } from '@/lib/banners';
 
@@ -46,7 +46,14 @@ export function HeroSlider({ slides }: { slides: Banner[] }) {
             {b.imageUrl ? (
               <>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <Image src={b.imageUrl} alt="" fill priority={i === 0} sizes="100vw" className="object-cover" />
+                <Image
+                  src={b.imageUrl}
+                  alt=""
+                  fill
+                  priority={i === 0}
+                  sizes="100vw"
+                  className={`object-cover transition-transform ease-out duration-[6000ms] ${active && !reduce ? 'scale-110' : 'scale-100'}`}
+                />
                 <div className="absolute inset-0 bg-gradient-to-r from-[#0b1322]/88 via-[#0b1322]/55 to-[#0b1322]/10" />
               </>
             ) : (
@@ -55,8 +62,13 @@ export function HeroSlider({ slides }: { slides: Banner[] }) {
 
             {/* Content */}
             <div className="relative z-10 h-full max-w-7xl mx-auto px-6 flex items-center">
-              <div className="max-w-xl text-white">
-                <h1 className="display text-4xl md:text-6xl mb-4">{b.heading}</h1>
+              <motion.div
+                className="max-w-xl text-white"
+                initial={false}
+                animate={active && !reduce ? { opacity: 1, y: 0 } : reduce ? {} : { opacity: 0, y: 24 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: active ? 0.18 : 0 }}
+              >
+                <h1 className="display text-4xl md:text-6xl mb-4 text-glow">{b.heading}</h1>
                 {b.subheading && (
                   <p className="text-white/85 text-base md:text-lg mb-7 max-w-lg">{b.subheading}</p>
                 )}
@@ -68,7 +80,7 @@ export function HeroSlider({ slides }: { slides: Banner[] }) {
                     {b.ctaLabel} <ArrowRight className="w-4 h-4" />
                   </Link>
                 )}
-              </div>
+              </motion.div>
             </div>
           </div>
         );
