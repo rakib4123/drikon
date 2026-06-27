@@ -6,12 +6,23 @@ import { ProductGrid } from '@/components/shop/product-grid';
 import { CategoryShowcase } from '@/components/shop/category-showcase';
 import { FlashSaleSection } from '@/components/shop/flash-sale-section';
 import { HeroSlider } from '@/components/shop/hero-slider';
+import { BrandStrip } from '@/components/shop/brand-strip';
+import { StatsBand } from '@/components/shop/stats-band';
 import { Reveal } from '@/components/ui/reveal';
 import { apiGet } from '@/lib/api-client';
 import { getSettings, resolveContent } from '@/lib/settings';
 import { getBanners } from '@/lib/banners';
 import { getCategories } from '@/lib/catalog';
 import type { ProductListResponse } from '@drikon/shared-types';
+
+interface BrandLite { id: string; name: string; slug: string; logoUrl?: string | null }
+async function getBrands(): Promise<BrandLite[]> {
+  try {
+    return await apiGet<BrandLite[]>('/api/v1/brands');
+  } catch {
+    return [];
+  }
+}
 
 // Rotating icon set for the (editable) feature strip cards.
 const FEATURE_ICONS = [
@@ -31,11 +42,12 @@ async function getFeatured(): Promise<ProductListResponse | null> {
 }
 
 export default async function HomePage() {
-  const [featured, settings, banners, categories] = await Promise.all([
+  const [featured, settings, banners, categories, brands] = await Promise.all([
     getFeatured(),
     getSettings(),
     getBanners(),
     getCategories(),
+    getBrands(),
   ]);
   const c = resolveContent(settings);
 
@@ -117,12 +129,12 @@ export default async function HomePage() {
         <div className="flex items-end justify-between mb-10 gap-6">
           <div>
             <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
-              Featured
+              Featured parts
             </div>
-            <h2 className="display text-3xl md:text-4xl">Hand-picked this week</h2>
+            <h2 className="display text-3xl md:text-4xl">Popular this week</h2>
           </div>
           <Link href="/products" className="text-sm font-medium hover:text-[color:var(--accent)] transition-colors inline-flex items-center gap-1">
-            See all <ArrowRight className="w-4 h-4" />
+            Shop all <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
@@ -130,11 +142,17 @@ export default async function HomePage() {
           <ProductGrid products={featured.items} />
         ) : (
           <div className="card text-center py-16 text-[color:var(--fg-muted)]">
-            <p>The API isn&apos;t reachable yet.</p>
-            <p className="text-xs mt-2">Run <code className="font-mono">docker-compose up -d && pnpm db:migrate && pnpm db:seed && pnpm dev</code></p>
+            <p>No featured parts yet.</p>
+            <p className="text-xs mt-2">Mark products as featured in the admin to show them here.</p>
           </div>
         )}
       </section>
+
+      {/* ─── TRUSTED BRANDS ─── */}
+      <BrandStrip brands={brands} />
+
+      {/* ─── STATS BAND ─── */}
+      <StatsBand />
 
       {/* ─── EDITORIAL CTA ─── */}
       <section className="max-w-7xl mx-auto px-6 pb-24">
