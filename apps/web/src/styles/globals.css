@@ -212,3 +212,91 @@ select.input {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='3'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
   z-index: 0;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   FUTURISTIC LAYER — bolder gradients, glows, motion, skeletons.
+   Additive: builds on the tokens above. All animations are
+   transform/opacity only and disabled under reduced-motion.
+   ═══════════════════════════════════════════════════════════════ */
+
+@keyframes aurora-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(40px, 30px) scale(1.12); }
+  66%      { transform: translate(-30px, 18px) scale(0.94); }
+}
+@keyframes shimmer { 100% { transform: translateX(100%); } }
+@keyframes float-slow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes glow-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+
+/* Animate the ambient aurora and add a cool second blob for depth. */
+.aurora::before { animation: aurora-drift 18s ease-in-out infinite; opacity: 0.24; }
+.aurora::after {
+  content: '';
+  position: absolute;
+  width: 460px; height: 460px;
+  border-radius: 9999px;
+  filter: blur(100px);
+  opacity: 0.18;
+  background: radial-gradient(circle, var(--accent-2), transparent 70%);
+  bottom: -180px; left: -120px;
+  animation: aurora-drift 24s ease-in-out infinite reverse;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Headline glow for hero emphasis. */
+.text-glow { text-shadow: 0 0 34px var(--glow); }
+
+/* Holographic gradient ring for premium cards / CTAs. */
+.holo-border { position: relative; }
+.holo-border::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(120deg, var(--accent), var(--accent-2), transparent 65%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Light sweep across primary buttons on hover. */
+.btn-primary { position: relative; overflow: hidden; }
+.btn-primary::after {
+  content: '';
+  position: absolute; top: 0; left: -75%;
+  width: 55%; height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+.btn-primary:hover::after { left: 135%; }
+
+/* Stronger glow-lift on cards. */
+.card:hover {
+  box-shadow: 0 18px 44px -22px var(--glow), 0 0 0 1px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+/* Skeleton shimmer for loading states. */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--fg) 7%, var(--bg-soft));
+  border-radius: 10px;
+}
+.skeleton::after {
+  content: '';
+  position: absolute; inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--fg) 7%, transparent), transparent);
+  animation: shimmer 1.4s infinite;
+}
+
+.animate-float { animation: float-slow 6s ease-in-out infinite; }
+.animate-glow-pulse { animation: glow-pulse 2.4s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora::before, .aurora::after, .animate-float, .animate-glow-pulse, .skeleton::after { animation: none; }
+  .btn-primary::after { transition: none; }
+}
