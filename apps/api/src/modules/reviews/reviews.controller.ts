@@ -9,6 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { Role } from '@prisma/client';
 
 import { ReviewsService } from './reviews.service';
@@ -28,6 +29,7 @@ export class ReviewsController {
   }
 
   @Post('product/:productId')
+  @Throttle({ short: { limit: 10, ttl: 60_000 } }) // 10 review writes / min / IP
   @ApiOperation({ summary: 'Create or update your review for a product' })
   upsert(
     @CurrentUser('id') userId: string,

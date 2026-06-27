@@ -7,6 +7,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 
 import { OrdersService } from './orders.service';
 import { CreateOrderDto, OrderQueryDto } from './dto/order.dto';
@@ -19,6 +20,7 @@ export class OrdersController {
   constructor(private readonly orders: OrdersService) {}
 
   @Post()
+  @Throttle({ short: { limit: 12, ttl: 60_000 } }) // cap order placement / inventory abuse
   @ApiOperation({ summary: 'Place an order from a cart payload' })
   create(@CurrentUser('id') userId: string, @Body() dto: CreateOrderDto) {
     return this.orders.create(userId, dto);
