@@ -14,6 +14,26 @@ const API_BASE =
     : window.location.protocol + '//' + (process.env.NEXT_PUBLIC_API_URL?.replace(/^https?:\/\//, '') ?? 'localhost:4000')) ??
   'http://localhost:4000';
 
+/**
+ * Per-browser CSRF token, echoed in the `X-CSRF-Token` header. The API requires
+ * this header on state-changing requests; browsers forbid setting custom headers
+ * on forged cross-site requests, so this defeats CSRF. Empty on the server (RSC
+ * only issues safe GETs, which the API doesn't gate).
+ */
+function csrfToken(): string {
+  if (typeof window === 'undefined') return '';
+  try {
+    let t = localStorage.getItem('drikon_csrf');
+    if (!t) {
+      t = (crypto.randomUUID() + crypto.randomUUID()).replace(/-/g, '');
+      localStorage.setItem('drikon_csrf', t);
+    }
+    return t;
+  } catch {
+    return '';
+  }
+}
+
 export class ApiError extends Error {
   constructor(
     public status: number,
@@ -64,6 +84,7 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
       credentials: 'include',
       headers: {
         ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+        'X-CSRF-Token': csrfToken(),
         ...(headers ?? {}),
       },
       body: body !== undefined ? JSON.stringify(body) : undefined,

@@ -10,6 +10,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
+import { CsrfGuard } from '../../common/guards/csrf.guard';
 import { MailModule } from '../mail/mail.module';
 
 /**
@@ -46,6 +47,7 @@ const googleStrategyProvider: Provider = {
     googleStrategyProvider,
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
+    { provide: APP_GUARD, useClass: CsrfGuard },
   ],
   exports: [AuthService],
 })

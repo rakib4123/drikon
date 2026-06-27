@@ -118,6 +118,7 @@ export class AuthController {
   // REFRESH (cookie-driven; no body needed)
   // ───────────────────────────────────────────────────────────
   @Public()
+  @Throttle({ short: { limit: 30, ttl: 60_000 } })
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Rotate refresh token; issue new access + refresh' })
@@ -209,6 +210,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle({ short: { limit: 5, ttl: 60_000 } })
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Reset password using token from email' })

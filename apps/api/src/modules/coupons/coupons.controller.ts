@@ -8,6 +8,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { Role } from '@prisma/client';
 
 import { CouponsService } from './coupons.service';
@@ -26,6 +27,7 @@ export class CouponsController {
 
   // ─── Storefront (public — guests can apply coupons in the cart) ───
   @Public()
+  @Throttle({ short: { limit: 20, ttl: 60_000 } }) // throttle code enumeration
   @Post('validate')
   @ApiOperation({ summary: 'Validate a coupon against a cart' })
   validate(@Body() dto: ValidateCouponDto) {
@@ -33,6 +35,7 @@ export class CouponsController {
   }
 
   @Public()
+  @Throttle({ short: { limit: 20, ttl: 60_000 } }) // amplifying (loops all coupons) → cap it
   @Post('best')
   @ApiOperation({ summary: 'Best eligible coupon for a cart (auto-apply)' })
   best(@Body() dto: BestCouponDto) {

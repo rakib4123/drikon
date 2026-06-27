@@ -18,10 +18,21 @@ const argonOpts: argon2.Options = {
 };
 
 async function main() {
+  // Safety: the seed creates an admin with a publicly-known password. Never let
+  // that run against a production database unless explicitly forced.
+  if (process.env.NODE_ENV === 'production' && process.env.ALLOW_PROD_SEED !== 'true') {
+    throw new Error(
+      'Refusing to seed in production (NODE_ENV=production). The seed creates a ' +
+        'well-known admin password. Set ALLOW_PROD_SEED=true only if you truly intend ' +
+        'to, and rotate the admin password immediately afterward.',
+    );
+  }
+
   console.log('🌱 Seeding Drikon database...');
 
   // ─── Users ───
-  const adminHash = await argon2.hash('Admin@drikon2026', argonOpts);
+  // NOTE: this is a DEMO password — rotate it immediately on any real deployment.
+  const adminHash = await argon2.hash(process.env.SEED_ADMIN_PASSWORD || 'Admin@drikon2026', argonOpts);
   const userHash = await argon2.hash('User@drikon2026', argonOpts);
 
   const admin = await prisma.user.upsert({
@@ -180,8 +191,10 @@ async function main() {
 
   console.log(`  ✓ products (${products.length})`);
   console.log('\n✨ Seed complete.\n');
-  console.log('Login as admin: admin@drikon.com / Admin@drikon2026');
+  const adminPw = process.env.SEED_ADMIN_PASSWORD || 'Admin@drikon2026';
+  console.log(`Login as admin: admin@drikon.com / ${adminPw}`);
   console.log('Login as demo:  demo@drikon.com  / User@drikon2026\n');
+  console.log('⚠️  These are DEMO credentials. Rotate the admin password before exposing this publicly.\n');
 }
 
 main()
