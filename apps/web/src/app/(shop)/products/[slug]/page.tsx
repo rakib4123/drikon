@@ -1,8 +1,11 @@
+import type { Metadata } from 'next';
+import { cache } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Star, ShieldCheck, Truck, RefreshCw } from 'lucide-react';
 import { apiGet, ApiError } from '@/lib/api-client';
+import { SITE_URL } from '@/lib/site';
 import { ProductGrid } from '@/components/shop/product-grid';
 import { AddToCart } from '@/components/shop/add-to-cart';
 import { WishlistButton } from '@/components/shop/wishlist-button';
@@ -34,13 +37,43 @@ interface ProductListResponse {
   pagination: { total: number };
 }
 
-async function getProduct(slug: string): Promise<ProductDetail | null> {
+// cache() dedupes the fetch shared by generateMetadata + the page render.
+const getProduct = cache(async (slug: string): Promise<ProductDetail | null> => {
   try {
     return await apiGet<ProductDetail>(`/api/v1/products/slug/${slug}`);
   } catch (err) {
     if (err instanceof ApiError && err.status === 404) return null;
     throw err;
   }
+});
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const product = await getProduct(slug);
+  if (!product) return { title: 'Product not found' };
+  const desc =
+    product.shortDescription ||
+    (product.description ? product.description.replace(/\s+/g, ' ').slice(0, 160) : `${product.name} — available now.`);
+  const url = `${SITE_URL}/products/${product.slug}`;
+  const img = product.images?.[0]?.url;
+  return {
+    title: product.name,
+    description: desc,
+    alternates: { canonical: url },
+    openGraph: {
+      title: product.name,
+      description: desc,
+      url,
+      type: 'website',
+      ...(img ? { images: [{ url: img }] } : {}),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: product.name,
+      description: desc,
+      ...(img ? { images: [img] } : {}),
+    },
+  };
 }
 
 async function getRelated(categorySlug: string, excludeId: string): Promise<ProductSummary[]> {
@@ -72,11 +105,42 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
   const isPremium = product.attributes && typeof product.attributes === 'object' && 'template' in product.attributes && product.attributes.template === 'premium';
 
+  // Product structured data (rich results in search).
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.shortDescription || product.description,
+    sku: product.sku,
+    ...(product.images?.length ? { image: product.images.map((i) => i.url) } : {}),
+    ...(product.brand ? { brand: { '@type': 'Brand', name: product.brand.name } } : {}),
+    offers: {
+      '@type': 'Offer',
+      price,
+      priceCurrency: product.currency,
+      availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      url: `${SITE_URL}/products/${product.slug}`,
+    },
+    ...(product.averageRating > 0
+      ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: product.averageRating, reviewCount: product.reviewCount } }
+      : {}),
+  };
+  const JsonLd = () => (
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+  );
+
   if (isPremium) {
-    return <PremiumProductPage product={product} related={related} />;
+    return (
+      <>
+        <JsonLd />
+        <PremiumProductPage product={product} related={related} />
+      </>
+    );
   }
 
   return (
+    <>
+    <JsonLd />
     <div className="max-w-7xl mx-auto px-6 py-10">
       {/* Breadcrumb */}
       <nav className="text-xs text-[color:var(--fg-muted)] mb-8 flex items-center gap-1.5 flex-wrap">
@@ -251,5 +315,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
         </section>
       )}
     </div>
+    </>
   );
 }
