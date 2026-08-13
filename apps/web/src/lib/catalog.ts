@@ -14,7 +14,26 @@ export interface NavCategory {
 /** Cached per request — feeds the mega-menu without a client fetch flash. */
 export const getCategories = cache(async (): Promise<NavCategory[]> => {
   try {
-    return await apiGet<NavCategory[]>('/api/v1/categories');
+    const [cats, brands] = await Promise.all([
+      apiGet<NavCategory[]>('/api/v1/categories'),
+      apiGet<any[]>('/api/v1/brands').catch(() => []),
+    ]);
+    
+    const smart = cats.find(c => c.slug === 'smartphones');
+    if (smart) {
+      smart.name = 'Mobile';
+      
+      const brandCats = brands.map(b => ({
+        id: `virtual-brand-${b.id}`,
+        name: b.name,
+        slug: `smartphones&brand=${b.slug}`,
+        parentId: smart.id,
+      }));
+      
+      return [...cats, ...brandCats];
+    }
+
+    return cats;
   } catch {
     return [];
   }

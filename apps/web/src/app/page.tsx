@@ -57,24 +57,25 @@ export default async function HomePage() {
       {banners.length > 0 ? (
         <HeroSlider slides={banners} />
       ) : (
-      <section className="relative overflow-hidden grain aurora grid-overlay">
+      <section className="relative overflow-hidden grain aurora">
         <div className="absolute inset-0 bg-drikon-mesh" aria-hidden />
-        <div className="relative z-10 max-w-7xl mx-auto px-6 pt-20 pb-28 md:pt-32 md:pb-40">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-xs font-medium mb-6 animate-fade-up shadow-[0_0_24px_-8px_var(--glow)]">
-              <Sparkles className="w-3.5 h-3.5 text-[color:var(--accent)]" />
-              <span>{c.heroBadge}</span>
-            </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-6 pt-12 pb-16 md:pt-20 md:pb-24">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div className="max-w-3xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-xs font-medium mb-6 animate-fade-up shadow-[0_0_24px_-8px_var(--glow)]">
+                <Sparkles className="w-3.5 h-3.5 text-[color:var(--accent)]" />
+                <span>{c.heroBadge}</span>
+              </div>
 
-            <h1 className="display text-5xl md:text-7xl lg:text-8xl animate-fade-up" style={{ animationDelay: '120ms' }}>
-              {c.heroTitle.split('\n').map((line, i, arr) => {
-                const isHighlight = line.trim() === c.heroHighlight.trim();
-                return (
-                  <span key={i}>
-                    {isHighlight ? (
-                      <span className="bg-gradient-to-r from-[#ef6a20] via-[#f9822f] to-[#14233f] bg-clip-text text-transparent">
-                        {line}
-                      </span>
+              <h1 className="display text-5xl md:text-6xl lg:text-7xl animate-fade-up" style={{ animationDelay: '120ms' }}>
+                {c.heroTitle.split('\n').map((line, i, arr) => {
+                  const isHighlight = line.trim() === c.heroHighlight.trim();
+                  return (
+                    <span key={i}>
+                      {isHighlight ? (
+                        <span className="bg-gradient-to-r from-[color:var(--accent)] via-[color:var(--accent-2)] to-white/70 bg-clip-text text-transparent">
+                          {line}
+                        </span>
                     ) : (
                       line
                     )}
@@ -88,13 +89,20 @@ export default async function HomePage() {
               {c.heroSubtitle}
             </p>
 
-            <div className="mt-10 flex flex-wrap gap-3 animate-fade-up" style={{ animationDelay: '360ms' }}>
-              <Link href={c.heroCtaHref} className="btn-primary">
-                {c.heroCtaLabel} <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link href={c.heroCtaAltHref} className="btn-ghost">
-                {c.heroCtaAltLabel}
-              </Link>
+              <div className="mt-10 flex flex-wrap gap-3 animate-fade-up" style={{ animationDelay: '360ms' }}>
+                <Link href={c.heroCtaHref} className="btn-primary">
+                  {c.heroCtaLabel} <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link href={c.heroCtaAltHref} className="btn-ghost">
+                  {c.heroCtaAltLabel}
+                </Link>
+              </div>
+            </div>
+
+            {/* Hero Image Side */}
+            <div className="hidden lg:flex justify-center relative animate-float" style={{ animationDelay: '400ms' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/hero.png" alt="Premium Smartphone" className="w-full max-w-[500px] h-auto drop-shadow-[0_0_60px_rgba(59,130,246,0.3)] object-contain rounded-[2rem]" />
             </div>
           </div>
 
