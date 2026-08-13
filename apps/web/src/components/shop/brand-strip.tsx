@@ -20,7 +20,7 @@ export function BrandStrip({ brands }: { brands: Brand[] }) {
         <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
           Trusted brands
         </div>
-        <h2 className="display text-2xl md:text-3xl">Genuine gear makers trust</h2>
+        <h2 className="display text-2xl md:text-3xl">Premium brands you love</h2>
       </div>
       <div className="flex flex-wrap items-center justify-center gap-3">
         {brands.map((b, i) => (

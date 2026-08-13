@@ -38,35 +38,35 @@ export interface ResolvedContent {
 
 /** Built-in defaults. `{brand}` is substituted with the live site name. */
 export const CONTENT_DEFAULTS = {
-  heroBadge: 'Genuine components · Fast nationwide shipping',
-  heroTitle: 'Build it.\nProgram it.\nDeploy it.',
-  heroHighlight: 'Program it.',
+  heroBadge: 'Premium devices · Express delivery',
+  heroTitle: 'Upgrade Your Tech.\nProtect Your Gear.\nPower Your Life.',
+  heroHighlight: 'Power Your Life.',
   heroSubtitle:
-    '{brand} is your robotics & gadgets store — microcontrollers, sensors, motors, drones, and the parts that make things move. Genuine components, expert support, fast delivery.',
-  heroCtaLabel: 'Shop all parts',
+    '{brand} is your premium destination for the latest smartphones, protective cases, and high-speed chargers. Authentic devices, expert support, express delivery.',
+  heroCtaLabel: 'Shop all devices',
   heroCtaHref: '/products',
   heroCtaAltLabel: 'New arrivals',
   heroCtaAltHref: '/products?featured=true',
   features: [
-    { title: 'Genuine components', body: 'Authentic boards, sensors & modules' },
-    { title: 'Fast delivery', body: 'Tracked, nationwide shipping' },
-    { title: 'Maker support', body: 'Engineers who actually build' },
-    { title: 'Datasheets & docs', body: 'Specs and guides for every part' },
+    { title: 'Premium Devices', body: 'Latest flagship smartphones' },
+    { title: 'Express Delivery', body: 'Tracked, nationwide shipping' },
+    { title: 'Authentic Accessories', body: 'Genuine cases and chargers' },
+    { title: '24/7 Support', body: 'Always here to help' },
   ] as SiteFeature[],
-  ctaHeading: 'From idea to working prototype.',
+  ctaHeading: 'Elevate your mobile experience.',
   ctaBody:
-    'Whatever you’re building — a line-following bot, a smart-home gadget, an autonomous drone — {brand} stocks the boards, sensors, motors, and parts to make it real. Genuine components, expert advice.',
-  ctaButtonLabel: 'Start building',
+    'Whether you are upgrading to the latest flagship or looking for the perfect MagSafe accessory, {brand} brings you the finest selection of premium mobile gear.',
+  ctaButtonLabel: 'Start exploring',
   ctaButtonHref: '/register',
   dealsTitle: 'Deals of the week',
-  dealsBlurb: 'Hand-picked robotics & gadget gear on sale.',
+  dealsBlurb: 'Hand-picked premium mobile gear on sale.',
   dealsImage: '',
-  topbarPromo: 'Free shipping over ৳3,000 · Genuine components guaranteed',
-  footerNote: 'Built for makers in Dhaka.',
+  topbarPromo: 'Free shipping over ৳3,000 · Authentic devices guaranteed',
+  footerNote: 'Built for mobile enthusiasts.',
   shippingNote: 'Free shipping over ৳3,000',
   returnsNote: '14-day easy returns',
-  warrantyNote: 'Genuine parts guaranteed',
-  seoKeywords: 'robotics, arduino, raspberry pi, esp32, sensors, microcontrollers, drones, gadgets, electronics, components, dhaka',
+  warrantyNote: 'Genuine devices guaranteed',
+  seoKeywords: 'smartphones, mobile accessories, phone cases, fast chargers, power banks, iphone, samsung',
 };
 
 const sub = (v: string | null | undefined, fallback: string, brand: string) =>
