@@ -62,34 +62,44 @@ async function main() {
   console.log(`  ✓ users (admin: ${admin.email}, demo: ${customer.email})`);
 
   // ─── Categories ───
-  const electronics = await prisma.category.upsert({
-    where: { slug: 'electronics' },
+  const smartphones = await prisma.category.upsert({
+    where: { slug: 'smartphones' },
     update: {},
-    create: { name: 'Electronics', slug: 'electronics', description: 'Phones, laptops, audio, accessories' },
+    create: { name: 'Smartphones', slug: 'smartphones', description: 'Premium flagship devices' },
   });
-  const fashion = await prisma.category.upsert({
-    where: { slug: 'fashion' },
+  const cases = await prisma.category.upsert({
+    where: { slug: 'cases' },
     update: {},
-    create: { name: 'Fashion', slug: 'fashion', description: 'Clothing & accessories' },
+    create: { name: 'Cases & Protection', slug: 'cases', description: 'Premium cases, screen protectors' },
   });
-  const home = await prisma.category.upsert({
-    where: { slug: 'home-living' },
+  const power = await prisma.category.upsert({
+    where: { slug: 'power' },
     update: {},
-    create: { name: 'Home & Living', slug: 'home-living', description: 'Furniture, decor, kitchen' },
+    create: { name: 'Chargers & Power', slug: 'power', description: 'Fast chargers, MagSafe, power banks' },
   });
 
   console.log('  ✓ categories');
 
   // ─── Brands ───
-  const aurelis = await prisma.brand.upsert({
-    where: { slug: 'aurelis' },
+  const apple = await prisma.brand.upsert({
+    where: { slug: 'apple' },
     update: {},
-    create: { name: 'Aurelis', slug: 'aurelis' },
+    create: { name: 'Apple', slug: 'apple' },
   });
-  const nordval = await prisma.brand.upsert({
-    where: { slug: 'nordval' },
+  const samsung = await prisma.brand.upsert({
+    where: { slug: 'samsung' },
     update: {},
-    create: { name: 'Nordval', slug: 'nordval' },
+    create: { name: 'Samsung', slug: 'samsung' },
+  });
+  const spigen = await prisma.brand.upsert({
+    where: { slug: 'spigen' },
+    update: {},
+    create: { name: 'Spigen', slug: 'spigen' },
+  });
+  const anker = await prisma.brand.upsert({
+    where: { slug: 'anker' },
+    update: {},
+    create: { name: 'Anker', slug: 'anker' },
   });
 
   console.log('  ✓ brands');
@@ -97,87 +107,88 @@ async function main() {
   // ─── Products ───
   const products: Array<Prisma.ProductCreateInput> = [
     {
-      name: 'Aurelis Aether Pro Headphones',
-      slug: 'aurelis-aether-pro-headphones',
-      sku: 'AUR-AETH-PRO-001',
+      name: 'iPhone 15 Pro Titanium',
+      slug: 'iphone-15-pro-titanium',
+      sku: 'APL-IP15P-256-NT',
       description:
-        'Reference-grade over-ear headphones with adaptive ANC, 40-hour battery, and hi-res certified drivers. Travel-grade comfort meets studio-grade sound.',
-      shortDescription: 'Reference-grade ANC over-ears, 40h battery.',
-      price: new Prisma.Decimal(28990),
-      compareAtPrice: new Prisma.Decimal(34990),
+        'Forged in aerospace-grade titanium. Features the A17 Pro chip, a customizable Action button, and the most powerful iPhone camera system ever.',
+      shortDescription: 'Aerospace-grade titanium, A17 Pro chip, Pro camera system.',
+      price: new Prisma.Decimal(139990),
+      compareAtPrice: new Prisma.Decimal(149990),
       stock: 42,
       isFeatured: true,
-      category: { connect: { id: electronics.id } },
-      brand: { connect: { id: aurelis.id } },
+      category: { connect: { id: smartphones.id } },
+      brand: { connect: { id: apple.id } },
       images: {
         create: [
-          { url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800', position: 0, alt: 'Aurelis Aether Pro' },
+          { url: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=800', position: 0, alt: 'iPhone 15 Pro' },
         ],
       },
-      attributes: { color: ['midnight', 'silver'], driverSize: '40mm', batteryHours: 40 },
-      averageRating: 4.7,
-      reviewCount: 128,
-    },
-    {
-      name: 'Nordval Linen Overshirt',
-      slug: 'nordval-linen-overshirt',
-      sku: 'NRD-LIN-OVR-002',
-      description:
-        'Lightweight 100% Belgian linen overshirt. Cut for a relaxed, lived-in fit. Garment-washed for instant softness.',
-      shortDescription: 'Relaxed linen overshirt, garment-washed.',
-      price: new Prisma.Decimal(4990),
-      stock: 80,
-      isFeatured: true,
-      category: { connect: { id: fashion.id } },
-      brand: { connect: { id: nordval.id } },
-      images: {
-        create: [
-          { url: 'https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?w=800', position: 0, alt: 'Nordval linen overshirt' },
-        ],
-      },
-      attributes: { size: ['S', 'M', 'L', 'XL'], material: 'linen', care: 'cold wash' },
-      averageRating: 4.4,
-      reviewCount: 42,
-    },
-    {
-      name: 'Aurelis Lumen Desk Lamp',
-      slug: 'aurelis-lumen-desk-lamp',
-      sku: 'AUR-LUM-DSK-003',
-      description:
-        'Tunable-white LED desk lamp with built-in wireless charger. Adjustable color temp from warm 2700K to focused 6500K.',
-      shortDescription: 'Tunable-white LED lamp + wireless charger.',
-      price: new Prisma.Decimal(7490),
-      stock: 26,
-      isFeatured: false,
-      category: { connect: { id: home.id } },
-      brand: { connect: { id: aurelis.id } },
-      images: {
-        create: [
-          { url: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=800', position: 0, alt: 'Aurelis Lumen Desk Lamp' },
-        ],
-      },
-      averageRating: 4.6,
-      reviewCount: 19,
-    },
-    {
-      name: 'Drikon Voyager Backpack 28L',
-      slug: 'drikon-voyager-backpack-28l',
-      sku: 'DRK-VYG-BP-004',
-      description:
-        'Carry-on legal 28L backpack with weatherproof ripstop shell, magnetic quick-access laptop sleeve, and a hidden RFID pocket.',
-      shortDescription: 'Carry-on 28L pack, weatherproof, RFID pocket.',
-      price: new Prisma.Decimal(8990),
-      compareAtPrice: new Prisma.Decimal(11990),
-      stock: 150,
-      isFeatured: true,
-      category: { connect: { id: fashion.id } },
-      images: {
-        create: [
-          { url: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800', position: 0, alt: 'Voyager Backpack' },
-        ],
-      },
-      averageRating: 4.8,
+      attributes: { storage: ['128GB', '256GB', '512GB', '1TB'], color: ['Natural Titanium', 'Blue Titanium', 'Black Titanium'] },
+      averageRating: 4.9,
       reviewCount: 312,
+    },
+    {
+      name: 'Samsung Galaxy S24 Ultra',
+      slug: 'samsung-galaxy-s24-ultra',
+      sku: 'SAM-S24U-512-TI',
+      description:
+        'Welcome to the era of mobile AI. The Galaxy S24 Ultra unleashes new levels of creativity, productivity, and possibility, starting with the most important device in your life.',
+      shortDescription: 'Titanium exterior, Galaxy AI, 200MP camera, built-in S Pen.',
+      price: new Prisma.Decimal(154990),
+      stock: 35,
+      isFeatured: true,
+      category: { connect: { id: smartphones.id } },
+      brand: { connect: { id: samsung.id } },
+      images: {
+        create: [
+          { url: 'https://images.unsplash.com/photo-1678911820864-e2c567c655d7?w=800', position: 0, alt: 'Galaxy S24 Ultra' },
+        ],
+      },
+      attributes: { storage: ['256GB', '512GB', '1TB'], color: ['Titanium Gray', 'Titanium Black'] },
+      averageRating: 4.8,
+      reviewCount: 245,
+    },
+    {
+      name: 'Spigen Core Armor Case',
+      slug: 'spigen-core-armor-iphone-15-pro',
+      sku: 'SPG-CA-IP15P-MB',
+      description:
+        'Suit up. The Core Armor provides absolute protection with its signature shock-absorbing design and tactile grip. Keeps your device pristine in every drop.',
+      shortDescription: 'Slim shock-absorbing protection, matte black finish.',
+      price: new Prisma.Decimal(2490),
+      stock: 120,
+      isFeatured: false,
+      category: { connect: { id: cases.id } },
+      brand: { connect: { id: spigen.id } },
+      images: {
+        create: [
+          { url: 'https://images.unsplash.com/photo-1605170439002-90845e8c0137?w=800', position: 0, alt: 'Spigen Case' },
+        ],
+      },
+      averageRating: 4.7,
+      reviewCount: 512,
+    },
+    {
+      name: 'Anker MagGo Power Bank (10K)',
+      slug: 'anker-maggo-power-bank-10k',
+      sku: 'ANK-MAG-10K-WHT',
+      description:
+        'Qi2-certified 15W ultra-fast wireless charging. With a 10,000mAh capacity, it secures perfectly to your MagSafe-compatible iPhone for a full recharge on the go.',
+      shortDescription: 'Qi2 15W wireless, 10000mAh capacity, MagSafe compatible.',
+      price: new Prisma.Decimal(6490),
+      compareAtPrice: new Prisma.Decimal(7990),
+      stock: 85,
+      isFeatured: true,
+      category: { connect: { id: power.id } },
+      brand: { connect: { id: anker.id } },
+      images: {
+        create: [
+          { url: 'https://images.unsplash.com/photo-1615526653198-d102e7df88e5?w=800', position: 0, alt: 'Anker Power Bank' },
+        ],
+      },
+      averageRating: 4.9,
+      reviewCount: 420,
     },
   ];
 

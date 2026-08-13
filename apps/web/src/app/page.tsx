@@ -129,9 +129,9 @@ export default async function HomePage() {
         <div className="flex items-end justify-between mb-10 gap-6">
           <div>
             <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
-              Featured parts
+              Featured devices
             </div>
-            <h2 className="display text-3xl md:text-4xl">Popular this week</h2>
+            <h2 className="display text-3xl md:text-4xl">Trending devices</h2>
           </div>
           <Link href="/products" className="text-sm font-medium hover:text-[color:var(--accent)] transition-colors inline-flex items-center gap-1">
             Shop all <ArrowRight className="w-4 h-4" />
@@ -142,7 +142,7 @@ export default async function HomePage() {
           <ProductGrid products={featured.items} />
         ) : (
           <div className="card text-center py-16 text-[color:var(--fg-muted)]">
-            <p>No featured parts yet.</p>
+            <p>No featured devices yet.</p>
             <p className="text-xs mt-2">Mark products as featured in the admin to show them here.</p>
           </div>
         )}

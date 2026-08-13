@@ -2,10 +2,10 @@ import { Boxes, Truck, ShieldCheck, Headphones } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 const STATS: { icon: ReactNode; value: string; label: string }[] = [
-  { icon: <Boxes className="w-5 h-5" />, value: '500+', label: 'Components in stock' },
+  { icon: <Boxes className="w-5 h-5" />, value: '500+', label: 'Premium accessories' },
   { icon: <Truck className="w-5 h-5" />, value: '24h', label: 'Same-day dispatch' },
-  { icon: <ShieldCheck className="w-5 h-5" />, value: '100%', label: 'Genuine parts' },
-  { icon: <Headphones className="w-5 h-5" />, value: '7-day', label: 'Maker support' },
+  { icon: <ShieldCheck className="w-5 h-5" />, value: '100%', label: 'Authentic devices' },
+  { icon: <Headphones className="w-5 h-5" />, value: '7-day', label: 'Device support' },
 ];
 
 /** Full-width gradient stats band — a confident "enterprise" trust strip. */
