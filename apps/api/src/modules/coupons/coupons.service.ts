@@ -5,10 +5,11 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
+import { CouponModel } from '../../models/coupon.model';
+import { ProductModel } from '../../models/product.model';
 import type { CreateCouponDto, UpdateCouponDto } from './dto/coupon.dto';
 
-const SHIPPING_FEE = new Prisma.Decimal(60); // used to rank free-shipping coupons
+const SHIPPING_FEE = new Prisma.Decimal(60);
 
 export interface CartLine {
   productId: string;
@@ -27,10 +28,13 @@ export interface CouponValidation {
 
 @Injectable()
 export class CouponsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly coupons: CouponModel,
+    private readonly products: ProductModel,
+  ) {}
 
   list() {
-    return this.prisma.coupon.findMany({
+    return this.coupons.findMany({
       orderBy: { createdAt: 'desc' },
       include: { category: { select: { id: true, name: true, slug: true } } },
     });
@@ -39,7 +43,7 @@ export class CouponsService {
   /** Public, advertisable offers that are currently valid. */
   async offers() {
     const now = new Date();
-    const rows = await this.prisma.coupon.findMany({
+    const rows = await this.coupons.findMany({
       where: {
         isActive: true,
         isPublic: true,
@@ -60,24 +64,23 @@ export class CouponsService {
         category: { select: { name: true, slug: true } },
       },
     });
-    // Drop fully-redeemed codes.
     return rows.filter((c) => !c.maxRedemptions || c.redemptionCount < c.maxRedemptions);
   }
 
   async create(dto: CreateCouponDto) {
-    const exists = await this.prisma.coupon.findUnique({ where: { code: dto.code }, select: { id: true } });
+    const exists = await this.coupons.findUnique({ where: { code: dto.code }, select: { id: true } });
     if (exists) throw new ConflictException(`Coupon "${dto.code}" already exists`);
-    return this.prisma.coupon.create({ data: this.toData(dto) as Prisma.CouponCreateInput });
+    return this.coupons.create({ data: this.toData(dto) as Prisma.CouponCreateInput });
   }
 
   async update(id: string, dto: UpdateCouponDto) {
     await this.getOrThrow(id);
-    return this.prisma.coupon.update({ where: { id }, data: this.toData(dto) as Prisma.CouponUpdateInput });
+    return this.coupons.update({ where: { id }, data: this.toData(dto) as Prisma.CouponUpdateInput });
   }
 
   async remove(id: string) {
     await this.getOrThrow(id);
-    await this.prisma.coupon.delete({ where: { id } });
+    await this.coupons.delete({ where: { id } });
     return { id, deleted: true };
   }
 
@@ -86,7 +89,7 @@ export class CouponsService {
     const zero = new Prisma.Decimal(0);
     const invalid = (message: string): CouponValidation => ({ valid: false, message, discount: zero, freeShipping: false });
 
-    const coupon = await this.prisma.coupon.findUnique({ where: { code: code.toUpperCase().trim() } });
+    const coupon = await this.coupons.findUnique({ where: { code: code.toUpperCase().trim() } });
     if (!coupon || !coupon.isActive) return invalid('Invalid or inactive coupon');
 
     const now = new Date();
@@ -100,13 +103,12 @@ export class CouponsService {
       return invalid(`Minimum order of ${coupon.minOrderAmount} required`);
     }
 
-    // Category-restricted: discount applies only to the eligible portion.
     let base = sub;
     if (coupon.categoryId) {
       if (!items || items.length === 0) {
         return invalid('Add eligible items to use this code');
       }
-      const products = await this.prisma.product.findMany({
+      const products = await this.products.findMany({
         where: { id: { in: items.map((i) => i.productId) } },
         select: { id: true, categoryId: true },
       });
@@ -143,7 +145,7 @@ export class CouponsService {
   /** Best eligible active coupon for the given cart, or null. */
   async best(subtotal: number, items?: CartLine[]) {
     const now = new Date();
-    const candidates = await this.prisma.coupon.findMany({
+    const candidates = await this.coupons.findMany({
       where: {
         isActive: true,
         startsAt: { lte: now },
@@ -183,7 +185,7 @@ export class CouponsService {
   }
 
   private async getOrThrow(id: string) {
-    const c = await this.prisma.coupon.findUnique({ where: { id }, select: { id: true } });
+    const c = await this.coupons.findUnique({ where: { id }, select: { id: true } });
     if (!c) throw new NotFoundException('Coupon not found');
     return c;
   }
