@@ -4,16 +4,16 @@ import {
   ConflictException,
   BadRequestException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { BrandModel } from '../../models/brand.model';
 import { slugify } from '../../common/utils/slugify';
 import type { CreateBrandDto, UpdateBrandDto } from './dto/brand.dto';
 
 @Injectable()
 export class BrandsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly brands: BrandModel) {}
 
   list() {
-    return this.prisma.brand.findMany({
+    return this.brands.findMany({
       orderBy: { name: 'asc' },
       select: {
         id: true,
@@ -28,7 +28,7 @@ export class BrandsService {
   async create(dto: CreateBrandDto) {
     const slug = dto.slug || slugify(dto.name);
     await this.assertFree(slug, dto.name);
-    return this.prisma.brand.create({
+    return this.brands.create({
       data: { name: dto.name, slug, logoUrl: dto.logoUrl || null },
     });
   }
@@ -37,7 +37,7 @@ export class BrandsService {
     await this.getOrThrow(id);
     const slug = dto.slug || (dto.name ? slugify(dto.name) : undefined);
     if (slug) await this.assertFree(slug, dto.name, id);
-    return this.prisma.brand.update({
+    return this.brands.update({
       where: { id },
       data: {
         ...(dto.name !== undefined && { name: dto.name }),
@@ -48,7 +48,7 @@ export class BrandsService {
   }
 
   async remove(id: string) {
-    const brand = await this.prisma.brand.findUnique({
+    const brand = await this.brands.findUnique({
       where: { id },
       select: { id: true, _count: { select: { products: true } } },
     });
@@ -56,18 +56,18 @@ export class BrandsService {
     if (brand._count.products > 0) {
       throw new BadRequestException('This brand still has products. Reassign them first.');
     }
-    await this.prisma.brand.delete({ where: { id } });
+    await this.brands.delete({ where: { id } });
     return { id, deleted: true };
   }
 
   private async getOrThrow(id: string) {
-    const b = await this.prisma.brand.findUnique({ where: { id }, select: { id: true } });
+    const b = await this.brands.findUnique({ where: { id }, select: { id: true } });
     if (!b) throw new NotFoundException('Brand not found');
     return b;
   }
 
   private async assertFree(slug: string, name?: string, exceptId?: string) {
-    const clash = await this.prisma.brand.findFirst({
+    const clash = await this.brands.findFirst({
       where: {
         OR: [{ slug }, ...(name ? [{ name }] : [])],
         ...(exceptId ? { NOT: { id: exceptId } } : {}),
