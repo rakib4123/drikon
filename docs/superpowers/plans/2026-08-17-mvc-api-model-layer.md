@@ -1440,7 +1440,7 @@ import { PrismaService } from '../modules/prisma/prisma.service';
 export class CouponModel {
   constructor(private readonly prisma: PrismaService) {}
 
-  findMany<T extends Prisma.CouponFindManyArgs>(args: Prisma.SelectSubset<T, Prisma.CouponFindManyArgs> = {} as T) {
+  findMany<T extends Prisma.CouponFindManyArgs>(args: Prisma.SelectSubset<T, Prisma.CouponFindManyArgs>) {
     return this.prisma.coupon.findMany(args);
   }
 
@@ -1494,7 +1494,8 @@ describe('CouponModel', () => {
 
   it('findMany delegates to prisma.coupon.findMany', async () => {
     prisma.coupon.findMany.mockResolvedValue([{ id: 'c1' }]);
-    await expect(model.findMany()).resolves.toEqual([{ id: 'c1' }]);
+    await expect(model.findMany({})).resolves.toEqual([{ id: 'c1' }]);
+    expect(prisma.coupon.findMany).toHaveBeenCalledWith({});
     expect(prisma.coupon.findMany).toHaveBeenCalledWith({});
   });
 
@@ -1784,7 +1785,7 @@ import { PrismaService } from '../modules/prisma/prisma.service';
 export class BrandModel {
   constructor(private readonly prisma: PrismaService) {}
 
-  findMany<T extends Prisma.BrandFindManyArgs>(args: Prisma.SelectSubset<T, Prisma.BrandFindManyArgs> = {} as T) {
+  findMany<T extends Prisma.BrandFindManyArgs>(args: Prisma.SelectSubset<T, Prisma.BrandFindManyArgs>) {
     return this.prisma.brand.findMany(args);
   }
 
@@ -1843,7 +1844,8 @@ describe('BrandModel', () => {
 
   it('findMany delegates to prisma.brand.findMany', async () => {
     prisma.brand.findMany.mockResolvedValue([{ id: 'b1' }]);
-    await expect(model.findMany()).resolves.toEqual([{ id: 'b1' }]);
+    await expect(model.findMany({})).resolves.toEqual([{ id: 'b1' }]);
+    expect(prisma.brand.findMany).toHaveBeenCalledWith({});
   });
 
   it('findFirst delegates to prisma.brand.findFirst', async () => {
@@ -2025,7 +2027,7 @@ import { PrismaService } from '../modules/prisma/prisma.service';
 export class CategoryModel {
   constructor(private readonly prisma: PrismaService) {}
 
-  findMany<T extends Prisma.CategoryFindManyArgs>(args: Prisma.SelectSubset<T, Prisma.CategoryFindManyArgs> = {} as T) {
+  findMany<T extends Prisma.CategoryFindManyArgs>(args: Prisma.SelectSubset<T, Prisma.CategoryFindManyArgs>) {
     return this.prisma.category.findMany(args);
   }
 
@@ -2079,7 +2081,8 @@ describe('CategoryModel', () => {
 
   it('findMany delegates to prisma.category.findMany', async () => {
     prisma.category.findMany.mockResolvedValue([{ id: 'c1' }]);
-    await expect(model.findMany()).resolves.toEqual([{ id: 'c1' }]);
+    await expect(model.findMany({})).resolves.toEqual([{ id: 'c1' }]);
+    expect(prisma.category.findMany).toHaveBeenCalledWith({});
   });
 
   it('findUnique delegates to prisma.category.findUnique', async () => {
@@ -2289,7 +2292,7 @@ import { PrismaService } from '../modules/prisma/prisma.service';
 export class BannerModel {
   constructor(private readonly prisma: PrismaService) {}
 
-  findMany<T extends Prisma.BannerFindManyArgs>(args: Prisma.SelectSubset<T, Prisma.BannerFindManyArgs> = {} as T) {
+  findMany<T extends Prisma.BannerFindManyArgs>(args: Prisma.SelectSubset<T, Prisma.BannerFindManyArgs>) {
     return this.prisma.banner.findMany(args);
   }
 
@@ -2343,7 +2346,8 @@ describe('BannerModel', () => {
 
   it('findMany delegates to prisma.banner.findMany', async () => {
     prisma.banner.findMany.mockResolvedValue([{ id: 'b1' }]);
-    await expect(model.findMany()).resolves.toEqual([{ id: 'b1' }]);
+    await expect(model.findMany({})).resolves.toEqual([{ id: 'b1' }]);
+    expect(prisma.banner.findMany).toHaveBeenCalledWith({});
   });
 
   it('findUnique delegates to prisma.banner.findUnique', async () => {
@@ -2499,7 +2503,7 @@ import { PrismaService } from '../modules/prisma/prisma.service';
 export class FlashSaleModel {
   constructor(private readonly prisma: PrismaService) {}
 
-  findMany<T extends Prisma.FlashSaleFindManyArgs>(args: Prisma.SelectSubset<T, Prisma.FlashSaleFindManyArgs> = {} as T) {
+  findMany<T extends Prisma.FlashSaleFindManyArgs>(args: Prisma.SelectSubset<T, Prisma.FlashSaleFindManyArgs>) {
     return this.prisma.flashSale.findMany(args);
   }
 
@@ -2570,7 +2574,8 @@ describe('FlashSaleModel', () => {
 
   it('findMany delegates to prisma.flashSale.findMany', async () => {
     prisma.flashSale.findMany.mockResolvedValue([{ id: 'fs1' }]);
-    await expect(model.findMany()).resolves.toEqual([{ id: 'fs1' }]);
+    await expect(model.findMany({})).resolves.toEqual([{ id: 'fs1' }]);
+    expect(prisma.flashSale.findMany).toHaveBeenCalledWith({});
   });
 
   it('findFirst delegates to prisma.flashSale.findFirst', async () => {
