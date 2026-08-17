@@ -6,8 +6,8 @@ import { PrismaService } from '../modules/prisma/prisma.service';
 export class CouponModel {
   constructor(private readonly prisma: PrismaService) {}
 
-  findMany<T extends Prisma.CouponFindManyArgs>(args?: Prisma.SelectSubset<T, Prisma.CouponFindManyArgs>) {
-    return this.prisma.coupon.findMany(args || ({} as any));
+  findMany<T extends Prisma.CouponFindManyArgs>(args: Prisma.SelectSubset<T, Prisma.CouponFindManyArgs>) {
+    return this.prisma.coupon.findMany(args);
   }
 
   findUnique<T extends Prisma.CouponFindUniqueArgs>(args: Prisma.SelectSubset<T, Prisma.CouponFindUniqueArgs>) {
