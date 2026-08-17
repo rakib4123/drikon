@@ -5,7 +5,8 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
+import { ProductModel } from '../../models/product.model';
+import { OrderModel } from '../../models/order.model';
 import type {
   CreateProductDto,
   UpdateProductDto,
@@ -16,7 +17,10 @@ import type {
 export class ProductsService {
   private readonly logger = new Logger(ProductsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly products: ProductModel,
+    private readonly orders: OrderModel,
+  ) {}
 
   // ─────────────────────────────────────────────────────────────────
   // LIST — filtering, sorting, pagination
@@ -62,8 +66,8 @@ export class ProductsService {
       }
     })();
 
-    const [items, total] = await this.prisma.$transaction([
-      this.prisma.product.findMany({
+    const [items, total] = await this.products.findManyAndCount(
+      {
         where,
         orderBy,
         skip,
@@ -73,9 +77,9 @@ export class ProductsService {
           category: { select: { id: true, name: true, slug: true } },
           brand: { select: { id: true, name: true, slug: true } },
         },
-      }),
-      this.prisma.product.count({ where }),
-    ]);
+      },
+      { where },
+    );
 
     return {
       items,
@@ -94,7 +98,7 @@ export class ProductsService {
   // DETAIL
   // ─────────────────────────────────────────────────────────────────
   async findBySlug(slug: string) {
-    const product = await this.prisma.product.findUnique({
+    const product = await this.products.findUnique({
       where: { slug },
       include: {
         images: { orderBy: { position: 'asc' } },
@@ -121,7 +125,7 @@ export class ProductsService {
   // GET ONE BY ID (admin edit form)
   // ─────────────────────────────────────────────────────────────────
   async findById(id: string) {
-    const product = await this.prisma.product.findUnique({
+    const product = await this.products.findUnique({
       where: { id },
       include: {
         images: { orderBy: { position: 'asc' } },
@@ -139,7 +143,7 @@ export class ProductsService {
   async create(dto: CreateProductDto) {
     const slug = dto.slug ?? this.slugify(dto.name);
     try {
-      return await this.prisma.product.create({
+      return await this.products.create({
         data: {
           name: dto.name,
           slug,
@@ -179,27 +183,18 @@ export class ProductsService {
 
     const { images, price, compareAtPrice, videoUrl, ...rest } = dto;
 
-    return this.prisma.$transaction(async (tx) => {
-      if (images) {
-        // Replace image set atomically
-        await tx.productImage.deleteMany({ where: { productId: id } });
-        await tx.productImage.createMany({
-          data: images.map((img) => ({ ...img, productId: id })),
-        });
-      }
-      return tx.product.update({
-        where: { id },
-        data: {
-          ...rest,
-          ...(videoUrl !== undefined && { videoUrl: videoUrl || null }),
-          ...(price !== undefined && { price: new Prisma.Decimal(price) }),
-          ...(compareAtPrice !== undefined && {
-            compareAtPrice: compareAtPrice === null ? null : new Prisma.Decimal(compareAtPrice),
-          }),
-        },
-        include: { images: true, category: true, brand: true },
-      });
-    });
+    return this.products.updateWithImages(
+      id,
+      {
+        ...rest,
+        ...(videoUrl !== undefined && { videoUrl: videoUrl || null }),
+        ...(price !== undefined && { price: new Prisma.Decimal(price) }),
+        ...(compareAtPrice !== undefined && {
+          compareAtPrice: compareAtPrice === null ? null : new Prisma.Decimal(compareAtPrice),
+        }),
+      },
+      images,
+    );
   }
 
   // ─────────────────────────────────────────────────────────────────
@@ -210,14 +205,14 @@ export class ProductsService {
   // ─────────────────────────────────────────────────────────────────
   async remove(id: string) {
     await this.findById(id);
-    const orderCount = await this.prisma.orderItem.count({ where: { productId: id } });
+    const orderCount = await this.orders.countItemsForProducts([id]);
     if (orderCount > 0) {
-      return this.prisma.product.update({
+      return this.products.update({
         where: { id },
         data: { isActive: false },
       });
     }
-    await this.prisma.product.delete({ where: { id } });
+    await this.products.delete({ where: { id } });
     return { id, deleted: true };
   }
 
@@ -225,11 +220,8 @@ export class ProductsService {
   // STOCK MUTATION — atomic, used by checkout
   // ─────────────────────────────────────────────────────────────────
   async decrementStock(productId: string, qty: number): Promise<void> {
-    const result = await this.prisma.product.updateMany({
-      where: { id: productId, stock: { gte: qty } },
-      data: { stock: { decrement: qty } },
-    });
-    if (result.count === 0) {
+    const ok = await this.products.decrementStock(productId, qty);
+    if (!ok) {
       throw new ConflictException('Insufficient stock');
     }
   }

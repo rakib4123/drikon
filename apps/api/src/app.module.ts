@@ -6,6 +6,7 @@ import { LoggerModule } from 'nestjs-pino';
 
 import { envValidationSchema } from './config/env.validation';
 import { PrismaModule } from './modules/prisma/prisma.module';
+import { ModelsModule } from './models/models.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { ProductsModule } from './modules/products/products.module';
@@ -67,6 +68,7 @@ import { MailModule } from './modules/mail/mail.module';
     ]),
 
     PrismaModule,
+    ModelsModule,
     MailModule,
     AuthModule,
     UsersModule,
