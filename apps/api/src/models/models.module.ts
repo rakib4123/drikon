@@ -5,10 +5,11 @@ import { ReviewModel } from './review.model';
 import { CouponModel } from './coupon.model';
 import { BrandModel } from './brand.model';
 import { CategoryModel } from './category.model';
+import { BannerModel } from './banner.model';
 
 @Global()
 @Module({
-  providers: [ProductModel, OrderModel, ReviewModel, CouponModel, BrandModel, CategoryModel],
-  exports: [ProductModel, OrderModel, ReviewModel, CouponModel, BrandModel, CategoryModel],
+  providers: [ProductModel, OrderModel, ReviewModel, CouponModel, BrandModel, CategoryModel, BannerModel],
+  exports: [ProductModel, OrderModel, ReviewModel, CouponModel, BrandModel, CategoryModel, BannerModel],
 })
 export class ModelsModule {}
