@@ -27,7 +27,7 @@ describe('BrandModel', () => {
 
   it('findMany delegates to prisma.brand.findMany', async () => {
     prisma.brand.findMany.mockResolvedValue([{ id: 'b1' }]);
-    await expect(model.findMany()).resolves.toEqual([{ id: 'b1' }]);
+    await expect(model.findMany({})).resolves.toEqual([{ id: 'b1' }]);
   });
 
   it('findFirst delegates to prisma.brand.findFirst', async () => {
