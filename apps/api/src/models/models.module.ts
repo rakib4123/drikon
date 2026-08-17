@@ -8,10 +8,11 @@ import { CategoryModel } from './category.model';
 import { BannerModel } from './banner.model';
 import { FlashSaleModel } from './flash-sale.model';
 import { WishlistModel } from './wishlist.model';
+import { SettingsModel } from './settings.model';
 
 @Global()
 @Module({
-  providers: [ProductModel, OrderModel, ReviewModel, CouponModel, BrandModel, CategoryModel, BannerModel, FlashSaleModel, WishlistModel],
-  exports: [ProductModel, OrderModel, ReviewModel, CouponModel, BrandModel, CategoryModel, BannerModel, FlashSaleModel, WishlistModel],
+  providers: [ProductModel, OrderModel, ReviewModel, CouponModel, BrandModel, CategoryModel, BannerModel, FlashSaleModel, WishlistModel, SettingsModel],
+  exports: [ProductModel, OrderModel, ReviewModel, CouponModel, BrandModel, CategoryModel, BannerModel, FlashSaleModel, WishlistModel, SettingsModel],
 })
 export class ModelsModule {}
