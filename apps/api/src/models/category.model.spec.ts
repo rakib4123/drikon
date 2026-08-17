@@ -32,7 +32,9 @@ describe('CategoryModel', () => {
 
   it('findUnique delegates to prisma.category.findUnique', async () => {
     prisma.category.findUnique.mockResolvedValue({ id: 'c1' });
-    await expect(model.findUnique({ where: { id: 'c1' } } as any)).resolves.toEqual({ id: 'c1' });
+    const args = { where: { id: 'c1' } };
+    await expect(model.findUnique(args as any)).resolves.toEqual({ id: 'c1' });
+    expect(prisma.category.findUnique).toHaveBeenCalledWith(args);
   });
 
   it('create delegates to prisma.category.create', async () => {

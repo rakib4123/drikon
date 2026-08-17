@@ -86,7 +86,7 @@ export class CategoriesService {
       const withOrders = await this.orders.countItemsForProducts(ids);
       if (withOrders > 0) {
         throw new BadRequestException(
-          'This category has archived products linked to past orders, so it cannot be deleted.',
+          'This category has archived products linked to past orders, so it can’t be deleted.',
         );
       }
       await this.products.deleteMany({ where: { id: { in: ids } } });
