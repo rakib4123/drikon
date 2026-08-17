@@ -28,6 +28,7 @@ describe('BrandModel', () => {
   it('findMany delegates to prisma.brand.findMany', async () => {
     prisma.brand.findMany.mockResolvedValue([{ id: 'b1' }]);
     await expect(model.findMany({})).resolves.toEqual([{ id: 'b1' }]);
+    expect(prisma.brand.findMany).toHaveBeenCalledWith({});
   });
 
   it('findFirst delegates to prisma.brand.findFirst', async () => {
@@ -39,7 +40,9 @@ describe('BrandModel', () => {
 
   it('findUnique delegates to prisma.brand.findUnique', async () => {
     prisma.brand.findUnique.mockResolvedValue({ id: 'b1' });
-    await expect(model.findUnique({ where: { id: 'b1' } } as any)).resolves.toEqual({ id: 'b1' });
+    const args = { where: { id: 'b1' } };
+    await expect(model.findUnique(args as any)).resolves.toEqual({ id: 'b1' });
+    expect(prisma.brand.findUnique).toHaveBeenCalledWith(args);
   });
 
   it('create delegates to prisma.brand.create', async () => {
