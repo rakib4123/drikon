@@ -5,7 +5,8 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
+import { FlashSaleModel } from '../../models/flash-sale.model';
+import { ProductModel } from '../../models/product.model';
 import { slugify } from '../../common/utils/slugify';
 import type {
   CreateFlashSaleDto,
@@ -27,10 +28,13 @@ const productCard = {
 
 @Injectable()
 export class FlashSalesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly flashSales: FlashSaleModel,
+    private readonly products: ProductModel,
+  ) {}
 
   list() {
-    return this.prisma.flashSale.findMany({
+    return this.flashSales.findMany({
       orderBy: { createdAt: 'desc' },
       include: { products: { include: { product: productCard } } },
     });
@@ -39,7 +43,7 @@ export class FlashSalesService {
   /** Storefront: products in the currently-running sale (flat, with sale price). */
   async active() {
     const now = new Date();
-    const sale = await this.prisma.flashSale.findFirst({
+    const sale = await this.flashSales.findFirst({
       where: { isActive: true, startsAt: { lte: now }, endsAt: { gte: now } },
       orderBy: { endsAt: 'asc' },
       include: { products: { include: { product: productCard } } },
@@ -58,9 +62,9 @@ export class FlashSalesService {
 
   async create(dto: CreateFlashSaleDto) {
     const slug = dto.slug || slugify(dto.name);
-    const exists = await this.prisma.flashSale.findUnique({ where: { slug }, select: { id: true } });
+    const exists = await this.flashSales.findUnique({ where: { slug }, select: { id: true } });
     if (exists) throw new ConflictException(`A flash sale with slug "${slug}" already exists`);
-    return this.prisma.flashSale.create({
+    return this.flashSales.create({
       data: { name: dto.name, slug, startsAt: dto.startsAt, endsAt: dto.endsAt, isActive: dto.isActive },
       include: { products: { include: { product: productCard } } },
     });
@@ -72,7 +76,7 @@ export class FlashSalesService {
       throw new BadRequestException('End must be after start');
     }
     const slug = dto.slug || (dto.name ? slugify(dto.name) : undefined);
-    return this.prisma.flashSale.update({
+    return this.flashSales.update({
       where: { id },
       data: {
         ...(dto.name !== undefined && { name: dto.name }),
@@ -87,15 +91,15 @@ export class FlashSalesService {
 
   async remove(id: string) {
     await this.getOrThrow(id);
-    await this.prisma.flashSale.delete({ where: { id } });
+    await this.flashSales.delete({ where: { id } });
     return { id, deleted: true };
   }
 
   async addProduct(id: string, dto: AddFlashSaleProductDto) {
     await this.getOrThrow(id);
-    const product = await this.prisma.product.findUnique({ where: { id: dto.productId }, select: { id: true } });
+    const product = await this.products.findUnique({ where: { id: dto.productId }, select: { id: true } });
     if (!product) throw new NotFoundException('Product not found');
-    return this.prisma.flashSaleProduct.upsert({
+    return this.flashSales.upsertProduct({
       where: { flashSaleId_productId: { flashSaleId: id, productId: dto.productId } },
       create: {
         flashSaleId: id,
@@ -112,12 +116,12 @@ export class FlashSalesService {
   }
 
   async removeProduct(id: string, productId: string) {
-    await this.prisma.flashSaleProduct.deleteMany({ where: { flashSaleId: id, productId } });
+    await this.flashSales.deleteManyProducts({ where: { flashSaleId: id, productId } });
     return { flashSaleId: id, productId, removed: true };
   }
 
   private async getOrThrow(id: string) {
-    const s = await this.prisma.flashSale.findUnique({ where: { id }, select: { id: true } });
+    const s = await this.flashSales.findUnique({ where: { id }, select: { id: true } });
     if (!s) throw new NotFoundException('Flash sale not found');
     return s;
   }
