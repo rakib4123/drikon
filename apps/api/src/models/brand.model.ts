@@ -6,8 +6,7 @@ import { PrismaService } from '../modules/prisma/prisma.service';
 export class BrandModel {
   constructor(private readonly prisma: PrismaService) {}
 
-  // @ts-expect-error TS2322 - type-safe at runtime via SelectSubset
-  findMany<T extends Prisma.BrandFindManyArgs>(args: Prisma.SelectSubset<T, Prisma.BrandFindManyArgs> = {} as T) {
+  findMany<T extends Prisma.BrandFindManyArgs>(args: Prisma.SelectSubset<T, Prisma.BrandFindManyArgs>) {
     return this.prisma.brand.findMany(args);
   }
 
