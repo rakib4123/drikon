@@ -26,7 +26,7 @@ describe('CouponModel', () => {
 
   it('findMany delegates to prisma.coupon.findMany', async () => {
     prisma.coupon.findMany.mockResolvedValue([{ id: 'c1' }]);
-    await expect(model.findMany()).resolves.toEqual([{ id: 'c1' }]);
+    await expect(model.findMany({})).resolves.toEqual([{ id: 'c1' }]);
     expect(prisma.coupon.findMany).toHaveBeenCalledWith({});
   });
 
