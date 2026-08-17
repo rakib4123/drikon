@@ -33,6 +33,16 @@ describe('ReviewModel', () => {
     await expect(model.listVisibleForProduct('p1')).resolves.toEqual([[{ id: 'r1' }], [{ rating: 5 }]]);
     expect(prisma.$transaction).toHaveBeenCalledTimes(1);
     expect(prisma.review.findMany).toHaveBeenCalledTimes(2);
+    expect(prisma.review.findMany).toHaveBeenNthCalledWith(1, {
+      where: { productId: 'p1', isHidden: false },
+      orderBy: [{ isVerified: 'desc' }, { createdAt: 'desc' }],
+      take: 50,
+      include: { user: { select: { id: true, name: true, avatarUrl: true } } },
+    });
+    expect(prisma.review.findMany).toHaveBeenNthCalledWith(2, {
+      where: { productId: 'p1', isHidden: false },
+      select: { rating: true },
+    });
   });
 
   it('upsert delegates to prisma.review.upsert', async () => {
@@ -54,8 +64,12 @@ describe('ReviewModel', () => {
 
   it('findManyAndCount runs findMany + count inside one $transaction call', async () => {
     prisma.$transaction.mockResolvedValue([[], 0]);
-    await model.findManyAndCount({} as any, {} as any);
+    const args = { where: { productId: 'p1' } };
+    const countArgs = { where: { productId: 'p1' } };
+    await model.findManyAndCount(args as any, countArgs as any);
     expect(prisma.$transaction).toHaveBeenCalledTimes(1);
+    expect(prisma.review.findMany).toHaveBeenCalledWith(args);
+    expect(prisma.review.count).toHaveBeenCalledWith(countArgs);
   });
 
   it('update delegates to prisma.review.update', async () => {
