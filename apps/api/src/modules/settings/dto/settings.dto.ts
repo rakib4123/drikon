@@ -24,6 +24,10 @@ export const UpdateSettingsSchema = z.object({
   supportEmail: z.string().email().optional().or(z.literal('')),
   socialFacebook: z.string().url().optional().or(z.literal('')),
   socialInstagram: z.string().url().optional().or(z.literal('')),
+  bkashNumber: text(30),
+  bkashInstructions: text(300),
+  bkashEnabled: z.boolean().optional(),
+  codEnabled: z.boolean().optional(),
 
   // Editable storefront content
   heroBadge: text(120),
