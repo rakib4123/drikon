@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { OrderStatus, Prisma } from '@prisma/client';
+import { OrderStatus, PaymentMethod, Prisma } from '@prisma/client';
 import { PrismaService } from '../modules/prisma/prisma.service';
 
 interface ShippingAddressInput {
@@ -23,6 +23,10 @@ interface OrderLineInput {
   lineTotal: Prisma.Decimal;
 }
 
+export type PaymentPersistInput =
+  | { method: typeof PaymentMethod.BKASH_MANUAL; providerPaymentId: string; payerReference: string }
+  | { method: typeof PaymentMethod.COD };
+
 export interface CreateOrderPersistArgs {
   userId: string;
   shippingAddress: ShippingAddressInput;
@@ -36,6 +40,7 @@ export interface CreateOrderPersistArgs {
   couponId: string | null;
   notes?: string;
   lines: OrderLineInput[];
+  payment: PaymentPersistInput;
 }
 
 @Injectable()
@@ -91,6 +96,18 @@ export class OrderModel {
         }
       }
 
+      await tx.payment.create({
+        data: {
+          orderId: created.id,
+          method: args.payment.method,
+          amount: args.total,
+          currency: args.currency,
+          ...(args.payment.method === PaymentMethod.BKASH_MANUAL
+            ? { providerPaymentId: args.payment.providerPaymentId, payerReference: args.payment.payerReference }
+            : {}),
+        },
+      });
+
       if (args.couponId) {
         await tx.coupon.update({
           where: { id: args.couponId },
@@ -126,6 +143,10 @@ export class OrderModel {
 
   update<T extends Prisma.OrderUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.OrderUpdateArgs>) {
     return this.prisma.order.update(args);
+  }
+
+  updatePayment<T extends Prisma.PaymentUpdateArgs>(args: Prisma.SelectSubset<T, Prisma.PaymentUpdateArgs>) {
+    return this.prisma.payment.update(args);
   }
 
   count<T extends Prisma.OrderCountArgs>(args: Prisma.SelectSubset<T, Prisma.OrderCountArgs>) {
