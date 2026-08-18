@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
-import { ArrowRight, Sparkles, ShieldCheck, Truck, Headphones } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { ProductGrid } from '@/components/shop/product-grid';
 import { CategoryShowcase } from '@/components/shop/category-showcase';
 import { FlashSaleSection } from '@/components/shop/flash-sale-section';
@@ -23,14 +23,6 @@ async function getBrands(): Promise<BrandLite[]> {
     return [];
   }
 }
-
-// Rotating icon set for the (editable) feature strip cards.
-const FEATURE_ICONS = [
-  <ShieldCheck className="w-5 h-5" key="shield" />,
-  <Truck className="w-5 h-5" key="truck" />,
-  <Headphones className="w-5 h-5" key="headphones" />,
-  <Sparkles className="w-5 h-5" key="sparkles" />,
-];
 
 // Fetch on the server — RSC means no API key/token leaks to client.
 async function getFeatured(): Promise<ProductListResponse | null> {
@@ -57,59 +49,43 @@ export default async function HomePage() {
       {banners.length > 0 ? (
         <HeroSlider slides={banners} />
       ) : (
-      <section className="relative overflow-hidden grain aurora">
-        <div className="absolute inset-0 bg-drikon-mesh" aria-hidden />
-        <div className="relative z-10 max-w-7xl mx-auto px-6 pt-12 pb-16 md:pt-20 md:pb-24">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-xs font-medium mb-6 animate-fade-up shadow-[0_0_24px_-8px_var(--glow)]">
-                <Sparkles className="w-3.5 h-3.5 text-[color:var(--accent)]" />
-                <span>{c.heroBadge}</span>
-              </div>
-
-              <h1 className="display text-5xl md:text-6xl lg:text-7xl animate-fade-up" style={{ animationDelay: '120ms' }}>
-                {c.heroTitle.split('\n').map((line, i, arr) => {
-                  const isHighlight = line.trim() === c.heroHighlight.trim();
-                  return (
-                    <span key={i}>
-                      {isHighlight ? (
-                        <span className="bg-gradient-to-r from-[color:var(--accent)] via-[color:var(--accent-2)] to-white/70 bg-clip-text text-transparent">
-                          {line}
-                        </span>
-                    ) : (
-                      line
-                    )}
-                    {i < arr.length - 1 && <br />}
-                  </span>
-                );
-              })}
-            </h1>
-
-            <p className="mt-6 max-w-xl text-lg text-[color:var(--fg-muted)] animate-fade-up" style={{ animationDelay: '240ms' }}>
-              {c.heroSubtitle}
-            </p>
-
-              <div className="mt-10 flex flex-wrap gap-3 animate-fade-up" style={{ animationDelay: '360ms' }}>
-                <Link href={c.heroCtaHref} className="btn-primary">
-                  {c.heroCtaLabel} <ArrowRight className="w-4 h-4" />
-                </Link>
-                <Link href={c.heroCtaAltHref} className="btn-ghost">
-                  {c.heroCtaAltLabel}
-                </Link>
-              </div>
-            </div>
-
-            {/* Hero Image Side */}
-            <div className="hidden lg:flex justify-center relative animate-float" style={{ animationDelay: '400ms' }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/hero.png" alt="Premium Smartphone" className="w-full max-w-[500px] h-auto drop-shadow-[0_0_60px_rgba(59,130,246,0.3)] object-contain rounded-[2rem]" />
-            </div>
+      <section className="relative overflow-hidden">
+        <div className="relative z-10 max-w-3xl mx-auto px-6 pt-20 pb-16 md:pt-28 md:pb-20 text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[color:var(--border)] text-xs font-medium text-[color:var(--fg-muted)] mb-8 animate-fade-up">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>{c.heroBadge}</span>
           </div>
 
-          {/* Asymmetric decoration */}
-          <div
-            className="hidden md:block absolute right-[-80px] top-24 w-[420px] h-[420px] rounded-full bg-gradient-to-br from-[#ef6a20]/30 to-[#14233f]/20 blur-3xl"
-            aria-hidden
+          <h1 className="display text-5xl md:text-6xl lg:text-7xl animate-fade-up" style={{ animationDelay: '120ms' }}>
+            {c.heroTitle.split('\n').map((line, i, arr) => (
+              <span key={i}>
+                {line}
+                {i < arr.length - 1 && <br />}
+              </span>
+            ))}
+          </h1>
+
+          <p className="mt-6 max-w-xl mx-auto text-lg text-[color:var(--fg-muted)] animate-fade-up" style={{ animationDelay: '240ms' }}>
+            {c.heroSubtitle}
+          </p>
+
+          <div className="mt-10 flex flex-wrap gap-3 justify-center animate-fade-up" style={{ animationDelay: '360ms' }}>
+            <Link href={c.heroCtaHref} className="btn-primary">
+              {c.heroCtaLabel} <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link href={c.heroCtaAltHref} className="btn-ghost">
+              {c.heroCtaAltLabel}
+            </Link>
+          </div>
+        </div>
+
+        {/* Hero image — full-bleed, no overlay, lets the product carry the visual weight */}
+        <div className="max-w-6xl mx-auto px-6 pb-20 md:pb-28 animate-fade-up" style={{ animationDelay: '440ms' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/hero.png"
+            alt="Featured device"
+            className="w-full max-h-[420px] object-cover rounded-3xl border border-[color:var(--border)] grayscale contrast-105 brightness-110"
           />
         </div>
       </section>
@@ -117,10 +93,10 @@ export default async function HomePage() {
 
       {/* ─── FEATURE STRIP ─── */}
       {c.features.length > 0 && (
-        <section className="border-y border-[color:var(--border)] bg-[color:var(--bg-soft)]/30">
+        <section className="border-y border-[color:var(--border)]">
           <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-8">
             {c.features.map((f, i) => (
-              <Feature key={i} icon={FEATURE_ICONS[i % FEATURE_ICONS.length]} title={f.title} body={f.body} />
+              <Feature key={i} title={f.title} body={f.body} />
             ))}
           </div>
         </section>
@@ -173,7 +149,7 @@ export default async function HomePage() {
               {c.ctaBody}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href={c.ctaButtonHref} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-[#06070d] font-semibold hover:bg-white/90 transition-colors">
+              <Link href={c.ctaButtonHref} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-[#151515] font-semibold hover:bg-white/90 transition-colors">
                 {c.ctaButtonLabel} <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -184,12 +160,10 @@ export default async function HomePage() {
   );
 }
 
-function Feature({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
+function Feature({ title, body }: { title: string; body: string }) {
   return (
     <div className="flex items-start gap-3">
-      <div className="w-9 h-9 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] grid place-items-center text-[color:var(--accent)] shrink-0">
-        {icon}
-      </div>
+      <div className="w-px h-8 bg-[color:var(--fg)] shrink-0 mt-0.5" />
       <div>
         <div className="font-semibold text-sm">{title}</div>
         <div className="text-xs text-[color:var(--fg-muted)] mt-0.5">{body}</div>
