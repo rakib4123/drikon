@@ -15,7 +15,7 @@ export function StatsBand() {
       <div className="relative overflow-hidden rounded-3xl bg-drikon-gradient grain text-white">
         <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-px bg-white/10">
           {STATS.map((s) => (
-            <div key={s.label} className="bg-[#14233f]/30 px-6 py-8 flex flex-col items-center text-center gap-2">
+            <div key={s.label} className="bg-white/5 px-6 py-8 flex flex-col items-center text-center gap-2">
               <span className="w-11 h-11 rounded-xl bg-white/12 grid place-items-center text-white">
                 {s.icon}
               </span>
