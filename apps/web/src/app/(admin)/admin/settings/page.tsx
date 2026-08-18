@@ -42,6 +42,10 @@ export default function AdminSettingsPage() {
           supportEmail: s.supportEmail ?? '',
           socialFacebook: s.socialFacebook ?? '',
           socialInstagram: s.socialInstagram ?? '',
+          bkashNumber: s.bkashNumber ?? '',
+          bkashInstructions: s.bkashInstructions ?? '',
+          bkashEnabled: s.bkashEnabled ?? true,
+          codEnabled: s.codEnabled ?? true,
           heroBadge: s.heroBadge ?? '',
           heroTitle: s.heroTitle ?? '',
           heroHighlight: s.heroHighlight ?? '',
@@ -174,6 +178,36 @@ export default function AdminSettingsPage() {
             <Field label="Instagram URL" error={errors.socialInstagram?.message}>
               <input className="input" {...register('socialInstagram')} placeholder="https://instagram.com/…" />
             </Field>
+          </div>
+        </section>
+
+        {/* Payments */}
+        <section className="card space-y-5">
+          <h2 className="font-semibold">Payments</h2>
+          <p className="text-xs text-[color:var(--fg-muted)] -mt-3">
+            Manual payment methods — no gateway integration yet. Toggle a method off to hide it at checkout.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-5">
+            <Field label="bKash number" error={errors.bkashNumber?.message}>
+              <input className="input" {...register('bkashNumber')} placeholder="01XXXXXXXXX" />
+            </Field>
+            <Field label="bKash instructions (optional override)" error={errors.bkashInstructions?.message}>
+              <input
+                className="input"
+                {...register('bkashInstructions')}
+                placeholder="Leave blank to use the default instructions"
+              />
+            </Field>
+          </div>
+          <div className="flex items-center gap-6">
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" className="w-4 h-4" {...register('bkashEnabled')} />
+              Accept bKash
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" className="w-4 h-4" {...register('codEnabled')} />
+              Accept cash on delivery
+            </label>
           </div>
         </section>
 
