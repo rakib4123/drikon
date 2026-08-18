@@ -15,6 +15,7 @@ import {
   UpdateOrderStatusDto,
   AdminUserQueryDto,
   UpdateUserRoleDto,
+  VerifyPaymentDto,
 } from './dto/admin.dto';
 import { CurrentUser, Roles } from '../../common/decorators';
 
@@ -42,6 +43,12 @@ export class AdminController {
   @ApiOperation({ summary: 'Update an order status' })
   updateOrderStatus(@Param('id') id: string, @Body() dto: UpdateOrderStatusDto) {
     return this.admin.updateOrderStatus(id, dto.status);
+  }
+
+  @Patch('orders/:id/payment')
+  @ApiOperation({ summary: 'Verify a manual payment (mark paid or failed)' })
+  verifyPayment(@Param('id') id: string, @Body() dto: VerifyPaymentDto) {
+    return this.admin.verifyPayment(id, dto.status, dto.adminNote);
   }
 
   // ─── Users ───

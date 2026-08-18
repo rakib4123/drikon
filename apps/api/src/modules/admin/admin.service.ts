@@ -4,7 +4,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { OrderStatus, Prisma, Role } from '@prisma/client';
+import { OrderStatus, PaymentMethod, PaymentStatus, Prisma, Role } from '@prisma/client';
 import { ProductModel } from '../../models/product.model';
 import { OrderModel } from '../../models/order.model';
 import { UserModel } from '../../models/user.model';
@@ -138,6 +138,7 @@ export class AdminService {
         include: {
           items: true,
           user: { select: { id: true, name: true, email: true } },
+          payment: true,
         },
       },
       { where },
@@ -157,8 +158,23 @@ export class AdminService {
   }
 
   async updateOrderStatus(id: string, status: OrderStatus) {
-    const order = await this.orders.findUnique({ where: { id }, select: { id: true } });
+    const order = await this.orders.findUnique({
+      where: { id },
+      select: { id: true, payment: { select: { method: true, status: true } } },
+    });
     if (!order) throw new NotFoundException('Order not found');
+
+    if (
+      status === OrderStatus.DELIVERED &&
+      order.payment?.method === PaymentMethod.COD &&
+      order.payment.status !== PaymentStatus.SUCCEEDED
+    ) {
+      await this.orders.updatePayment({
+        where: { orderId: id },
+        data: { status: PaymentStatus.SUCCEEDED, paidAt: new Date() },
+      });
+    }
+
     return this.orders.update({
       where: { id },
       data: {
@@ -167,6 +183,30 @@ export class AdminService {
       },
       include: { items: true, user: { select: { id: true, name: true, email: true } } },
     });
+  }
+
+  async verifyPayment(orderId: string, status: PaymentStatus, adminNote?: string) {
+    const order = await this.orders.findUnique({ where: { id: orderId }, select: { id: true, status: true } });
+    if (!order) throw new NotFoundException('Order not found');
+
+    const payment = await this.orders.updatePayment({
+      where: { orderId },
+      data: {
+        status,
+        adminNote,
+        ...(status === PaymentStatus.SUCCEEDED
+          ? { paidAt: new Date() }
+          : status === PaymentStatus.FAILED
+            ? { failureReason: adminNote }
+            : {}),
+      },
+    });
+
+    if (status === PaymentStatus.SUCCEEDED && order.status === OrderStatus.PENDING) {
+      await this.orders.update({ where: { id: orderId }, data: { status: OrderStatus.PROCESSING } });
+    }
+
+    return payment;
   }
 
   // ─────────────────────────────────────────────────────────────────
