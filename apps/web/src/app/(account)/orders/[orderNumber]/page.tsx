@@ -139,7 +139,22 @@ export default function OrderDetailPage({
             Placed {dateFmt.format(new Date(order.createdAt))}
           </p>
         </div>
-        <OrderStatusBadge status={order.status} className="text-xs px-3 py-1.5" />
+        <div className="text-right">
+          <OrderStatusBadge status={order.status} className="text-xs px-3 py-1.5" />
+          {order.payment && (
+            <p className="text-xs text-[color:var(--fg-muted)] mt-2">
+              {order.payment.method === 'BKASH_MANUAL'
+                ? order.payment.status === 'SUCCEEDED'
+                  ? 'Payment verified ✓'
+                  : order.payment.status === 'FAILED'
+                    ? 'Payment verification failed — please contact support.'
+                    : "Payment pending verification — we'll update this once confirmed."
+                : order.payment.status === 'SUCCEEDED'
+                  ? 'Paid on delivery ✓'
+                  : `Pay ${formatPrice(order.total, order.currency)} in cash on delivery`}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Items */}
