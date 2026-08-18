@@ -42,6 +42,7 @@ interface LoginResult {
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
+  // argon2id parameters — tuned to ~250 ms on a modern CPU
   private readonly argonOptions: argon2.Options;
 
   constructor(
@@ -57,6 +58,7 @@ export class AuthService {
       parallelism: config.get<number>('ARGON2_PARALLELISM', 4),
     };
 
+    // TOTP defaults: 6 digits, 30s window, 1 step skew tolerance
     authenticator.options = { window: 1 };
   }
 
@@ -67,6 +69,7 @@ export class AuthService {
   async register(input: { email: string; password: string; name: string }): Promise<{ message: string }> {
     const existing = await this.users.findUnique({ where: { email: input.email } });
     if (existing) {
+      // Return the SAME message as success — never leak which emails are registered.
       return { message: 'Account created. Please check your email to verify.' };
     }
 
@@ -81,12 +84,13 @@ export class AuthService {
       },
     });
 
+    // Issue verification token (raw token sent in mail, hash stored)
     const { raw, hash } = this.generateOneTimeToken();
     await this.users.createVerificationToken({
       data: {
         userId: user.id,
         tokenHash: hash,
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h
       },
     });
 
@@ -119,11 +123,14 @@ export class AuthService {
       include: { twoFactorSecret: true },
     });
 
+    // Constant-time-ish: we still run a fake hash check if user doesn't exist,
+    // so attackers can't distinguish "no such user" from "wrong password" via timing.
     if (!user || !user.passwordHash) {
       await argon2.hash('dummy-password', this.argonOptions).catch(() => undefined);
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    // Account lockout check
     if (user.lockedUntil && user.lockedUntil > new Date()) {
       throw new UnauthorizedException(
         'Account temporarily locked due to too many failed attempts. Try again later.',
@@ -136,6 +143,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    // 2FA check
     if (user.twoFactorEnabled && user.twoFactorSecret) {
       if (!input.twoFactorCode) {
         return {
@@ -147,6 +155,10 @@ export class AuthService {
       if (!valid) throw new UnauthorizedException('Invalid 2FA code');
     }
 
+    // (Optional) email-verified gate. Comment out for friendlier dev experience.
+    // if (!user.emailVerified) throw new ForbiddenException('Email not verified');
+
+    // Successful login — clear failed counters, issue tokens
     await this.users.update({
       where: { id: user.id },
       data: {
@@ -186,6 +198,7 @@ export class AuthService {
   // ───────────────────────────────────────────────────────────────────
 
   async loginWithGoogle(payload: GoogleUserPayload, ctx: LoginContext): Promise<LoginResult> {
+    // Upsert by googleId, falling back to email match.
     let user = await this.users.findFirst({
       where: { OR: [{ googleId: payload.googleId }, { email: payload.email }] },
     });
@@ -202,6 +215,7 @@ export class AuthService {
         },
       });
     } else if (!user.googleId) {
+      // Existing email account — link Google identity.
       user = await this.users.update({
         where: { id: user.id },
         data: {
@@ -233,6 +247,8 @@ export class AuthService {
     const tokenHash = this.hashToken(refreshToken);
     const session = await this.users.findSessionByRefreshHash(tokenHash);
 
+    // Token reuse detection: refresh was valid JWT but not in DB → it was rotated.
+    // This is a strong signal of theft. Nuke everything for that user.
     if (!session) {
       this.logger.warn({ msg: 'refresh.reuse_detected', sub: payload.sub });
       await this.users.deleteSessionsForUser(payload.sub);
@@ -242,6 +258,7 @@ export class AuthService {
       throw new UnauthorizedException('Refresh token expired');
     }
 
+    // Rotation: invalidate old, issue new.
     await this.users.deleteSession(session.id);
     return this.issueTokenPair(session.user, ctx);
   }
@@ -268,13 +285,14 @@ export class AuthService {
 
   async forgotPassword(email: string, ipAddress?: string): Promise<{ message: string }> {
     const user = await this.users.findUnique({ where: { email } });
+    // Always return the same response — no user enumeration.
     if (user && user.authProvider === AuthProvider.LOCAL) {
       const { raw, hash } = this.generateOneTimeToken();
       await this.users.createPasswordResetToken({
         data: {
           userId: user.id,
           tokenHash: hash,
-          expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+          expiresAt: new Date(Date.now() + 60 * 60 * 1000), // 1h
           ipAddress,
         },
       });
@@ -290,6 +308,7 @@ export class AuthService {
       throw new BadRequestException('Invalid or expired reset token');
     }
     const passwordHash = await argon2.hash(newPassword, this.argonOptions);
+    // Also revokes all sessions — force re-login everywhere after a password reset.
     await this.users.resetPasswordTransaction(row.id, row.userId, passwordHash);
     return { message: 'Password updated. Please log in again.' };
   }
@@ -307,6 +326,7 @@ export class AuthService {
     const otpauth = authenticator.keyuri(user.email, 'Drikon', secret);
     const qrCodeDataUrl = await qrcode.toDataURL(otpauth);
 
+    // Store secret but don't enable until verified.
     await this.users.upsertTwoFactorSecret({
       where: { userId },
       create: { userId, secret, recoveryCodes: [] },
@@ -321,6 +341,7 @@ export class AuthService {
     if (!authenticator.check(code, row.secret)) {
       throw new BadRequestException('Invalid code');
     }
+    // Generate one-time recovery codes (10 × 10 chars). Store hashes.
     const recoveryCodes = Array.from({ length: 10 }, () => randomBytes(5).toString('hex'));
     const hashedCodes = recoveryCodes.map((c) => this.hashToken(c));
     await this.users.enableTwoFactorTransaction(userId, hashedCodes);
@@ -374,6 +395,7 @@ export class AuthService {
       }),
     ]);
 
+    // Store HASH of refresh token, never the raw value.
     await this.users.createSession({
       data: {
         id: sessionId,
@@ -392,6 +414,7 @@ export class AuthService {
   // PRIMITIVES
   // ───────────────────────────────────────────────────────────────────
 
+  /** Generates a URL-safe 32-byte token and its SHA-256 hash. */
   private generateOneTimeToken(): { raw: string; hash: string } {
     const raw = randomBytes(32).toString('base64url');
     return { raw, hash: this.hashToken(raw) };
