@@ -197,10 +197,26 @@ export const CheckoutItemSchema = z.object({
   quantity: z.coerce.number().int().positive().max(99),
 });
 
+export type PaymentMethod = 'BKASH_MANUAL' | 'COD';
+export type PaymentStatus = 'PENDING' | 'SUCCEEDED' | 'FAILED' | 'REFUNDED';
+
+export const PaymentInputSchema = z.discriminatedUnion('method', [
+  z.object({
+    method: z.literal('BKASH_MANUAL'),
+    payerReference: z.string().min(5, 'Required').max(30).trim(),
+    providerPaymentId: z.string().min(4, 'Required').max(30).trim(),
+  }),
+  z.object({
+    method: z.literal('COD'),
+  }),
+]);
+export type PaymentInput = z.infer<typeof PaymentInputSchema>;
+
 export const CreateOrderSchema = z.object({
   items: z.array(CheckoutItemSchema).min(1, 'Your cart is empty').max(50),
   shippingAddress: ShippingAddressSchema,
   notes: z.string().max(500).trim().optional(),
+  payment: PaymentInputSchema,
 });
 export type CreateOrderInput = z.infer<typeof CreateOrderSchema>;
 
@@ -224,6 +240,15 @@ export interface OrderItemSummary {
   lineTotal: string | number;
 }
 
+export interface OrderPaymentSummary {
+  method: PaymentMethod;
+  status: PaymentStatus;
+  providerPaymentId?: string | null;
+  payerReference?: string | null;
+  paidAt?: string | null;
+  adminNote?: string | null;
+}
+
 export interface OrderSummary {
   id: string;
   orderNumber: string;
@@ -236,6 +261,7 @@ export interface OrderSummary {
   currency: string;
   createdAt: string;
   items: OrderItemSummary[];
+  payment?: OrderPaymentSummary | null;
 }
 
 export interface OrderListResponse {
@@ -264,6 +290,10 @@ export interface SiteSettings {
   supportEmail?: string | null;
   socialFacebook?: string | null;
   socialInstagram?: string | null;
+  bkashNumber?: string | null;
+  bkashInstructions?: string | null;
+  bkashEnabled?: boolean;
+  codEnabled?: boolean;
 
   // ── Editable storefront content (null → falls back to built-in defaults) ──
   heroBadge?: string | null;
@@ -309,6 +339,10 @@ export const UpdateSettingsSchema = z.object({
   supportEmail: z.string().email().optional().or(z.literal('')),
   socialFacebook: z.string().url().optional().or(z.literal('')),
   socialInstagram: z.string().url().optional().or(z.literal('')),
+  bkashNumber: emptyableText(30),
+  bkashInstructions: emptyableText(300),
+  bkashEnabled: z.boolean().optional(),
+  codEnabled: z.boolean().optional(),
 
   // Content (all optional; empty string clears back to the built-in default)
   heroBadge: emptyableText(120),
