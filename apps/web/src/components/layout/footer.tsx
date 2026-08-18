@@ -7,7 +7,7 @@ export function Footer({ brand, categories = [], note }: { brand: BrandInfo; cat
   const topCats = categories.filter((c) => !c.parentId).slice(0, 5);
   return (
     <footer className="mt-24 border-t border-[color:var(--border)]">
-      <div className="max-w-7xl mx-auto px-6 py-14 grid gap-10 md:grid-cols-3">
+      <div className="max-w-7xl mx-auto px-6 py-14 grid gap-10 md:grid-cols-4">
         <div className="md:col-span-2">
           <div className="mb-3">
             <BrandMark brand={brand} href={null} showTagline />
@@ -28,6 +28,13 @@ export function Footer({ brand, categories = [], note }: { brand: BrandInfo; cat
                 </Link>
               </li>
             ))}
+          </ul>
+        </div>
+
+        <div>
+          <div className="text-sm font-semibold mb-3">Company</div>
+          <ul className="space-y-2 text-sm text-[color:var(--fg-muted)]">
+            <li><Link href="/about" className="hover:text-[color:var(--fg)]">About</Link></li>
           </ul>
         </div>
       </div>
