@@ -8,6 +8,7 @@ import { Prisma } from '@prisma/client';
 import { OrderModel } from '../../models/order.model';
 import { ProductModel } from '../../models/product.model';
 import { CouponsService } from '../coupons/coupons.service';
+import { SettingsService } from '../settings/settings.service';
 import type { CreateOrderDto, OrderQueryDto } from './dto/order.dto';
 
 const FREE_SHIPPING_THRESHOLD = new Prisma.Decimal(3000);
@@ -21,12 +22,21 @@ export class OrdersService {
     private readonly orders: OrderModel,
     private readonly products: ProductModel,
     private readonly coupons: CouponsService,
+    private readonly settingsService: SettingsService,
   ) {}
 
   // ─────────────────────────────────────────────────────────────────
   // CREATE — turn a cart payload into a real Order (no payment yet)
   // ─────────────────────────────────────────────────────────────────
   async create(userId: string, dto: CreateOrderDto) {
+    const settings = await this.settingsService.get();
+    if (dto.payment.method === 'BKASH_MANUAL' && settings.bkashEnabled === false) {
+      throw new BadRequestException('bKash payment is currently unavailable');
+    }
+    if (dto.payment.method === 'COD' && settings.codEnabled === false) {
+      throw new BadRequestException('Cash on delivery is currently unavailable');
+    }
+
     const productIds = [...new Set(dto.items.map((i) => i.productId))];
     const products = await this.products.findMany({
       where: { id: { in: productIds }, isActive: true },
@@ -99,22 +109,33 @@ export class OrdersService {
 
     const orderNumber = await this.nextOrderNumber();
 
-    const order = await this.orders.createOrderTransaction({
-      userId,
-      shippingAddress: dto.shippingAddress,
-      orderNumber,
-      subtotal,
-      shipping,
-      tax,
-      discount,
-      total,
-      currency,
-      couponId,
-      notes: dto.notes,
-      lines,
-    });
-
-    return this.attachSlugs(order);
+    try {
+      const order = await this.orders.createOrderTransaction({
+        userId,
+        shippingAddress: dto.shippingAddress,
+        orderNumber,
+        subtotal,
+        shipping,
+        tax,
+        discount,
+        total,
+        currency,
+        couponId,
+        notes: dto.notes,
+        lines,
+        payment: dto.payment,
+      });
+      return this.attachSlugs(order);
+    } catch (err) {
+      if (
+        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err.code === 'P2002' &&
+        (err.meta?.target as string[] | undefined)?.includes('providerPaymentId')
+      ) {
+        throw new BadRequestException('This bKash Transaction ID has already been used for another order');
+      }
+      throw err;
+    }
   }
 
   // ─────────────────────────────────────────────────────────────────
