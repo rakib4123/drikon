@@ -132,9 +132,17 @@ rationale and rejected alternatives).
 | View | `src/modules/*/dto/*.dto.ts` + `common/interceptors/response.interceptor.ts` | The API's "view" is its response shape: DTOs plus the global response interceptor decide what a client actually sees. |
 | *(Service)* | `src/modules/*/‍*.service.ts` | Not a classic MVC layer — this is where business rules, validation, and cross-entity orchestration live, sitting between Controller and Model. Removing it would mean pushing business logic into the Model (wrong — Models should stay pure persistence) or the Controller (wrong — Controllers should stay thin), so it stays as an explicit fourth layer. |
 
-**apps/web (Next.js App Router):**
+**apps/web (Next.js App Router) — planned, not yet implemented:**
 
-| MVC role | Where it lives | What it does |
+The table below describes the *target* design for `apps/web`, specified in
+two not-yet-executed plans:
+`docs/superpowers/plans/2026-08-17-mvc-web-customer-routes.md` and
+`docs/superpowers/plans/2026-08-17-mvc-web-admin-routes.md`. As of this
+writing, `apps/web/src/` has no `models/` or `controllers/` directory —
+pages still fetch data inline via `lib/*.ts`. Do not go looking for these
+directories until one of those two plans has been executed.
+
+| MVC role | Where it will live | What it will do |
 |---|---|---|
 | Model | `src/models/*.ts` | Data-fetching functions against the API (via `lib/api-client.ts`), grouped by domain entity. |
 | View | `src/components/**` and `src/app/**/page.tsx` | Pure presentation — components render props, pages compose components. |

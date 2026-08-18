@@ -42,7 +42,7 @@ Model files to create, derived from which services currently import `PrismaServi
 | `models/wishlist.model.ts` | `wishlist.service.ts` |
 | `models/settings.model.ts` | `settings.service.ts` |
 
-`admin.service.ts` does cross-entity dashboard aggregation — it will consume the existing per-entity models above rather than getting its own model file. `prisma.service.ts` (the Prisma client provider itself) and `mail.service.ts`/`health.module.ts` (no Prisma usage) are unaffected.
+`admin.service.ts` does cross-entity dashboard aggregation — it will consume the existing per-entity models above rather than getting its own model file. `prisma.service.ts` (the Prisma client provider itself) and `mail.service.ts` (no Prisma usage) are unaffected. `health.module.ts` *does* use `PrismaService` — a raw `` this.prisma.$queryRaw`SELECT 1` `` liveness probe — but is deliberately left outside the Model layer because it's an infrastructure check, not a domain persistence operation, so it doesn't belong in a `*.model.ts` file.
 
 Each Model class:
 - Is `@Injectable()`, provided via a shared `ModelsModule` (`models/models.module.ts`) that imports `PrismaModule` and exports every Model class, so feature modules just import `ModelsModule` instead of `PrismaModule` directly.

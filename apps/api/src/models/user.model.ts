@@ -28,7 +28,7 @@ export class UserModel {
     return this.prisma.user.update(args);
   }
 
-  count(args: Prisma.UserCountArgs = {}) {
+  count<T extends Prisma.UserCountArgs>(args: Prisma.SelectSubset<T, Prisma.UserCountArgs>) {
     return this.prisma.user.count(args);
   }
 

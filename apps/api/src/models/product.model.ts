@@ -32,7 +32,7 @@ export class ProductModel {
     return this.prisma.product.create(args);
   }
 
-  count(args: Prisma.ProductCountArgs = {}) {
+  count<T extends Prisma.ProductCountArgs>(args: Prisma.SelectSubset<T, Prisma.ProductCountArgs>) {
     return this.prisma.product.count(args);
   }
 

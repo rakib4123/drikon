@@ -48,7 +48,7 @@ export class ReviewModel {
     return this.prisma.review.update(args);
   }
 
-  count(args: Prisma.ReviewCountArgs = {}) {
+  count<T extends Prisma.ReviewCountArgs>(args: Prisma.SelectSubset<T, Prisma.ReviewCountArgs>) {
     return this.prisma.review.count(args);
   }
 

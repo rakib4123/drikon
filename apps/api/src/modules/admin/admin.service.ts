@@ -45,10 +45,10 @@ export class AdminService {
       topProducts,
       statusRows,
     ] = await Promise.all([
-      this.orders.count(),
-      this.users.count(),
+      this.orders.count({}),
+      this.users.count({}),
       this.products.count({ where: { isActive: true } }),
-      this.reviews.count(),
+      this.reviews.count({}),
       this.orders.aggregate({
         _sum: { total: true },
         where: { status: { in: REVENUE_STATUSES } },
