@@ -9,10 +9,25 @@ import { BannerModel } from './banner.model';
 import { FlashSaleModel } from './flash-sale.model';
 import { WishlistModel } from './wishlist.model';
 import { SettingsModel } from './settings.model';
+import { UserModel } from './user.model';
+
+const models = [
+  ProductModel,
+  OrderModel,
+  ReviewModel,
+  CouponModel,
+  BrandModel,
+  CategoryModel,
+  BannerModel,
+  FlashSaleModel,
+  WishlistModel,
+  SettingsModel,
+  UserModel,
+];
 
 @Global()
 @Module({
-  providers: [ProductModel, OrderModel, ReviewModel, CouponModel, BrandModel, CategoryModel, BannerModel, FlashSaleModel, WishlistModel, SettingsModel],
-  exports: [ProductModel, OrderModel, ReviewModel, CouponModel, BrandModel, CategoryModel, BannerModel, FlashSaleModel, WishlistModel, SettingsModel],
+  providers: models,
+  exports: models,
 })
 export class ModelsModule {}
