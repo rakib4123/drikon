@@ -12,10 +12,12 @@ import {
   ShippingAddressSchema,
   type ShippingAddressInput,
   type OrderSummary,
+  type PaymentInput,
 } from '@drikon/shared-types';
 import { apiPost, ApiError } from '@/lib/api-client';
 import { formatPrice } from '@/lib/utils';
 import { CouponField, type CouponState } from '@/components/shop/coupon-field';
+import { PaymentMethodField } from '@/components/shop/payment-method-field';
 import { useCartStore } from '@/store/cart-store';
 import { useAuthStore } from '@/store/auth-store';
 
@@ -48,6 +50,9 @@ export default function CheckoutPage() {
   const [coupon, setCoupon] = useState<CouponState>({ code: null, discount: 0, freeShipping: false });
   const onCoupon = useCallback((s: CouponState) => setCoupon(s), []);
 
+  const [payment, setPayment] = useState<PaymentInput | null>(null);
+  const onPayment = useCallback((p: PaymentInput | null) => setPayment(p), []);
+
   const sub = subtotal();
   const currency = items[0]?.currency ?? 'BDT';
   const freeShip = coupon.freeShipping || sub >= FREE_SHIPPING_THRESHOLD;
@@ -64,6 +69,10 @@ export default function CheckoutPage() {
       toast.error('Your cart is empty');
       return;
     }
+    if (!payment) {
+      toast.error('Please choose and complete a payment method');
+      return;
+    }
     try {
       const order = await apiPost<OrderSummary>('/api/v1/orders', {
         items: items.map((i) => ({
@@ -73,6 +82,7 @@ export default function CheckoutPage() {
         })),
         shippingAddress: address,
         couponCode: couponCode ?? undefined,
+        payment,
       });
       clear();
       toast.success('Order placed!', { description: order.orderNumber });
@@ -146,6 +156,8 @@ export default function CheckoutPage() {
               </Field>
             </div>
           </div>
+
+          <PaymentMethodField total={total} currency={currency} onChange={onPayment} />
         </div>
 
         {/* ── Order summary ── */}
@@ -188,11 +200,14 @@ export default function CheckoutPage() {
           <div className="h-px bg-[color:var(--border)] my-4" />
           <Row label="Total" value={formatPrice(total, currency)} strong />
 
-          <button type="submit" disabled={isSubmitting} className="btn-primary w-full mt-5">
+          <button type="submit" disabled={isSubmitting || !payment} className="btn-primary w-full mt-5">
             {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Place order <ArrowRight className="w-4 h-4" /></>}
           </button>
           <p className="text-[11px] text-[color:var(--fg-muted)] mt-3 text-center inline-flex items-center gap-1 justify-center w-full">
-            <Lock className="w-3 h-3" /> Demo checkout — no payment is taken.
+            <Lock className="w-3 h-3" />
+            {payment?.method === 'BKASH_MANUAL'
+              ? "We'll verify your payment and update your order shortly."
+              : 'Your order is placed as soon as you submit.'}
           </p>
         </aside>
       </form>
