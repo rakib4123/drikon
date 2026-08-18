@@ -36,7 +36,7 @@ interface LoginResult {
 /**
  * The single source of truth for everything authentication.
  *
- * Security choices made here are deliberate; see ARCHITECTURE.md §6.
+ * Security choices made here are deliberate; see ARCHITECTURE.md §7.
  */
 @Injectable()
 export class AuthService {

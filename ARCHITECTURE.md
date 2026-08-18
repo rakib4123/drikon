@@ -114,7 +114,41 @@ drikon/
 
 ---
 
-## 4. Data Model (PostgreSQL via Prisma)
+## 4. MVC Layer Mapping
+
+Neither Next.js App Router nor NestJS spells out "Model/View/Controller" by
+folder name, so here's the explicit mapping — added as part of the course
+requirement to demonstrate the separation, without breaking either
+framework's own routing/DI conventions (see
+`docs/superpowers/specs/2026-08-17-mvc-conversion-design.md` for the full
+rationale and rejected alternatives).
+
+**apps/api (NestJS):**
+
+| MVC role | Where it lives | What it does |
+|---|---|---|
+| Model | `src/models/*.model.ts` | One injectable class per entity, wrapping every Prisma query. No business rules — only persistence. |
+| Controller | `src/modules/*/‍*.controller.ts` | Thin request/response handlers — unchanged by this refactor, they were already correctly scoped. |
+| View | `src/modules/*/dto/*.dto.ts` + `common/interceptors/response.interceptor.ts` | The API's "view" is its response shape: DTOs plus the global response interceptor decide what a client actually sees. |
+| *(Service)* | `src/modules/*/‍*.service.ts` | Not a classic MVC layer — this is where business rules, validation, and cross-entity orchestration live, sitting between Controller and Model. Removing it would mean pushing business logic into the Model (wrong — Models should stay pure persistence) or the Controller (wrong — Controllers should stay thin), so it stays as an explicit fourth layer. |
+
+**apps/web (Next.js App Router):**
+
+| MVC role | Where it lives | What it does |
+|---|---|---|
+| Model | `src/models/*.ts` | Data-fetching functions against the API (via `lib/api-client.ts`), grouped by domain entity. |
+| View | `src/components/**` and `src/app/**/page.tsx` | Pure presentation — components render props, pages compose components. |
+| Controller | `src/controllers/*.ts` | Thin per-route functions that read route params, call the Model layer, and return props for the View. `page.tsx` files stay in `app/` (required for file-based routing) but only call a controller and render — no fetching or business logic inline. |
+
+`lib/api-client.ts`, `lib/cloudinary.ts`, and `lib/utils.ts` stay in `lib/` —
+infrastructure, not domain data. Zustand stores in `src/store/` are also
+left out of this mapping: they hold transient client UI state (cart, auth
+session, compare/wishlist toggles), not persisted domain data, so folding
+them into "Model" would misrepresent what they are.
+
+---
+
+## 5. Data Model (PostgreSQL via Prisma)
 
 Core entities and relationships:
 
@@ -147,11 +181,11 @@ See `apps/api/prisma/schema.prisma` for the full schema.
 
 ---
 
-## 5. Authentication Flow
+## 6. Authentication Flow
 
 We use **JWT access tokens (15 min)** + **refresh tokens (7 days, rotating)**, both stored in `httpOnly`, `Secure`, `SameSite=strict` cookies. No tokens in localStorage — ever.
 
-### 5.1 Registration
+### 6.1 Registration
 1. Client POSTs `{email, password, name}` to `/auth/register`.
 2. Zod validates input.
 3. `argon2id` hashes password (memory-hard, side-channel resistant — beats bcrypt).
@@ -159,33 +193,33 @@ We use **JWT access tokens (15 min)** + **refresh tokens (7 days, rotating)**, b
 5. BullMQ job queued: send verification email with a signed, time-limited token.
 6. Response: 201, no tokens yet (must verify first).
 
-### 5.2 Login
+### 6.2 Login
 1. Rate-limited at 5/min per IP via Redis sliding window.
 2. Credentials checked with constant-time comparison.
 3. After 5 failed attempts in 15 min, account locked for 30 min (`Account.lockedUntil`).
 4. If 2FA enabled → return `requiresTwoFactor: true`, client prompts for TOTP code.
 5. On success: issue access + refresh, write `Session` row, set both cookies.
 
-### 5.3 Refresh (rotation)
+### 6.3 Refresh (rotation)
 1. Client hits `/auth/refresh` (cookie sent automatically).
 2. Server verifies refresh JWT, looks up `Session`.
 3. **Rotation**: invalidates current `Session`, issues new refresh, writes new `Session`.
 4. If a *revoked* refresh is reused → treat as token theft: nuke all sessions for that user.
 
-### 5.4 Google OAuth
+### 6.4 Google OAuth
 - Passport `passport-google-oauth20` strategy.
 - Server-side callback handler; we never expose client secrets to the browser.
 
-### 5.5 2FA (TOTP)
+### 6.5 2FA (TOTP)
 - `otplib` generates secrets; QR code returned as data URI for Google Authenticator/Authy.
 - Recovery codes generated and shown once.
 
-### 5.6 Logout
+### 6.6 Logout
 - Deletes `Session` row, clears cookies. Logout-everywhere wipes all sessions for the user.
 
 ---
 
-## 6. Security Posture
+## 7. Security Posture
 
 | Threat | Defense |
 |---|---|
@@ -222,7 +256,7 @@ We use **JWT access tokens (15 min)** + **refresh tokens (7 days, rotating)**, b
 
 ---
 
-## 7. Performance
+## 8. Performance
 
 - **SSR + RSC** for SEO-critical pages (PLP, PDP, home).
 - **Static generation** with `revalidate` for content pages.
@@ -235,7 +269,7 @@ We use **JWT access tokens (15 min)** + **refresh tokens (7 days, rotating)**, b
 
 ---
 
-## 8. Observability
+## 9. Observability
 
 - **Logs**: Pino JSON logs → stdout → Logtail/Datadog in prod. Each request gets an `X-Request-ID` propagated through services.
 - **Errors**: Sentry on both frontend and backend, with source map upload.
@@ -244,7 +278,7 @@ We use **JWT access tokens (15 min)** + **refresh tokens (7 days, rotating)**, b
 
 ---
 
-## 9. CI/CD Pipeline
+## 10. CI/CD Pipeline
 
 `.github/workflows/ci.yml`:
 
@@ -259,7 +293,7 @@ We use **JWT access tokens (15 min)** + **refresh tokens (7 days, rotating)**, b
 
 ---
 
-## 10. What's Built on Day 1 (this commit)
+## 11. What's Built on Day 1 (this commit)
 
 ✅ Full monorepo skeleton (Turborepo + pnpm)
 ✅ Root configs: `package.json`, `turbo.json`, `pnpm-workspace.yaml`, `.env.example`, `docker-compose.yml`
@@ -287,7 +321,7 @@ We use **JWT access tokens (15 min)** + **refresh tokens (7 days, rotating)**, b
 
 ---
 
-## 11. How to Talk About This in an Interview
+## 12. How to Talk About This in an Interview
 
 > "I built Drikon — a production-grade e-commerce platform. It's a Turborepo monorepo
 > with a Next.js 15 App Router frontend and a NestJS backend, all in strict TypeScript.
