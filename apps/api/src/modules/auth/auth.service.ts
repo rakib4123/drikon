@@ -7,13 +7,13 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { AuthProvider, Prisma, User } from '@prisma/client';
+import { AuthProvider, User } from '@prisma/client';
 import * as argon2 from 'argon2';
 import { authenticator } from 'otplib';
 import * as qrcode from 'qrcode';
-import { createHash, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
+import { createHash, randomBytes, randomUUID } from 'node:crypto';
 
-import { PrismaService } from '../prisma/prisma.service';
+import { UserModel } from '../../models/user.model';
 import { MailService } from '../mail/mail.service';
 import type { GoogleUserPayload } from './strategies/google.strategy';
 import type {
@@ -42,11 +42,10 @@ interface LoginResult {
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
-  // argon2id parameters — tuned to ~250 ms on a modern CPU
   private readonly argonOptions: argon2.Options;
 
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly users: UserModel,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly mail: MailService,
@@ -58,7 +57,6 @@ export class AuthService {
       parallelism: config.get<number>('ARGON2_PARALLELISM', 4),
     };
 
-    // TOTP defaults: 6 digits, 30s window, 1 step skew tolerance
     authenticator.options = { window: 1 };
   }
 
@@ -67,15 +65,14 @@ export class AuthService {
   // ───────────────────────────────────────────────────────────────────
 
   async register(input: { email: string; password: string; name: string }): Promise<{ message: string }> {
-    const existing = await this.prisma.user.findUnique({ where: { email: input.email } });
+    const existing = await this.users.findUnique({ where: { email: input.email } });
     if (existing) {
-      // Return the SAME message as success — never leak which emails are registered.
       return { message: 'Account created. Please check your email to verify.' };
     }
 
     const passwordHash = await argon2.hash(input.password, this.argonOptions);
 
-    const user = await this.prisma.user.create({
+    const user = await this.users.create({
       data: {
         email: input.email,
         name: input.name,
@@ -84,13 +81,12 @@ export class AuthService {
       },
     });
 
-    // Issue verification token (raw token sent in mail, hash stored)
     const { raw, hash } = this.generateOneTimeToken();
-    await this.prisma.verificationToken.create({
+    await this.users.createVerificationToken({
       data: {
         userId: user.id,
         tokenHash: hash,
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
       },
     });
 
@@ -102,22 +98,11 @@ export class AuthService {
 
   async verifyEmail(token: string): Promise<{ message: string }> {
     const hash = this.hashToken(token);
-    const row = await this.prisma.verificationToken.findUnique({
-      where: { tokenHash: hash },
-    });
+    const row = await this.users.findVerificationToken(hash);
     if (!row || row.usedAt || row.expiresAt < new Date()) {
       throw new BadRequestException('Invalid or expired verification token');
     }
-    await this.prisma.$transaction([
-      this.prisma.user.update({
-        where: { id: row.userId },
-        data: { emailVerified: new Date() },
-      }),
-      this.prisma.verificationToken.update({
-        where: { id: row.id },
-        data: { usedAt: new Date() },
-      }),
-    ]);
+    await this.users.consumeVerificationToken(row.id, row.userId);
     return { message: 'Email verified successfully.' };
   }
 
@@ -129,19 +114,16 @@ export class AuthService {
     input: { email: string; password: string; twoFactorCode?: string },
     ctx: LoginContext,
   ): Promise<LoginResult> {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.users.findUnique({
       where: { email: input.email },
       include: { twoFactorSecret: true },
     });
 
-    // Constant-time-ish: we still run a fake hash check if user doesn't exist,
-    // so attackers can't distinguish "no such user" from "wrong password" via timing.
     if (!user || !user.passwordHash) {
       await argon2.hash('dummy-password', this.argonOptions).catch(() => undefined);
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Account lockout check
     if (user.lockedUntil && user.lockedUntil > new Date()) {
       throw new UnauthorizedException(
         'Account temporarily locked due to too many failed attempts. Try again later.',
@@ -154,7 +136,6 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // 2FA check
     if (user.twoFactorEnabled && user.twoFactorSecret) {
       if (!input.twoFactorCode) {
         return {
@@ -166,11 +147,7 @@ export class AuthService {
       if (!valid) throw new UnauthorizedException('Invalid 2FA code');
     }
 
-    // (Optional) email-verified gate. Comment out for friendlier dev experience.
-    // if (!user.emailVerified) throw new ForbiddenException('Email not verified');
-
-    // Successful login — clear failed counters, issue tokens
-    await this.prisma.user.update({
+    await this.users.update({
       where: { id: user.id },
       data: {
         failedLoginAttempts: 0,
@@ -192,7 +169,7 @@ export class AuthService {
     const duration = this.config.get<number>('ACCOUNT_LOCK_DURATION', 1800);
     const attempts = user.failedLoginAttempts + 1;
     const shouldLock = attempts >= threshold;
-    await this.prisma.user.update({
+    await this.users.update({
       where: { id: user.id },
       data: {
         failedLoginAttempts: attempts,
@@ -209,13 +186,12 @@ export class AuthService {
   // ───────────────────────────────────────────────────────────────────
 
   async loginWithGoogle(payload: GoogleUserPayload, ctx: LoginContext): Promise<LoginResult> {
-    // Upsert by googleId, falling back to email match.
-    let user = await this.prisma.user.findFirst({
+    let user = await this.users.findFirst({
       where: { OR: [{ googleId: payload.googleId }, { email: payload.email }] },
     });
 
     if (!user) {
-      user = await this.prisma.user.create({
+      user = await this.users.create({
         data: {
           email: payload.email,
           name: payload.name,
@@ -226,8 +202,7 @@ export class AuthService {
         },
       });
     } else if (!user.googleId) {
-      // Existing email account — link Google identity.
-      user = await this.prisma.user.update({
+      user = await this.users.update({
         where: { id: user.id },
         data: {
           googleId: payload.googleId,
@@ -256,24 +231,18 @@ export class AuthService {
     if (payload.type !== 'refresh') throw new UnauthorizedException('Wrong token type');
 
     const tokenHash = this.hashToken(refreshToken);
-    const session = await this.prisma.session.findUnique({
-      where: { refreshTokenHash: tokenHash },
-      include: { user: true },
-    });
+    const session = await this.users.findSessionByRefreshHash(tokenHash);
 
-    // Token reuse detection: refresh was valid JWT but not in DB → it was rotated.
-    // This is a strong signal of theft. Nuke everything for that user.
     if (!session) {
       this.logger.warn({ msg: 'refresh.reuse_detected', sub: payload.sub });
-      await this.prisma.session.deleteMany({ where: { userId: payload.sub } });
+      await this.users.deleteSessionsForUser(payload.sub);
       throw new UnauthorizedException('Token reuse detected — all sessions revoked');
     }
     if (session.revokedAt || session.expiresAt < new Date()) {
       throw new UnauthorizedException('Refresh token expired');
     }
 
-    // Rotation: invalidate old, issue new.
-    await this.prisma.session.delete({ where: { id: session.id } });
+    await this.users.deleteSession(session.id);
     return this.issueTokenPair(session.user, ctx);
   }
 
@@ -284,12 +253,12 @@ export class AuthService {
   async logout(refreshToken?: string): Promise<{ message: string }> {
     if (!refreshToken) return { message: 'Logged out' };
     const tokenHash = this.hashToken(refreshToken);
-    await this.prisma.session.deleteMany({ where: { refreshTokenHash: tokenHash } });
+    await this.users.deleteSessionsByRefreshHash(tokenHash);
     return { message: 'Logged out' };
   }
 
   async logoutEverywhere(userId: string): Promise<{ message: string }> {
-    await this.prisma.session.deleteMany({ where: { userId } });
+    await this.users.deleteSessionsForUser(userId);
     return { message: 'All sessions revoked' };
   }
 
@@ -298,15 +267,14 @@ export class AuthService {
   // ───────────────────────────────────────────────────────────────────
 
   async forgotPassword(email: string, ipAddress?: string): Promise<{ message: string }> {
-    const user = await this.prisma.user.findUnique({ where: { email } });
-    // Always return the same response — no user enumeration.
+    const user = await this.users.findUnique({ where: { email } });
     if (user && user.authProvider === AuthProvider.LOCAL) {
       const { raw, hash } = this.generateOneTimeToken();
-      await this.prisma.passwordResetToken.create({
+      await this.users.createPasswordResetToken({
         data: {
           userId: user.id,
           tokenHash: hash,
-          expiresAt: new Date(Date.now() + 60 * 60 * 1000), // 1h
+          expiresAt: new Date(Date.now() + 60 * 60 * 1000),
           ipAddress,
         },
       });
@@ -317,25 +285,12 @@ export class AuthService {
 
   async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
     const hash = this.hashToken(token);
-    const row = await this.prisma.passwordResetToken.findUnique({
-      where: { tokenHash: hash },
-    });
+    const row = await this.users.findPasswordResetToken(hash);
     if (!row || row.usedAt || row.expiresAt < new Date()) {
       throw new BadRequestException('Invalid or expired reset token');
     }
     const passwordHash = await argon2.hash(newPassword, this.argonOptions);
-    await this.prisma.$transaction([
-      this.prisma.user.update({
-        where: { id: row.userId },
-        data: { passwordHash, failedLoginAttempts: 0, lockedUntil: null },
-      }),
-      this.prisma.passwordResetToken.update({
-        where: { id: row.id },
-        data: { usedAt: new Date() },
-      }),
-      // Revoke all sessions — force re-login everywhere after a password reset.
-      this.prisma.session.deleteMany({ where: { userId: row.userId } }),
-    ]);
+    await this.users.resetPasswordTransaction(row.id, row.userId, passwordHash);
     return { message: 'Password updated. Please log in again.' };
   }
 
@@ -344,7 +299,7 @@ export class AuthService {
   // ───────────────────────────────────────────────────────────────────
 
   async setup2FA(userId: string): Promise<{ secret: string; qrCodeDataUrl: string }> {
-    const user = await this.prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const user = await this.users.findUniqueOrThrow({ where: { id: userId } });
     if (user.twoFactorEnabled) {
       throw new BadRequestException('2FA already enabled');
     }
@@ -352,8 +307,7 @@ export class AuthService {
     const otpauth = authenticator.keyuri(user.email, 'Drikon', secret);
     const qrCodeDataUrl = await qrcode.toDataURL(otpauth);
 
-    // Store secret but don't enable until verified.
-    await this.prisma.twoFactorSecret.upsert({
+    await this.users.upsertTwoFactorSecret({
       where: { userId },
       create: { userId, secret, recoveryCodes: [] },
       update: { secret, recoveryCodes: [] },
@@ -362,40 +316,24 @@ export class AuthService {
   }
 
   async enable2FA(userId: string, code: string): Promise<{ recoveryCodes: string[] }> {
-    const row = await this.prisma.twoFactorSecret.findUnique({ where: { userId } });
+    const row = await this.users.findTwoFactorSecret(userId);
     if (!row) throw new BadRequestException('Run 2FA setup first');
     if (!authenticator.check(code, row.secret)) {
       throw new BadRequestException('Invalid code');
     }
-    // Generate one-time recovery codes (10 × 10 chars). Store hashes.
     const recoveryCodes = Array.from({ length: 10 }, () => randomBytes(5).toString('hex'));
     const hashedCodes = recoveryCodes.map((c) => this.hashToken(c));
-    await this.prisma.$transaction([
-      this.prisma.twoFactorSecret.update({
-        where: { userId },
-        data: { recoveryCodes: hashedCodes },
-      }),
-      this.prisma.user.update({
-        where: { id: userId },
-        data: { twoFactorEnabled: true },
-      }),
-    ]);
+    await this.users.enableTwoFactorTransaction(userId, hashedCodes);
     return { recoveryCodes };
   }
 
   async disable2FA(userId: string, code: string): Promise<{ message: string }> {
-    const row = await this.prisma.twoFactorSecret.findUnique({ where: { userId } });
+    const row = await this.users.findTwoFactorSecret(userId);
     if (!row) throw new BadRequestException('2FA not enabled');
     if (!authenticator.check(code, row.secret)) {
       throw new BadRequestException('Invalid code');
     }
-    await this.prisma.$transaction([
-      this.prisma.user.update({
-        where: { id: userId },
-        data: { twoFactorEnabled: false },
-      }),
-      this.prisma.twoFactorSecret.delete({ where: { userId } }),
-    ]);
+    await this.users.disableTwoFactorTransaction(userId);
     return { message: '2FA disabled' };
   }
 
@@ -436,8 +374,7 @@ export class AuthService {
       }),
     ]);
 
-    // Store HASH of refresh token, never the raw value.
-    await this.prisma.session.create({
+    await this.users.createSession({
       data: {
         id: sessionId,
         userId: user.id,
@@ -455,7 +392,6 @@ export class AuthService {
   // PRIMITIVES
   // ───────────────────────────────────────────────────────────────────
 
-  /** Generates a URL-safe 32-byte token and its SHA-256 hash. */
   private generateOneTimeToken(): { raw: string; hash: string } {
     const raw = randomBytes(32).toString('base64url');
     return { raw, hash: this.hashToken(raw) };
