@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
 
-import { PrismaService } from '../../prisma/prisma.service';
+import { UserModel } from '../../../models/user.model';
 import { JwtAccessPayload } from '../interfaces/jwt.interface';
 import { AuthenticatedUser } from '../../../common/decorators';
 
@@ -22,7 +22,7 @@ function cookieExtractor(req: Request): string | null {
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     config: ConfigService,
-    private readonly prisma: PrismaService,
+    private readonly users: UserModel,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -43,7 +43,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
     // Verify the user still exists and is not banned/locked.
     // (One DB hit per request, but small and indexed — acceptable trade for safety.)
-    const user = await this.prisma.user.findUnique({
+    const user = await this.users.findUnique({
       where: { id: payload.sub },
       select: { id: true, email: true, role: true, lockedUntil: true },
     });

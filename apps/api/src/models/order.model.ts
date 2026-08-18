@@ -128,7 +128,7 @@ export class OrderModel {
     return this.prisma.order.update(args);
   }
 
-  count(args: Prisma.OrderCountArgs = {}) {
+  count<T extends Prisma.OrderCountArgs>(args: Prisma.SelectSubset<T, Prisma.OrderCountArgs>) {
     return this.prisma.order.count(args);
   }
 
