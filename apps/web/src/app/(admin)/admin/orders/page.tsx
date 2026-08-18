@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { apiGet, apiPatch } from '@/lib/api-client';
 import { formatPrice } from '@/lib/utils';
 import { OrderStatusBadge } from '@/components/shop/order-status-badge';
-import type { OrderStatus, Pagination } from '@drikon/shared-types';
+import type { OrderStatus, PaymentMethod, PaymentStatus, Pagination } from '@drikon/shared-types';
 
 const STATUSES: OrderStatus[] = [
   'PENDING',
@@ -27,6 +27,12 @@ interface AdminOrder {
   createdAt: string;
   items: { id: string; quantity: number }[];
   user: { id: string; name: string; email: string };
+  payment?: {
+    method: PaymentMethod;
+    status: PaymentStatus;
+    providerPaymentId?: string | null;
+    payerReference?: string | null;
+  } | null;
 }
 
 const dateFmt = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -39,6 +45,7 @@ export default function AdminOrdersPage() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [verifyingId, setVerifyingId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -76,6 +83,19 @@ export default function AdminOrdersPage() {
       toast.error('Could not update order');
     } finally {
       setSavingId(null);
+    }
+  };
+
+  const verifyPayment = async (id: string, status: 'SUCCEEDED' | 'FAILED') => {
+    setVerifyingId(id);
+    try {
+      await apiPatch(`/api/v1/admin/orders/${id}/payment`, { status });
+      toast.success(status === 'SUCCEEDED' ? 'Payment marked paid' : 'Payment marked failed');
+      load();
+    } catch {
+      toast.error('Could not update payment');
+    } finally {
+      setVerifyingId(null);
     }
   };
 
@@ -132,6 +152,7 @@ export default function AdminOrdersPage() {
                   <th className="px-3 py-3 font-medium">Items</th>
                   <th className="px-3 py-3 font-medium">Total</th>
                   <th className="px-3 py-3 font-medium">Status</th>
+                  <th className="px-3 py-3 font-medium">Payment</th>
                   <th className="px-5 py-3 font-medium text-right">Change</th>
                 </tr>
               </thead>
@@ -151,6 +172,43 @@ export default function AdminOrdersPage() {
                     </td>
                     <td className="px-3 py-3 font-semibold">{formatPrice(o.total, o.currency)}</td>
                     <td className="px-3 py-3"><OrderStatusBadge status={o.status} /></td>
+                    <td className="px-3 py-3">
+                      {o.payment ? (
+                        <div className="space-y-1">
+                          <div className="text-xs font-medium">
+                            {o.payment.method === 'BKASH_MANUAL' ? 'bKash' : 'COD'} ·{' '}
+                            {o.payment.status.charAt(0) + o.payment.status.slice(1).toLowerCase()}
+                          </div>
+                          {o.payment.method === 'BKASH_MANUAL' && o.payment.status === 'PENDING' && (
+                            <div className="space-y-1">
+                              <div className="text-[10px] text-[color:var(--fg-muted)]">
+                                {o.payment.payerReference} · TrxID {o.payment.providerPaymentId}
+                              </div>
+                              <div className="flex gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => verifyPayment(o.id, 'SUCCEEDED')}
+                                  disabled={verifyingId === o.id}
+                                  className="btn-ghost !py-1 !px-2 text-[10px] text-emerald-600"
+                                >
+                                  Mark Paid
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => verifyPayment(o.id, 'FAILED')}
+                                  disabled={verifyingId === o.id}
+                                  className="btn-ghost !py-1 !px-2 text-[10px] text-red-600"
+                                >
+                                  Mark Failed
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-[color:var(--fg-muted)]">—</span>
+                      )}
+                    </td>
                     <td className="px-5 py-3 text-right">
                       <select
                         className="input w-auto inline-block !py-1.5 text-xs"
