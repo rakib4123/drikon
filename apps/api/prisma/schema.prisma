@@ -47,6 +47,11 @@ enum PaymentStatus {
   REFUNDED
 }
 
+enum PaymentMethod {
+  BKASH_MANUAL
+  COD
+}
+
 enum ShippingEventType {
   CREATED
   PACKED
@@ -380,21 +385,23 @@ model OrderItem {
 }
 
 model Payment {
-  id                   String        @id @default(cuid())
-  orderId              String        @unique
-  order                Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  provider             String        @default("stripe")
-  providerPaymentId    String?       @unique
-  providerCustomerId   String?
-  amount               Decimal       @db.Decimal(12, 2)
-  currency             String        @default("BDT")
-  status               PaymentStatus @default(PENDING)
-  paidAt               DateTime?
-  refundedAt           DateTime?
-  failureReason        String?
-  // Last-4 only — for receipts. NEVER store full PAN.
-  cardLast4            String?
-  cardBrand            String?
+  id                String        @id @default(cuid())
+  orderId           String        @unique
+  order             Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  method            PaymentMethod
+  // Holds the customer-submitted bKash Transaction ID for BKASH_MANUAL payments. Null for COD.
+  // The @unique constraint doubles as a fraud guard — two orders can't both claim the same TrxID.
+  providerPaymentId String?       @unique
+  // bKash sender's phone number, for BKASH_MANUAL only.
+  payerReference    String?
+  amount            Decimal       @db.Decimal(12, 2)
+  currency          String        @default("BDT")
+  status            PaymentStatus @default(PENDING)
+  paidAt            DateTime?
+  refundedAt        DateTime?
+  failureReason     String?
+  // Free-text note an admin can attach when verifying (e.g. "confirmed against bKash statement, ref #1234").
+  adminNote         String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -533,6 +540,12 @@ model SiteSettings {
   supportEmail String?
   socialFacebook  String?
   socialInstagram String?
+
+  // ── Payments (manual methods — see docs/superpowers/specs/2026-08-18-manual-payment-methods-design.md) ──
+  bkashNumber       String?
+  bkashInstructions String?
+  bkashEnabled      Boolean @default(true)
+  codEnabled        Boolean @default(true)
 
   // ── Editable storefront content (white-label; null falls back to defaults) ──
   // Hero (used as the home hero when no Banner slides are active)
