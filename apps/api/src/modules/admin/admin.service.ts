@@ -1,16 +1,19 @@
+// apps/api/src/modules/admin/admin.service.ts
 import {
   Injectable,
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
 import { OrderStatus, Prisma, Role } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
+import { ProductModel } from '../../models/product.model';
+import { OrderModel } from '../../models/order.model';
+import { UserModel } from '../../models/user.model';
+import { ReviewModel } from '../../models/review.model';
 import type {
   AdminOrderQueryDto,
   AdminUserQueryDto,
 } from './dto/admin.dto';
 
-// Statuses that count as realized revenue.
 const REVENUE_STATUSES: OrderStatus[] = [
   OrderStatus.PAID,
   OrderStatus.PROCESSING,
@@ -20,33 +23,38 @@ const REVENUE_STATUSES: OrderStatus[] = [
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly products: ProductModel,
+    private readonly orders: OrderModel,
+    private readonly users: UserModel,
+    private readonly reviews: ReviewModel,
+  ) {}
 
   // ─────────────────────────────────────────────────────────────────
   // DASHBOARD STATS
   // ─────────────────────────────────────────────────────────────────
   async stats() {
     const [
-      orders,
-      customers,
-      products,
-      reviews,
+      orderCount,
+      customerCount,
+      productCount,
+      reviewCount,
       revenueAgg,
       pendingOrders,
       recentOrdersRaw,
       topProducts,
       statusRows,
-    ] = await this.prisma.$transaction([
-      this.prisma.order.count(),
-      this.prisma.user.count(),
-      this.prisma.product.count({ where: { isActive: true } }),
-      this.prisma.review.count(),
-      this.prisma.order.aggregate({
+    ] = await Promise.all([
+      this.orders.count(),
+      this.users.count(),
+      this.products.count({ where: { isActive: true } }),
+      this.reviews.count(),
+      this.orders.aggregate({
         _sum: { total: true },
         where: { status: { in: REVENUE_STATUSES } },
       }),
-      this.prisma.order.count({ where: { status: OrderStatus.PENDING } }),
-      this.prisma.order.findMany({
+      this.orders.count({ where: { status: OrderStatus.PENDING } }),
+      this.orders.findMany({
         orderBy: { createdAt: 'desc' },
         take: 6,
         select: {
@@ -59,7 +67,7 @@ export class AdminService {
           user: { select: { name: true, email: true } },
         },
       }),
-      this.prisma.product.findMany({
+      this.products.findMany({
         orderBy: { salesCount: 'desc' },
         take: 5,
         select: {
@@ -72,7 +80,7 @@ export class AdminService {
           images: { orderBy: { position: 'asc' }, take: 1, select: { url: true } },
         },
       }),
-      this.prisma.order.findMany({ select: { status: true } }),
+      this.orders.findMany({ select: { status: true } }),
     ]);
 
     const ordersByStatus: Record<string, number> = {};
@@ -83,10 +91,10 @@ export class AdminService {
     return {
       totals: {
         revenue: revenueAgg._sum.total ?? new Prisma.Decimal(0),
-        orders,
-        customers,
-        products,
-        reviews,
+        orders: orderCount,
+        customers: customerCount,
+        products: productCount,
+        reviews: reviewCount,
         pendingOrders,
       },
       ordersByStatus,
@@ -121,8 +129,8 @@ export class AdminService {
       }),
     };
 
-    const [items, total] = await this.prisma.$transaction([
-      this.prisma.order.findMany({
+    const [items, total] = await this.orders.findManyAndCount(
+      {
         where,
         orderBy: { createdAt: 'desc' },
         skip,
@@ -131,9 +139,9 @@ export class AdminService {
           items: true,
           user: { select: { id: true, name: true, email: true } },
         },
-      }),
-      this.prisma.order.count({ where }),
-    ]);
+      },
+      { where },
+    );
 
     return {
       items,
@@ -149,9 +157,9 @@ export class AdminService {
   }
 
   async updateOrderStatus(id: string, status: OrderStatus) {
-    const order = await this.prisma.order.findUnique({ where: { id }, select: { id: true } });
+    const order = await this.orders.findUnique({ where: { id }, select: { id: true } });
     if (!order) throw new NotFoundException('Order not found');
-    return this.prisma.order.update({
+    return this.orders.update({
       where: { id },
       data: {
         status,
@@ -177,8 +185,8 @@ export class AdminService {
         }
       : {};
 
-    const [items, total] = await this.prisma.$transaction([
-      this.prisma.user.findMany({
+    const [items, total] = await this.users.findManyAndCount(
+      {
         where,
         orderBy: { createdAt: 'desc' },
         skip,
@@ -195,9 +203,9 @@ export class AdminService {
           twoFactorEnabled: true,
           _count: { select: { orders: true } },
         },
-      }),
-      this.prisma.user.count({ where }),
-    ]);
+      },
+      { where },
+    );
 
     return {
       items,
@@ -216,9 +224,9 @@ export class AdminService {
     if (actingUserId === targetId) {
       throw new BadRequestException('You cannot change your own role');
     }
-    const user = await this.prisma.user.findUnique({ where: { id: targetId }, select: { id: true } });
+    const user = await this.users.findUnique({ where: { id: targetId }, select: { id: true } });
     if (!user) throw new NotFoundException('User not found');
-    return this.prisma.user.update({
+    return this.users.update({
       where: { id: targetId },
       data: { role },
       select: { id: true, name: true, email: true, role: true },
