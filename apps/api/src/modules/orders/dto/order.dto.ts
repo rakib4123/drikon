@@ -19,11 +19,23 @@ export const CheckoutItemSchema = z.object({
   quantity: z.coerce.number().int().positive().max(99),
 });
 
+export const PaymentInputSchema = z.discriminatedUnion('method', [
+  z.object({
+    method: z.literal('BKASH_MANUAL'),
+    payerReference: z.string().min(5).max(30).trim(),
+    providerPaymentId: z.string().min(4).max(30).trim(),
+  }),
+  z.object({
+    method: z.literal('COD'),
+  }),
+]);
+
 export const CreateOrderSchema = z.object({
   items: z.array(CheckoutItemSchema).min(1).max(50),
   shippingAddress: ShippingAddressSchema,
   notes: z.string().max(500).trim().optional(),
   couponCode: z.string().max(40).trim().optional().or(z.literal('')),
+  payment: PaymentInputSchema,
 });
 export class CreateOrderDto extends createZodDto(CreateOrderSchema) {}
 
