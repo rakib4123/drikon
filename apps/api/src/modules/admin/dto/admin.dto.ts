@@ -15,6 +15,12 @@ export const UpdateOrderStatusSchema = z.object({
 });
 export class UpdateOrderStatusDto extends createZodDto(UpdateOrderStatusSchema) {}
 
+export const VerifyPaymentSchema = z.object({
+  status: z.enum(['SUCCEEDED', 'FAILED']),
+  adminNote: z.string().max(300).trim().optional(),
+});
+export class VerifyPaymentDto extends createZodDto(VerifyPaymentSchema) {}
+
 export const AdminUserQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(50).default(20),
