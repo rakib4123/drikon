@@ -171,7 +171,7 @@ export class OrdersService {
   async getByNumber(userId: string, orderNumber: string) {
     const order = await this.orders.findFirst({
       where: { orderNumber, userId },
-      include: { items: true, shippingAddress: true },
+      include: { items: true, shippingAddress: true, payment: true },
     });
     if (!order) throw new NotFoundException('Order not found');
     return this.attachSlugs(order);
