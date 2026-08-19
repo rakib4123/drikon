@@ -113,6 +113,7 @@ describe('RecommendationsService', () => {
       expect(rules.findMany).toHaveBeenCalledWith({
         where: { antecedentIds: { hasSome: ['a'] } },
         orderBy: [{ antecedentSize: 'desc' }, { confidence: 'desc' }, { lift: 'desc' }],
+        take: 500,
       });
       expect(products.findMany).toHaveBeenCalledWith({
         where: { id: { in: ['c2'] }, isActive: true },

@@ -12,7 +12,8 @@ const QUALIFYING_STATUSES: OrderStatus[] = [
   OrderStatus.SHIPPED,
   OrderStatus.DELIVERED,
 ];
-const DEFAULT_LIMIT = 6;
+/** Defensive upper bound on the candidate-rule query backing the public recommendation endpoints. */
+const MAX_CANDIDATE_RULES = 500;
 
 @Injectable()
 export class RecommendationsService {
@@ -66,12 +67,13 @@ export class RecommendationsService {
   }
 
   /** Top recommended products whose triggering rule's antecedent is fully covered by `contextIds`. */
-  async getRecommendations(contextIds: string[], excludeIds: string[], limit: number = DEFAULT_LIMIT) {
+  async getRecommendations(contextIds: string[], excludeIds: string[], limit: number) {
     if (contextIds.length === 0) return [];
 
     const candidates = await this.rules.findMany({
       where: { antecedentIds: { hasSome: contextIds } },
       orderBy: [{ antecedentSize: 'desc' }, { confidence: 'desc' }, { lift: 'desc' }],
+      take: MAX_CANDIDATE_RULES,
     });
 
     const exclude = new Set(excludeIds);
@@ -83,7 +85,10 @@ export class RecommendationsService {
       bestByConsequent.set(rule.consequentId, rule);
     }
 
-    const rankedIds = [...bestByConsequent.keys()].slice(0, limit);
+    // Over-fetch the full candidate pool (not pre-sliced to `limit`) so that an archived
+    // (isActive: false) product doesn't silently consume a slot and shrink the result below
+    // `limit` — trim to `limit` only after hydration filters out inactive survivors.
+    const rankedIds = [...bestByConsequent.keys()];
     if (rankedIds.length === 0) return [];
 
     const productRows = await this.products.findMany({
@@ -95,7 +100,10 @@ export class RecommendationsService {
       },
     });
     const byId = new Map(productRows.map((p) => [p.id, p]));
-    return rankedIds.map((id) => byId.get(id)).filter((p): p is NonNullable<typeof p> => !!p);
+    return rankedIds
+      .map((id) => byId.get(id))
+      .filter((p): p is NonNullable<typeof p> => !!p)
+      .slice(0, limit);
   }
 
   async getStatus() {
