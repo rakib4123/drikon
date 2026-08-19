@@ -2,7 +2,7 @@
   "name": "drikon",
   "version": "0.1.0",
   "private": true,
-  "description": "Drikon — vision, engineered. An enterprise-grade e-commerce platform.",
+  "description": "Drikon — vision, engineered. A full-stack e-commerce platform for smartphones and accessories, with Apriori-driven product recommendations and voice search.",
   "packageManager": "pnpm@9.12.0",
   "engines": {
     "node": ">=20.0.0",

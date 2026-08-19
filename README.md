@@ -10,6 +10,10 @@ store, built as a real, production-shaped application rather than a toy demo.
 
 **Storefront**
 - Product catalog with search, category/brand/price filtering, and sorting
+- Voice search — speak a query via the browser's Web Speech API instead of typing
+- **"Frequently bought together" / "Add these too" / "Recommended for you"** —
+  product recommendations mined from real order history with the Apriori
+  association-rule algorithm, surfaced on the product page, cart, and homepage
 - Two product page templates — a standard layout and an alternate cinematic
   "premium" template, selectable per product
 - Cart, wishlist, and side-by-side product comparison
@@ -28,6 +32,8 @@ store, built as a real, production-shaped application rather than a toy demo.
 - Order management, including manual bKash payment verification
   (mark paid/failed) — Cash on Delivery orders are marked paid automatically
   on delivery
+- Recommendations — trigger and inspect Apriori recomputation, with a preview
+  of the generated rules (confidence, lift)
 - Coupons, flash sales, and review moderation
 - Customer/role management
 - White-label branding: site identity, theme accent color, homepage content,
