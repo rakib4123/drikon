@@ -2,20 +2,15 @@
 
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { ArrowUpRight, LayoutGrid, Zap, Cpu, Radar, Cog, Bot, Plane, CircuitBoard, Wrench, Camera } from 'lucide-react';
+import { ArrowUpRight, LayoutGrid, Zap, Smartphone, ShieldCheck, BatteryCharging } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { NavCategory } from '@/lib/catalog';
 
-// Map known robotics category slugs to fitting icons (falls back to a grid).
+// Map known catalog category slugs to fitting icons (falls back to a grid).
 const CATEGORY_ICONS: Record<string, ReactNode> = {
-  'microcontrollers': <Cpu className="w-5 h-5" />,
-  'sensors-modules': <Radar className="w-5 h-5" />,
-  'motors-actuators': <Cog className="w-5 h-5" />,
-  'robotic-parts': <Bot className="w-5 h-5" />,
-  'drones-fpv': <Plane className="w-5 h-5" />,
-  'components': <CircuitBoard className="w-5 h-5" />,
-  'tools-gear': <Wrench className="w-5 h-5" />,
-  'gadgets': <Camera className="w-5 h-5" />,
+  'smartphones': <Smartphone className="w-5 h-5" />,
+  'cases': <ShieldCheck className="w-5 h-5" />,
+  'power': <BatteryCharging className="w-5 h-5" />,
 };
 const iconFor = (slug: string): ReactNode => CATEGORY_ICONS[slug] ?? <LayoutGrid className="w-5 h-5" />;
 

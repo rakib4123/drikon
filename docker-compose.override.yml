@@ -1,11 +1,8 @@
-# Local override: this machine already runs native Postgres (5432) and Redis (6379),
-# so expose the project's containers on alternate host ports to avoid the clash.
+# Local override: this machine already runs native Postgres (5432),
+# so expose the project's container on an alternate host port to avoid the clash.
 # `!override` replaces the base ports list instead of appending to it.
 # Auto-merged by `docker compose`; the committed docker-compose.yml is untouched.
 services:
   postgres:
     ports: !override
       - "5433:5432"
-  redis:
-    ports: !override
-      - "6380:6379"
