@@ -11,9 +11,12 @@ import type { ProductListResponse, ProductSummary } from '@drikon/shared-types';
 import { apiGet } from '@/lib/api-client';
 import { cn, formatPrice } from '@/lib/utils';
 
+const MIC_BLOCKED_MESSAGE =
+  'Microphone is blocked for this site. Click the icon left of the address bar → Site settings → Microphone → Allow, then reload the page.';
+
 const SPEECH_ERROR_MESSAGES: Record<string, string> = {
-  'not-allowed': "Microphone access is blocked. Allow it in your browser's site settings and try again.",
-  'service-not-allowed': "Microphone access is blocked. Allow it in your browser's site settings and try again.",
+  'not-allowed': MIC_BLOCKED_MESSAGE,
+  'service-not-allowed': MIC_BLOCKED_MESSAGE,
   'no-speech': "Didn't catch that — try again.",
   'audio-capture': 'No microphone found.',
   network: 'Voice search needs an internet connection.',
@@ -130,7 +133,8 @@ export function SearchCommand() {
     };
     recognition.onerror = (e) => {
       setListening(false);
-      toast.error(SPEECH_ERROR_MESSAGES[e.error] ?? 'Voice search failed. Please try again.');
+      const message = SPEECH_ERROR_MESSAGES[e.error] ?? 'Voice search failed. Please try again.';
+      toast.error(message, { duration: message === MIC_BLOCKED_MESSAGE ? 8000 : 4000 });
     };
     recognition.onend = () => setListening(false);
 
