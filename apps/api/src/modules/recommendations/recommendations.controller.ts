@@ -31,7 +31,12 @@ export class RecommendationsController {
   async forMe(@CurrentUser('id') userId: string) {
     const history = await this.recommendations.getUserPurchaseHistory(userId);
     if (history.length === 0) return [];
-    return this.recommendations.getRecommendations(history, history, DEFAULT_LIMIT);
+    // Don't exclude already-purchased products here: unlike the PDP/cart contexts (where
+    // the viewed/cart item itself is meaningless as a "recommendation"), a customer's full
+    // purchase history is a valid basket to mine rules against, and excluding every product
+    // they've ever bought means a loyal customer who has purchased across the whole catalog
+    // would always get zero recommendations.
+    return this.recommendations.getRecommendations(history, [], DEFAULT_LIMIT);
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)

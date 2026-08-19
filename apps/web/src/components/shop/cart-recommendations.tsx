@@ -1,15 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { ProductSummary } from '@drikon/shared-types';
 import { apiPost } from '@/lib/api-client';
 import { useCartStore } from '@/store/cart-store';
 import { ProductGrid } from './product-grid';
 
 export function CartRecommendations() {
-  const productIds = useCartStore((s) => s.items.map((i) => i.productId));
+  const items = useCartStore((s) => s.items);
   const [recommendations, setRecommendations] = useState<ProductSummary[]>([]);
-  const key = productIds.slice().sort().join(',');
+  const productIds = useMemo(() => items.map((i) => i.productId), [items]);
+  const key = useMemo(() => productIds.slice().sort().join(','), [productIds]);
 
   useEffect(() => {
     if (productIds.length === 0) {
