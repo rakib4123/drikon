@@ -248,7 +248,6 @@ model Product {
   wishlistItems   WishlistItem[]
   orderItems      OrderItem[]
   flashSales      FlashSaleProduct[]
-  associationRulesAsConsequent ProductAssociationRule[]
 
   // Aggregates (denormalized for performance — kept in sync via service layer)
   averageRating   Float    @default(0)
@@ -262,28 +261,6 @@ model Product {
   @@index([categoryId])
   @@index([brandId])
   @@index([isActive, isFeatured])
-}
-
-model ProductAssociationRule {
-  id             String   @id @default(cuid())
-  antecedentIds  String[]
-  antecedentSize Int
-  consequentId   String
-  consequent     Product  @relation(fields: [consequentId], references: [id], onDelete: Cascade)
-  support        Float
-  confidence     Float
-  lift           Float
-  computedAt     DateTime @default(now())
-
-  @@index([antecedentIds], type: Gin)
-  @@index([consequentId])
-}
-
-model RecommendationRun {
-  id             String   @id @default(cuid())
-  ordersAnalyzed Int
-  rulesGenerated Int
-  computedAt     DateTime @default(now())
 }
 
 model ProductImage {
