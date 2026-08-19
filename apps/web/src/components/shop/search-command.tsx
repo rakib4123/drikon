@@ -5,10 +5,10 @@ import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'motion/react';
-import { Search, X, Loader2, CornerDownLeft } from 'lucide-react';
+import { Search, X, Loader2, CornerDownLeft, Mic } from 'lucide-react';
 import type { ProductListResponse, ProductSummary } from '@drikon/shared-types';
 import { apiGet } from '@/lib/api-client';
-import { formatPrice } from '@/lib/utils';
+import { cn, formatPrice } from '@/lib/utils';
 
 export function SearchCommand() {
   const router = useRouter();
@@ -17,9 +17,22 @@ export function SearchCommand() {
   const [results, setResults] = useState<ProductSummary[]>([]);
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [listening, setListening] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   useEffect(() => setMounted(true), []);
+
+  // Feature-detect the Web Speech API (Chrome/Safari only, prefixed).
+  useEffect(() => {
+    setSpeechSupported(!!(window.SpeechRecognition || window.webkitSpeechRecognition));
+  }, []);
+
+  // Stop any in-flight recognition on unmount so it doesn't keep the mic open.
+  useEffect(() => {
+    return () => recognitionRef.current?.stop();
+  }, []);
 
   // ⌘K / Ctrl+K to open, Esc handled by the panel below.
   useEffect(() => {
@@ -94,6 +107,30 @@ export function SearchCommand() {
     [close, router],
   );
 
+  const startListening = useCallback(() => {
+    const SpeechRecognitionCtor = window.SpeechRecognition ?? window.webkitSpeechRecognition;
+    if (!SpeechRecognitionCtor) return;
+
+    const recognition = new SpeechRecognitionCtor();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.onresult = (e) => {
+      const transcript = e.results[0]?.item(0)?.transcript;
+      if (transcript) setQuery(transcript);
+    };
+    recognition.onerror = () => setListening(false);
+    recognition.onend = () => setListening(false);
+
+    recognitionRef.current = recognition;
+    setListening(true);
+    recognition.start();
+  }, []);
+
+  const stopListening = useCallback(() => {
+    recognitionRef.current?.stop();
+  }, []);
+
   return (
     <>
       <button
@@ -151,6 +188,22 @@ export function SearchCommand() {
                   placeholder="Search products…"
                   className="flex-1 bg-transparent py-4 text-[15px] outline-none placeholder:text-[color:var(--fg-muted)]"
                 />
+                {speechSupported && (
+                  <button
+                    type="button"
+                    onClick={listening ? stopListening : startListening}
+                    aria-label={listening ? 'Stop voice search' : 'Search by voice'}
+                    aria-pressed={listening}
+                    className={cn(
+                      'p-1.5 rounded-md transition-colors',
+                      listening
+                        ? 'text-[color:var(--accent)] bg-[color:var(--bg-soft)] animate-pulse'
+                        : 'text-[color:var(--fg-muted)] hover:bg-[color:var(--bg-soft)]',
+                    )}
+                  >
+                    <Mic className="w-4 h-4" />
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={close}
