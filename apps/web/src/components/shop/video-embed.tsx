@@ -32,7 +32,6 @@ export function VideoEmbed({ url, className }: { url: string; className?: string
       className={`relative aspect-video w-full overflow-hidden rounded-2xl border border-[color:var(--border)] bg-black ${className ?? ''}`}
     >
       {type === 'file' ? (
-        // eslint-disable-next-line jsx-a11y/media-has-caption
         <video src={src} controls preload="metadata" className="absolute inset-0 h-full w-full object-contain" />
       ) : (
         <iframe

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { getSettings } from '@/lib/settings';
 
 export default async function ShippingReturnsPage() {
@@ -22,9 +23,9 @@ export default async function ShippingReturnsPage() {
           <p>
             You&apos;ll get a tracking link by email once your order leaves our warehouse, and you can always check
             an order&apos;s status from your account&apos;s{' '}
-            <a href="/orders" className="underline hover:text-[color:var(--fg)]">
+            <Link href="/orders" className="underline hover:text-[color:var(--fg)]">
               order history
-            </a>
+            </Link>
             .
           </p>
         </Section>

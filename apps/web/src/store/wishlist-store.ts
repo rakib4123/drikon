@@ -53,7 +53,7 @@ export const useWishlistStore = create<WishlistState>((set, get) => ({
         await apiPost(`/api/v1/wishlist/${productId}`);
       }
       return !wasWishlisted;
-    } catch (err) {
+    } catch {
       // Revert on failure
       set((s) => ({
         ids: wasWishlisted ? [...s.ids, productId] : s.ids.filter((id) => id !== productId),

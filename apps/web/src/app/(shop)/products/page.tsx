@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { PackageX, SearchX } from 'lucide-react';
-import { apiGet } from '@/lib/api-client';
+import { apiGet, ApiError } from '@/lib/api-client';
 import { getCategories } from '@/lib/catalog';
 import { ProductGrid } from '@/components/shop/product-grid';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -23,8 +23,8 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   let error: string | null = null;
   try {
     data = await apiGet<ProductListResponse>(`/api/v1/products?${qs.toString()}`);
-  } catch (e: any) {
-    error = e?.message ?? 'Failed to load products';
+  } catch (e) {
+    error = e instanceof ApiError ? e.message : 'Failed to load products';
   }
 
   const allCats = await getCategories();

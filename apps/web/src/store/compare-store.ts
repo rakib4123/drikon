@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist, createJSONStorage, type StateStorage } from 'zustand/middleware';
 import type { ProductSummary } from '@drikon/shared-types';
 
 export const MAX_COMPARE = 4;
@@ -36,7 +36,9 @@ export const useCompareStore = create<CompareState>()(
     }),
     {
       name: 'drikon-compare',
-      storage: createJSONStorage(() => (typeof window !== 'undefined' ? localStorage : (undefined as any))),
+      storage: createJSONStorage(() =>
+        typeof window !== 'undefined' ? localStorage : (undefined as unknown as StateStorage),
+      ),
       partialize: (s) => ({ items: s.items }),
     },
   ),
