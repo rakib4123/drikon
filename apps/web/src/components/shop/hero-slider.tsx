@@ -45,7 +45,6 @@ export function HeroSlider({ slides }: { slides: Banner[] }) {
             {/* Background */}
             {b.imageUrl ? (
               <>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <Image
                   src={b.imageUrl}
                   alt=""

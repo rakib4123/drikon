@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Toaster } from 'sonner';
 import type { SiteSettings } from '@drikon/shared-types';
 import { SettingsProvider } from '@/components/layout/settings-context';
+import { ApiError } from '@/lib/api-client';
 
 export function Providers({
   children,
@@ -20,9 +21,9 @@ export function Providers({
           queries: {
             staleTime: 60_000,        // 1 min
             gcTime: 5 * 60_000,       // 5 min
-            retry: (failureCount, err: any) => {
+            retry: (failureCount, err) => {
               // Don't retry on 4xx
-              if (err?.status >= 400 && err?.status < 500) return false;
+              if (err instanceof ApiError && err.status >= 400 && err.status < 500) return false;
               return failureCount < 2;
             },
             refetchOnWindowFocus: false,

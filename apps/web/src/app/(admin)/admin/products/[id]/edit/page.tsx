@@ -10,13 +10,32 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+interface AdminProductDetail {
+  name: string;
+  slug: string;
+  description: string;
+  shortDescription?: string | null;
+  sku: string;
+  price: string | number;
+  compareAtPrice?: string | number | null;
+  currency: string;
+  stock: number;
+  lowStockThreshold: number;
+  isActive: boolean;
+  isFeatured: boolean;
+  categoryId: string;
+  brandId?: string | null;
+  videoUrl?: string | null;
+  images?: { url: string; alt?: string | null }[];
+}
+
 export default function AdminProductEditPage({ params }: PageProps) {
   const { id } = use(params);
-  const [product, setProduct] = useState<any | null>(null);
+  const [product, setProduct] = useState<AdminProductDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    void apiGet<any>(`/api/v1/products/${id}`)
+    void apiGet<AdminProductDetail>(`/api/v1/products/${id}`)
       .then(setProduct)
       .catch((err) => {
         setError(err instanceof ApiError ? err.message : 'Failed to load product');

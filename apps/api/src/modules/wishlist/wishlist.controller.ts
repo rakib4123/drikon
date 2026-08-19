@@ -9,7 +9,6 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { WishlistService } from './wishlist.service';
 import { CurrentUser } from '../../common/decorators';
-import type { AuthenticatedUser } from '../../common/decorators';
 
 // Every route here is auth-protected by the global JwtAuthGuard (no @Public()).
 @ApiTags('wishlist')

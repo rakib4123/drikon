@@ -179,7 +179,6 @@ export class AuthController {
   @UseGuards(GoogleOAuthGuard)
   @Get('google')
   @ApiOperation({ summary: 'Begin Google OAuth flow' })
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   googleLogin() {}
 
   @Public()

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist, createJSONStorage, type StateStorage } from 'zustand/middleware';
 
 export interface CartItem {
   productId: string;
@@ -71,7 +71,9 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: 'drikon-cart',
-      storage: createJSONStorage(() => (typeof window !== 'undefined' ? localStorage : (undefined as any))),
+      storage: createJSONStorage(() =>
+        typeof window !== 'undefined' ? localStorage : (undefined as unknown as StateStorage),
+      ),
       // Persist the cart items + applied coupon
       partialize: (state) => ({ items: state.items, couponCode: state.couponCode }),
     },

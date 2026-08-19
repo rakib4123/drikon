@@ -21,7 +21,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     // Surface DB warnings and errors into our log stream.
     // @ts-expect-error — Prisma's event types are loose
     this.$on('warn', (e) => this.logger.warn(e.message));
-    // @ts-expect-error
+    // @ts-expect-error — Prisma's event types are loose
     this.$on('error', (e) => this.logger.error(e.message));
   }
 

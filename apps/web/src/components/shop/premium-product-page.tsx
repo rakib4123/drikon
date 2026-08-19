@@ -12,7 +12,7 @@ import type { ProductSummary } from '@drikon/shared-types';
 interface ProductDetail extends ProductSummary {
   description: string;
   sku: string;
-  attributes?: Record<string, any> | null;
+  attributes?: Record<string, unknown> | null;
   brandId?: string | null;
   categoryId: string;
 }

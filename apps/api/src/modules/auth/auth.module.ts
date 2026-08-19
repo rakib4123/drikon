@@ -24,7 +24,6 @@ const googleStrategyProvider: Provider = {
     const clientID = config.get<string>('GOOGLE_CLIENT_ID');
     const clientSecret = config.get<string>('GOOGLE_CLIENT_SECRET');
     if (!clientID || !clientSecret) {
-      // eslint-disable-next-line no-console
       console.log('ℹ️  Google OAuth disabled (set GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET to enable)');
       return null;
     }

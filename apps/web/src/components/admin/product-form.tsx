@@ -38,6 +38,25 @@ interface ProductFormProps {
   initial?: Partial<ProductFormState>;
 }
 
+interface ProductPayload {
+  name: string;
+  description: string;
+  sku: string;
+  price: number;
+  currency: string;
+  stock: number;
+  lowStockThreshold: number;
+  isActive: boolean;
+  isFeatured: boolean;
+  categoryId: string;
+  slug?: string;
+  shortDescription?: string;
+  compareAtPrice?: number;
+  brandId?: string;
+  videoUrl?: string;
+  images?: { url: string; alt: string; position: number }[];
+}
+
 const emptyState: ProductFormState = {
   name: '',
   slug: '',
@@ -94,7 +113,7 @@ export function ProductForm({ mode, productId, initial }: ProductFormProps) {
     setSubmitting(true);
 
     try {
-      const payload: any = {
+      const payload: ProductPayload = {
         name: state.name.trim(),
         description: state.description.trim(),
         sku: state.sku.trim(),

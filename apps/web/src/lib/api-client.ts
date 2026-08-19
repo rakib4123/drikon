@@ -104,13 +104,13 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
   if (!response.ok) {
     const err =
       typeof payload === 'string'
-        ? { error: { code: 'HTTP_ERROR', message: payload } }
+        ? { error: { code: 'HTTP_ERROR', message: payload }, requestId: undefined as string | undefined }
         : (payload as Extract<ApiResult<T>, { success: false }>);
     throw new ApiError(
       response.status,
       err.error?.code ?? 'HTTP_ERROR',
       typeof err.error?.message === 'string' ? err.error.message : JSON.stringify(err.error?.message),
-      (err as any).requestId,
+      err.requestId,
     );
   }
 

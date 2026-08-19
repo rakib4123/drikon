@@ -145,16 +145,13 @@ async function bootstrap() {
   app.enableShutdownHooks();
 
   await app.listen(port, host);
-  // eslint-disable-next-line no-console
   console.log(`🚀 Drikon API running on http://${host}:${port}`);
   if (!isProduction) {
-    // eslint-disable-next-line no-console
     console.log(`📚 Swagger docs at http://${host}:${port}/api/docs`);
   }
 }
 
 bootstrap().catch((err) => {
-  // eslint-disable-next-line no-console
   console.error('Fatal bootstrap error:', err);
   process.exit(1);
 });
