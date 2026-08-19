@@ -4,7 +4,7 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { LoggerModule } from 'nestjs-pino';
 
-import { envValidationSchema } from './config/env.validation';
+import { validateEnv } from './config/env.validation';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { ModelsModule } from './models/models.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -29,8 +29,7 @@ import { MailModule } from './modules/mail/mail.module';
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
-      validationSchema: envValidationSchema,
-      validationOptions: { abortEarly: true },
+      validate: validateEnv,
     }),
 
     // Structured request logging with request IDs

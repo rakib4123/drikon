@@ -25,21 +25,6 @@ services:
       timeout: 5s
       retries: 10
 
-  redis:
-    image: redis:7-alpine
-    container_name: drikon-redis
-    restart: unless-stopped
-    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
-    ports:
-      - "6379:6379"
-    volumes:
-      - drikon-redis-data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
   mailhog:
     # Catches all outgoing email in dev so we can preview templates without sending real mail.
     # UI: http://localhost:8025
@@ -52,4 +37,3 @@ services:
 
 volumes:
   drikon-postgres-data:
-  drikon-redis-data:

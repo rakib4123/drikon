@@ -1,0 +1,70 @@
+# Render Blueprint for the Drikon API + database.
+# The web app (apps/web) is NOT deployed here — it's hosted on Vercel, which
+# deploys itself via its own GitHub integration. See DEPLOY.md for the full,
+# ordered walkthrough of both sides.
+#
+# Deploy: connect this repo in the Render dashboard as a "Blueprint" and it
+# reads this file automatically. Commands run from the monorepo root (not
+# apps/api) because pnpm needs the root workspace to resolve the
+# @drikon/shared-types workspace dependency — do not set a service `rootDir`.
+
+databases:
+  - name: drikon-db
+    databaseName: drikon
+    user: drikon
+    plan: free # Render's smallest Postgres tier — upgrade for production traffic/backups.
+
+services:
+  - type: web
+    name: drikon-api
+    runtime: node
+    plan: free # Free web services spin down after inactivity — upgrade for an always-on API.
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter api db:generate && pnpm --filter api build
+    startCommand: pnpm --filter api exec prisma migrate deploy && pnpm --filter api start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: drikon-db
+          property: connectionString
+
+      # Cross-domain auth: Vercel and Render are different registrable
+      # domains, so cookies must NOT scope to a Domain attribute — leave this
+      # blank (do not set it to a Render hostname). See DEPLOY.md for why.
+      - key: COOKIE_DOMAIN
+        value: ""
+      - key: COOKIE_SECURE
+        value: "true"
+
+      # Generated once at first deploy, then stable — Render keeps these
+      # secret and won't show them again after creation.
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+
+      # Set manually in the Render dashboard after you know your Vercel URL —
+      # comma-separated if you need more than one (e.g. production + a
+      # specific preview URL). See DEPLOY.md step ordering.
+      - key: WEB_ORIGIN
+        sync: false
+
+      # Optional integrations — leave unset to disable the feature.
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_CALLBACK_URL
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false

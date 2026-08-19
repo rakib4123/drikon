@@ -11,7 +11,6 @@ env:
   PNPM_VERSION: "9.12.0"
   # Test env (matches docker-compose defaults)
   DATABASE_URL: "postgresql://drikon:drikon_dev_password@localhost:5432/drikon_test?schema=public"
-  REDIS_URL: "redis://localhost:6379"
   JWT_ACCESS_SECRET: "ci_access_secret_at_least_32_chars_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
   JWT_REFRESH_SECRET: "ci_refresh_secret_at_least_32_chars_yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
   WEB_ORIGIN: "http://localhost:3000"
@@ -58,14 +57,6 @@ jobs:
         ports: ["5432:5432"]
         options: >-
           --health-cmd "pg_isready -U drikon"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-      redis:
-        image: redis:7-alpine
-        ports: ["6379:6379"]
-        options: >-
-          --health-cmd "redis-cli ping"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
