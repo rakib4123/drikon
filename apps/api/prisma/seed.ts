@@ -5,7 +5,7 @@
  * Creates: admin user, a customer, categories, brands, sample products.
  * All passwords are hashed with the same argon2id parameters as production.
  */
-import { PrismaClient, Role, Prisma } from '@prisma/client';
+import { PrismaClient, Role, Prisma, OrderStatus, PaymentMethod, PaymentStatus } from '@prisma/client';
 import * as argon2 from 'argon2';
 
 const prisma = new PrismaClient();
@@ -201,6 +201,92 @@ async function main() {
   }
 
   console.log(`  ✓ products (${products.length})`);
+
+  // ─── Demo orders (for the Apriori-based recommendations feature) ───
+  // Deliberate co-purchase patterns so Apriori has real signal to mine:
+  //   iPhone + Case + Power bank bundle together often (strong 3-way rule),
+  //   iPhone + Case pair even more often (case is iPhone-specific),
+  //   Galaxy + Power bank pair independently, plus some solo purchases as noise.
+  const iphone = await prisma.product.findUniqueOrThrow({ where: { slug: 'iphone-15-pro-titanium' } });
+  const galaxy = await prisma.product.findUniqueOrThrow({ where: { slug: 'samsung-galaxy-s24-ultra' } });
+  const spigenCase = await prisma.product.findUniqueOrThrow({ where: { slug: 'spigen-core-armor-iphone-15-pro' } });
+  const powerBank = await prisma.product.findUniqueOrThrow({ where: { slug: 'anker-maggo-power-bank-10k' } });
+
+  let demoAddress = await prisma.address.findFirst({ where: { userId: customer.id } });
+  if (!demoAddress) {
+    demoAddress = await prisma.address.create({
+      data: {
+        userId: customer.id,
+        fullName: 'Demo Customer',
+        phone: '+8801711000000',
+        line1: 'House 12, Road 5, Banani',
+        city: 'Dhaka',
+        postalCode: '1213',
+        country: 'Bangladesh',
+      },
+    });
+  }
+
+  const basketPatterns: { products: typeof iphone[]; count: number }[] = [
+    { products: [iphone, spigenCase, powerBank], count: 8 },
+    { products: [iphone, spigenCase], count: 5 },
+    { products: [galaxy, powerBank], count: 6 },
+    { products: [iphone], count: 4 },
+    { products: [galaxy], count: 3 },
+    { products: [powerBank], count: 3 },
+    { products: [spigenCase], count: 2 },
+  ];
+
+  let orderSeq = 1;
+  let ordersCreated = 0;
+  for (const pattern of basketPatterns) {
+    for (let i = 0; i < pattern.count; i++) {
+      const orderNumber = `DEMO-${String(orderSeq).padStart(4, '0')}`;
+      orderSeq += 1;
+
+      const existing = await prisma.order.findUnique({ where: { orderNumber } });
+      if (existing) continue;
+
+      const lines = pattern.products.map((p) => ({
+        productId: p.id,
+        productName: p.name,
+        productImage: null,
+        unitPrice: p.price,
+        quantity: 1,
+        lineTotal: p.price,
+      }));
+      const total = lines.reduce((sum, l) => sum.add(l.lineTotal), new Prisma.Decimal(0));
+
+      await prisma.order.create({
+        data: {
+          orderNumber,
+          userId: customer.id,
+          status: OrderStatus.DELIVERED,
+          subtotal: total,
+          shipping: new Prisma.Decimal(0),
+          tax: new Prisma.Decimal(0),
+          discount: new Prisma.Decimal(0),
+          total,
+          currency: 'BDT',
+          shippingAddressId: demoAddress.id,
+          items: { create: lines },
+          payment: {
+            create: {
+              method: PaymentMethod.COD,
+              status: PaymentStatus.SUCCEEDED,
+              amount: total,
+              currency: 'BDT',
+              paidAt: new Date(),
+            },
+          },
+        },
+      });
+      ordersCreated += 1;
+    }
+  }
+
+  console.log(`  ✓ demo orders (${ordersCreated}) — click "Recompute" on the admin Recommendations page to generate rules`);
+
   console.log('\n✨ Seed complete.\n');
   const adminPw = process.env.SEED_ADMIN_PASSWORD || 'Admin@drikon2026';
   console.log(`Login as admin: admin@drikon.com / ${adminPw}`);

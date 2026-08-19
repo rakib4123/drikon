@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useCartStore } from '@/store/cart-store';
 import { formatPrice } from '@/lib/utils';
 import { CouponField, type CouponState } from '@/components/shop/coupon-field';
+import { CartRecommendations } from '@/components/shop/cart-recommendations';
 import { Minus, Plus, X, ArrowRight, ShoppingBag, Truck } from 'lucide-react';
 
 const FREE_SHIPPING_THRESHOLD = 3000;
@@ -116,6 +117,8 @@ export default function CartPage() {
           </p>
         </aside>
       </div>
+
+      <CartRecommendations />
     </div>
   );
 }
