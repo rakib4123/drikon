@@ -10,6 +10,8 @@ import { FlashSaleModel } from './flash-sale.model';
 import { WishlistModel } from './wishlist.model';
 import { SettingsModel } from './settings.model';
 import { UserModel } from './user.model';
+import { ProductAssociationRuleModel } from './product-association-rule.model';
+import { RecommendationRunModel } from './recommendation-run.model';
 
 const models = [
   ProductModel,
@@ -23,6 +25,8 @@ const models = [
   WishlistModel,
   SettingsModel,
   UserModel,
+  ProductAssociationRuleModel,
+  RecommendationRunModel,
 ];
 
 @Global()
