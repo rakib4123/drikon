@@ -112,7 +112,7 @@ export default function CartPage() {
             Proceed to checkout <ArrowRight className="w-4 h-4" />
           </Link>
           <p className="text-[11px] text-[color:var(--fg-muted)] mt-3 text-center">
-            Coupons carry over to checkout. Demo checkout — no payment taken.
+            Coupons carry over to checkout. Pay with bKash or Cash on Delivery.
           </p>
         </aside>
       </div>
