@@ -85,11 +85,25 @@ async function getRelated(categorySlug: string, excludeId: string): Promise<Prod
   }
 }
 
+async function getFrequentlyBoughtTogether(productId: string): Promise<ProductSummary[]> {
+  try {
+    return await apiGet<ProductSummary[]>(`/api/v1/recommendations/product/${productId}`);
+  } catch {
+    return [];
+  }
+}
+
 export default async function ProductDetailPage({ params }: PageProps) {
   const { slug } = await params;
   const product = await getProduct(slug);
 
   if (!product) notFound();
+
+  const frequentlyBoughtTogether = await getFrequentlyBoughtTogether(product.id);
+  const related =
+    frequentlyBoughtTogether.length > 0
+      ? frequentlyBoughtTogether
+      : await getRelated(product.category.slug, product.id);
 
   const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
   const compareAt = product.compareAtPrice
@@ -100,7 +114,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const onSale = compareAt && compareAt > price;
   const discount = onSale && compareAt ? Math.round(((compareAt - price) / compareAt) * 100) : 0;
 
-  const related = await getRelated(product.category.slug, product.id);
   const content = resolveContent(await getSettings());
 
   const isPremium = product.attributes && typeof product.attributes === 'object' && 'template' in product.attributes && product.attributes.template === 'premium';
@@ -310,7 +323,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
       {/* Related */}
       {related.length > 0 && (
         <section>
-          <h2 className="display text-2xl mb-6">You might also like</h2>
+          <h2 className="display text-2xl mb-6">
+            {frequentlyBoughtTogether.length > 0 ? 'Frequently bought together' : 'You might also like'}
+          </h2>
           <ProductGrid products={related} />
         </section>
       )}

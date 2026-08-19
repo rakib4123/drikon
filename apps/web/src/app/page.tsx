@@ -8,6 +8,7 @@ import { FlashSaleSection } from '@/components/shop/flash-sale-section';
 import { HeroSlider } from '@/components/shop/hero-slider';
 import { BrandStrip } from '@/components/shop/brand-strip';
 import { StatsBand } from '@/components/shop/stats-band';
+import { RecommendedForYou } from '@/components/shop/recommended-for-you';
 import { Reveal } from '@/components/ui/reveal';
 import { apiGet } from '@/lib/api-client';
 import { getSettings, resolveContent } from '@/lib/settings';
@@ -131,6 +132,9 @@ export default async function HomePage() {
           </div>
         )}
       </section>
+
+      {/* ─── RECOMMENDED FOR YOU (logged-in customers with order history only) ─── */}
+      <RecommendedForYou />
 
       {/* ─── TRUSTED BRANDS ─── */}
       <BrandStrip brands={brands} />
