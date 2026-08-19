@@ -11,12 +11,11 @@ import type { ProductListResponse, ProductSummary } from '@drikon/shared-types';
 import { apiGet } from '@/lib/api-client';
 import { cn, formatPrice } from '@/lib/utils';
 
-const MIC_BLOCKED_MESSAGE =
-  'Microphone is blocked for this site. Click the icon left of the address bar → Site settings → Microphone → Allow, then reload the page.';
-
 const SPEECH_ERROR_MESSAGES: Record<string, string> = {
-  'not-allowed': MIC_BLOCKED_MESSAGE,
-  'service-not-allowed': MIC_BLOCKED_MESSAGE,
+  'not-allowed':
+    'Microphone is blocked for this site. Click the icon left of the address bar → Site settings → Microphone → Allow, then reload the page.',
+  'service-not-allowed':
+    "Chrome's speech-recognition service is unavailable — this isn't a microphone permission issue. It commonly happens on Chromium builds without Google API keys (e.g. Linux distro packages installed via apt/snap rather than Google's own .deb), or under an enterprise/managed-browser policy that disables it. Try Chrome installed directly from google.com, or a different device.",
   'no-speech': "Didn't catch that — try again.",
   'audio-capture': 'No microphone found.',
   network: 'Voice search needs an internet connection.',
@@ -134,7 +133,8 @@ export function SearchCommand() {
     recognition.onerror = (e) => {
       setListening(false);
       const message = SPEECH_ERROR_MESSAGES[e.error] ?? 'Voice search failed. Please try again.';
-      toast.error(message, { duration: message === MIC_BLOCKED_MESSAGE ? 8000 : 4000 });
+      const longMessage = e.error === 'not-allowed' || e.error === 'service-not-allowed';
+      toast.error(message, { duration: longMessage ? 10000 : 4000 });
     };
     recognition.onend = () => setListening(false);
 
