@@ -6,9 +6,18 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'motion/react';
 import { Search, X, Loader2, CornerDownLeft, Mic } from 'lucide-react';
+import { toast } from 'sonner';
 import type { ProductListResponse, ProductSummary } from '@drikon/shared-types';
 import { apiGet } from '@/lib/api-client';
 import { cn, formatPrice } from '@/lib/utils';
+
+const SPEECH_ERROR_MESSAGES: Record<string, string> = {
+  'not-allowed': "Microphone access is blocked. Allow it in your browser's site settings and try again.",
+  'service-not-allowed': "Microphone access is blocked. Allow it in your browser's site settings and try again.",
+  'no-speech': "Didn't catch that — try again.",
+  'audio-capture': 'No microphone found.',
+  network: 'Voice search needs an internet connection.',
+};
 
 export function SearchCommand() {
   const router = useRouter();
@@ -119,7 +128,10 @@ export function SearchCommand() {
       const transcript = e.results[0]?.item(0)?.transcript;
       if (transcript) setQuery(transcript);
     };
-    recognition.onerror = () => setListening(false);
+    recognition.onerror = (e) => {
+      setListening(false);
+      toast.error(SPEECH_ERROR_MESSAGES[e.error] ?? 'Voice search failed. Please try again.');
+    };
     recognition.onend = () => setListening(false);
 
     recognitionRef.current = recognition;
