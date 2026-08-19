@@ -57,3 +57,7 @@ apps/api/prisma/migrations/dev.db*
 
 # ─── Sentry ───
 .sentryclirc
+
+# ─── Docker (local-dev convenience only — not part of the deployed stack) ───
+docker-compose.yml
+docker-compose.override.yml
