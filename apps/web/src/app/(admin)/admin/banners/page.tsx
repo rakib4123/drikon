@@ -187,7 +187,7 @@ export default function AdminBannersPage() {
           ) : (
             items.map((b) => (
               <div key={b.id} className={`card !p-0 overflow-hidden flex ${b.isActive ? '' : 'opacity-60'}`}>
-                <div className="relative w-32 shrink-0 bg-[#14233f]">
+                <div className="relative w-32 shrink-0 bg-[color:var(--bg-soft)]">
                   {b.imageUrl ? (
                     <Image src={b.imageUrl} alt="" fill sizes="128px" className="object-cover" />
                   ) : (
