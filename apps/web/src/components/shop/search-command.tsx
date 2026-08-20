@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'motion/react';
-import { Search, X, Loader2, CornerDownLeft, Mic, ShoppingCart } from 'lucide-react';
+import { Search, X, Loader2, CornerDownLeft, Mic, MicOff, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import type { ProductListResponse, ProductSummary } from '@drikon/shared-types';
@@ -34,6 +34,7 @@ export function SearchCommand() {
   const [mounted, setMounted] = useState(false);
   const [listening, setListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
+  const [micBlocked, setMicBlocked] = useState(false);
   const [voiceConfirm, setVoiceConfirm] = useState<{ quantity: number; product: ProductSummary } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
@@ -44,6 +45,28 @@ export function SearchCommand() {
   // Feature-detect the Web Speech API (Chrome/Safari only, prefixed).
   useEffect(() => {
     setSpeechSupported(!!(window.SpeechRecognition || window.webkitSpeechRecognition));
+  }, []);
+
+  // Surface an already-blocked mic permission up front, so the button shows
+  // a "blocked" state instead of only failing after the user clicks it.
+  // Not all browsers support querying 'microphone' (e.g. Safari) — fails
+  // silently there and the button just behaves as it did before.
+  useEffect(() => {
+    if (!navigator.permissions?.query) return;
+    let status: PermissionStatus | undefined;
+    navigator.permissions
+      .query({ name: 'microphone' as PermissionName })
+      .then((result) => {
+        status = result;
+        setMicBlocked(result.state === 'denied');
+        result.onchange = () => setMicBlocked(result.state === 'denied');
+      })
+      .catch(() => {
+        // Permission name unsupported — leave micBlocked false, normal flow applies.
+      });
+    return () => {
+      if (status) status.onchange = null;
+    };
   }, []);
 
   // Stop any in-flight recognition on unmount so it doesn't keep the mic open.
@@ -181,6 +204,7 @@ export function SearchCommand() {
     };
     recognition.onerror = (e) => {
       setListening(false);
+      if (e.error === 'not-allowed') setMicBlocked(true);
       const message = SPEECH_ERROR_MESSAGES[e.error] ?? 'Voice search failed. Please try again.';
       const longMessage = e.error === 'not-allowed' || e.error === 'service-not-allowed';
       toast.error(message, { duration: longMessage ? 10000 : 4000 });
@@ -195,6 +219,15 @@ export function SearchCommand() {
   const stopListening = useCallback(() => {
     recognitionRef.current?.stop();
   }, []);
+
+  const handleMicClick = useCallback(() => {
+    if (micBlocked) {
+      toast.error(SPEECH_ERROR_MESSAGES['not-allowed'], { duration: 10000 });
+      return;
+    }
+    if (listening) stopListening();
+    else startListening();
+  }, [micBlocked, listening, startListening, stopListening]);
 
   return (
     <>
@@ -259,17 +292,20 @@ export function SearchCommand() {
                 {speechSupported && (
                   <button
                     type="button"
-                    onClick={listening ? stopListening : startListening}
-                    aria-label={listening ? t('stopVoiceSearch') : t('searchByVoice')}
+                    onClick={handleMicClick}
+                    aria-label={micBlocked ? t('micBlocked') : listening ? t('stopVoiceSearch') : t('searchByVoice')}
                     aria-pressed={listening}
+                    title={micBlocked ? t('micBlocked') : undefined}
                     className={cn(
                       'p-1.5 rounded-md transition-colors',
-                      listening
-                        ? 'text-[color:var(--accent)] bg-[color:var(--bg-soft)] animate-pulse'
-                        : 'text-[color:var(--fg-muted)] hover:bg-[color:var(--bg-soft)]',
+                      micBlocked
+                        ? 'text-red-500 hover:bg-red-500/10'
+                        : listening
+                          ? 'text-[color:var(--accent)] bg-[color:var(--bg-soft)] animate-pulse'
+                          : 'text-[color:var(--fg-muted)] hover:bg-[color:var(--bg-soft)]',
                     )}
                   >
-                    <Mic className="w-4 h-4" />
+                    {micBlocked ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
                   </button>
                 )}
                 <button
