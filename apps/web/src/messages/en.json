@@ -60,5 +60,27 @@
     "soldOutButton": "Sold out",
     "outOfStockButton": "Out of stock",
     "addToCart": "Add to cart"
+  },
+  "products": {
+    "search": "Search",
+    "shop": "Shop",
+    "allProducts": "All products",
+    "productsCount": "{count} products",
+    "all": "All",
+    "couldntLoadProducts": "Couldn't load products",
+    "failedToLoadProducts": "Failed to load products",
+    "tryAgain": "Try again",
+    "noProductsMatch": "No products match",
+    "noResultsForFilters": "Nothing here for those filters yet — try clearing them.",
+    "noProductsYet": "No products have been added yet. Check back soon.",
+    "clearFilters": "Clear filters",
+    "previous": "← Previous",
+    "next": "Next →",
+    "pageOf": "Page {page} of {totalPages}",
+    "sortNewest": "Newest",
+    "sortPopular": "Most popular",
+    "sortPriceAsc": "Price ↑",
+    "sortPriceDesc": "Price ↓",
+    "sortRating": "Top rated"
   }
 }
