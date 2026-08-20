@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { ProductGrid } from '@/components/shop/product-grid';
 import { CategoryShowcase } from '@/components/shop/category-showcase';
@@ -42,6 +43,7 @@ export default async function HomePage() {
     getCategories(),
     getBrands(),
   ]);
+  const t = await getTranslations('home');
   const c = resolveContent(settings);
 
   return (
@@ -114,12 +116,12 @@ export default async function HomePage() {
         <div className="flex items-end justify-between mb-10 gap-6">
           <div>
             <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
-              Featured devices
+              {t('featuredDevices')}
             </div>
-            <h2 className="display text-3xl md:text-4xl">Trending devices</h2>
+            <h2 className="display text-3xl md:text-4xl">{t('trendingDevices')}</h2>
           </div>
           <Link href="/products" className="text-sm font-medium hover:text-[color:var(--accent)] transition-colors inline-flex items-center gap-1">
-            Shop all <ArrowRight className="w-4 h-4" />
+            {t('shopAll')} <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
@@ -127,8 +129,8 @@ export default async function HomePage() {
           <ProductGrid products={featured.items} />
         ) : (
           <div className="card text-center py-16 text-[color:var(--fg-muted)]">
-            <p>No featured devices yet.</p>
-            <p className="text-xs mt-2">Mark products as featured in the admin to show them here.</p>
+            <p>{t('noFeaturedYet')}</p>
+            <p className="text-xs mt-2">{t('markFeaturedHint')}</p>
           </div>
         )}
       </section>
