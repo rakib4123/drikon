@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import { ShoppingBag, Star } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import type { ProductSummary } from '@drikon/shared-types';
 import { formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/store/cart-store';
@@ -12,6 +13,7 @@ import { WishlistButton } from './wishlist-button';
 import { CompareButton } from './compare-button';
 
 export function ProductCard({ product }: { product: ProductSummary }) {
+  const t = useTranslations('product');
   const add = useCartStore((s) => s.add);
   const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
   const compareAt = product.compareAtPrice
@@ -47,7 +49,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
         )}
         {product.stock === 0 && (
           <span className="absolute bottom-3 left-3 px-2 py-1 text-[10px] font-bold rounded-md bg-black/70 text-white">
-            SOLD OUT
+            {t('soldOut')}
           </span>
         )}
         <WishlistButton
@@ -106,10 +108,10 @@ export function ProductCard({ product }: { product: ProductSummary }) {
                 unitPrice: price,
                 currency: product.currency,
               });
-              toast.success('Added to cart', { description: product.name });
+              toast.success(t('addedToCartToastTitle'), { description: product.name });
             }}
             className="p-2.5 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] hover:bg-[color:var(--accent)] hover:text-white hover:border-[color:var(--accent)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            aria-label="Add to cart"
+            aria-label={t('addToCartAria')}
           >
             <ShoppingBag className="w-4 h-4" />
           </motion.button>
