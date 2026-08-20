@@ -5,11 +5,13 @@ import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'motion/react';
-import { Search, X, Loader2, CornerDownLeft, Mic } from 'lucide-react';
+import { Search, X, Loader2, CornerDownLeft, Mic, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
 import type { ProductListResponse, ProductSummary } from '@drikon/shared-types';
 import { apiGet } from '@/lib/api-client';
 import { cn, formatPrice } from '@/lib/utils';
+import { parseVoiceCommand } from '@/lib/voice-command';
+import { useCartStore } from '@/store/cart-store';
 
 const SPEECH_ERROR_MESSAGES: Record<string, string> = {
   'not-allowed':
@@ -30,8 +32,10 @@ export function SearchCommand() {
   const [mounted, setMounted] = useState(false);
   const [listening, setListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
+  const [voiceConfirm, setVoiceConfirm] = useState<{ quantity: number; product: ProductSummary } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const cartAdd = useCartStore((s) => s.add);
 
   useEffect(() => setMounted(true), []);
 
@@ -101,6 +105,7 @@ export function SearchCommand() {
     setOpen(false);
     setQuery('');
     setResults([]);
+    setVoiceConfirm(null);
   }, []);
 
   const goToResults = useCallback(() => {
@@ -118,17 +123,59 @@ export function SearchCommand() {
     [close, router],
   );
 
+  // A voice command like "2 phone case" resolves quantity + item text, then
+  // looks up the best-matching product so the user can confirm-and-add
+  // in one step instead of retyping what they just said.
+  const handleVoiceTranscript = useCallback(async (transcript: string) => {
+    const { quantity, itemText } = parseVoiceCommand(transcript);
+    if (!itemText) {
+      setQuery(transcript);
+      return;
+    }
+    setQuery(itemText); // shows the normal live-search list immediately as feedback
+    try {
+      const data = await apiGet<ProductListResponse>(
+        `/api/v1/products?search=${encodeURIComponent(itemText)}&limit=1`,
+      );
+      if (data.items[0]) setVoiceConfirm({ quantity, product: data.items[0] });
+    } catch {
+      // No match / request failed — the normal search results already showing is fine.
+    }
+  }, []);
+
+  const confirmAddToCart = useCallback(() => {
+    if (!voiceConfirm) return;
+    const { quantity, product } = voiceConfirm;
+    const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
+    cartAdd(
+      {
+        productId: product.id,
+        name: product.name,
+        slug: product.slug,
+        image: product.images?.[0]?.url,
+        unitPrice: price,
+        currency: product.currency,
+      },
+      quantity,
+    );
+    toast.success(`Added ${quantity} × ${product.name} to cart`);
+    close();
+  }, [voiceConfirm, cartAdd, close]);
+
+  const searchInstead = useCallback(() => setVoiceConfirm(null), []);
+
   const startListening = useCallback(() => {
     const SpeechRecognitionCtor = window.SpeechRecognition ?? window.webkitSpeechRecognition;
     if (!SpeechRecognitionCtor) return;
 
+    setVoiceConfirm(null);
     const recognition = new SpeechRecognitionCtor();
     recognition.lang = 'en-US';
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
     recognition.onresult = (e) => {
       const transcript = e.results[0]?.item(0)?.transcript;
-      if (transcript) setQuery(transcript);
+      if (transcript) void handleVoiceTranscript(transcript);
     };
     recognition.onerror = (e) => {
       setListening(false);
@@ -141,7 +188,7 @@ export function SearchCommand() {
     recognitionRef.current = recognition;
     setListening(true);
     recognition.start();
-  }, []);
+  }, [handleVoiceTranscript]);
 
   const stopListening = useCallback(() => {
     recognitionRef.current?.stop();
@@ -200,7 +247,10 @@ export function SearchCommand() {
                 <input
                   ref={inputRef}
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => {
+                    setQuery(e.target.value);
+                    setVoiceConfirm(null);
+                  }}
                   placeholder="Search products…"
                   className="flex-1 bg-transparent py-4 text-[15px] outline-none placeholder:text-[color:var(--fg-muted)]"
                 />
@@ -231,7 +281,46 @@ export function SearchCommand() {
               </div>
 
               <div className="max-h-[50vh] overflow-y-auto">
-                {query.trim().length < 2 ? (
+                {voiceConfirm ? (
+                  <div className="px-4 py-6">
+                    <p className="text-xs text-[color:var(--fg-muted)] mb-3">Did you mean:</p>
+                    <div className="flex items-center gap-3 p-3 rounded-xl border border-[color:var(--border)] mb-4">
+                      <span className="relative w-12 h-14 rounded-md overflow-hidden bg-[color:var(--bg-soft)] shrink-0">
+                        {voiceConfirm.product.images?.[0]?.url && (
+                          <Image
+                            src={voiceConfirm.product.images[0].url}
+                            alt={voiceConfirm.product.images[0].alt ?? voiceConfirm.product.name}
+                            fill
+                            sizes="48px"
+                            className="object-cover"
+                          />
+                        )}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium line-clamp-2">
+                          {voiceConfirm.quantity} × {voiceConfirm.product.name}
+                        </div>
+                        <div className="text-xs text-[color:var(--fg-muted)] mt-0.5">
+                          {formatPrice(
+                            typeof voiceConfirm.product.price === 'string'
+                              ? parseFloat(voiceConfirm.product.price)
+                              : voiceConfirm.product.price,
+                            voiceConfirm.product.currency,
+                          )}{' '}
+                          each
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button type="button" onClick={confirmAddToCart} className="btn-primary flex-1 justify-center">
+                        <ShoppingCart className="w-4 h-4" /> Add to cart
+                      </button>
+                      <button type="button" onClick={searchInstead} className="btn-ghost flex-1 justify-center">
+                        Search instead
+                      </button>
+                    </div>
+                  </div>
+                ) : query.trim().length < 2 ? (
                   <p className="px-4 py-8 text-center text-sm text-[color:var(--fg-muted)]">
                     Type at least 2 characters to search the catalog.
                   </p>
