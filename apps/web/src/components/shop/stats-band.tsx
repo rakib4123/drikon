@@ -1,15 +1,17 @@
 import { Boxes, Truck, ShieldCheck, Headphones } from 'lucide-react';
 import type { ReactNode } from 'react';
-
-const STATS: { icon: ReactNode; value: string; label: string }[] = [
-  { icon: <Boxes className="w-5 h-5" />, value: '500+', label: 'Premium accessories' },
-  { icon: <Truck className="w-5 h-5" />, value: '24h', label: 'Same-day dispatch' },
-  { icon: <ShieldCheck className="w-5 h-5" />, value: '100%', label: 'Authentic devices' },
-  { icon: <Headphones className="w-5 h-5" />, value: '7-day', label: 'Device support' },
-];
+import { getTranslations } from 'next-intl/server';
 
 /** Full-width gradient stats band — a confident "enterprise" trust strip. */
-export function StatsBand() {
+export async function StatsBand() {
+  const t = await getTranslations('home');
+  const STATS: { icon: ReactNode; value: string; label: string }[] = [
+    { icon: <Boxes className="w-5 h-5" />, value: '500+', label: t('statAccessories') },
+    { icon: <Truck className="w-5 h-5" />, value: '24h', label: t('statDispatch') },
+    { icon: <ShieldCheck className="w-5 h-5" />, value: '100%', label: t('statAuthentic') },
+    { icon: <Headphones className="w-5 h-5" />, value: '7-day', label: t('statSupport') },
+  ];
+
   return (
     <section className="max-w-7xl mx-auto px-6 pb-4">
       <div className="relative overflow-hidden rounded-3xl bg-drikon-gradient grain text-white">

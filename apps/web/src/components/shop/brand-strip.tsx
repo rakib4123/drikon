@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'motion/react';
+import { useTranslations } from 'next-intl';
 
 interface Brand {
   id: string;
@@ -12,15 +13,16 @@ interface Brand {
 
 /** "Trusted brands" row — links each brand to its filtered catalog. */
 export function BrandStrip({ brands }: { brands: Brand[] }) {
+  const t = useTranslations('home');
   if (!brands || brands.length === 0) return null;
 
   return (
     <section className="max-w-7xl mx-auto px-6 py-14">
       <div className="text-center mb-8">
         <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
-          Trusted brands
+          {t('trustedBrands')}
         </div>
-        <h2 className="display text-2xl md:text-3xl">Premium brands you love</h2>
+        <h2 className="display text-2xl md:text-3xl">{t('premiumBrandsYouLove')}</h2>
       </div>
       <div className="flex flex-wrap items-center justify-center gap-3">
         {brands.map((b, i) => (

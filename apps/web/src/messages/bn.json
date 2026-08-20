@@ -36,5 +36,18 @@
     "seeAllResults": "সব ফলাফল দেখুন",
     "escToClose": "বন্ধ করতে Esc চাপুন",
     "addedToCartToast": "কার্টে {quantity} × {product} যোগ করা হয়েছে"
+  },
+  "home": {
+    "featuredDevices": "ফিচার্ড ডিভাইস",
+    "trendingDevices": "ট্রেন্ডিং ডিভাইস",
+    "shopAll": "সব দেখুন",
+    "noFeaturedYet": "এখনো কোনো ফিচার্ড ডিভাইস নেই।",
+    "markFeaturedHint": "এখানে দেখাতে অ্যাডমিন থেকে পণ্যগুলো ফিচার্ড হিসেবে চিহ্নিত করুন।",
+    "trustedBrands": "বিশ্বস্ত ব্র্যান্ড",
+    "premiumBrandsYouLove": "আপনার পছন্দের প্রিমিয়াম ব্র্যান্ড",
+    "statAccessories": "প্রিমিয়াম আনুষাঙ্গিক",
+    "statDispatch": "একই দিনে পাঠানো",
+    "statAuthentic": "আসল ডিভাইস",
+    "statSupport": "ডিভাইস সাপোর্ট"
   }
 }

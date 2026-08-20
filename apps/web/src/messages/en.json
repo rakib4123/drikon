@@ -36,5 +36,18 @@
     "seeAllResults": "See all results",
     "escToClose": "Esc to close",
     "addedToCartToast": "Added {quantity} × {product} to cart"
+  },
+  "home": {
+    "featuredDevices": "Featured devices",
+    "trendingDevices": "Trending devices",
+    "shopAll": "Shop all",
+    "noFeaturedYet": "No featured devices yet.",
+    "markFeaturedHint": "Mark products as featured in the admin to show them here.",
+    "trustedBrands": "Trusted brands",
+    "premiumBrandsYouLove": "Premium brands you love",
+    "statAccessories": "Premium accessories",
+    "statDispatch": "Same-day dispatch",
+    "statAuthentic": "Authentic devices",
+    "statSupport": "Device support"
   }
 }
