@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { AnimatePresence, motion } from 'motion/react';
 import { Search, X, Loader2, CornerDownLeft, Mic, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import type { ProductListResponse, ProductSummary } from '@drikon/shared-types';
 import { apiGet } from '@/lib/api-client';
 import { cn, formatPrice } from '@/lib/utils';
@@ -25,6 +26,7 @@ const SPEECH_ERROR_MESSAGES: Record<string, string> = {
 
 export function SearchCommand() {
   const router = useRouter();
+  const t = useTranslations('search');
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ProductSummary[]>([]);
@@ -158,9 +160,9 @@ export function SearchCommand() {
       },
       quantity,
     );
-    toast.success(`Added ${quantity} × ${product.name} to cart`);
+    toast.success(t('addedToCartToast', { quantity, product: product.name }));
     close();
-  }, [voiceConfirm, cartAdd, close]);
+  }, [voiceConfirm, cartAdd, close, t]);
 
   const searchInstead = useCallback(() => setVoiceConfirm(null), []);
 
@@ -198,7 +200,7 @@ export function SearchCommand() {
     <>
       <button
         type="button"
-        aria-label="Search"
+        aria-label={t('searchLabel')}
         onClick={() => setOpen(true)}
         className="p-2 rounded-lg hover:bg-[color:var(--bg-soft)] transition-colors"
       >
@@ -251,14 +253,14 @@ export function SearchCommand() {
                     setQuery(e.target.value);
                     setVoiceConfirm(null);
                   }}
-                  placeholder="Search products…"
+                  placeholder={t('searchPlaceholder')}
                   className="flex-1 bg-transparent py-4 text-[15px] outline-none placeholder:text-[color:var(--fg-muted)]"
                 />
                 {speechSupported && (
                   <button
                     type="button"
                     onClick={listening ? stopListening : startListening}
-                    aria-label={listening ? 'Stop voice search' : 'Search by voice'}
+                    aria-label={listening ? t('stopVoiceSearch') : t('searchByVoice')}
                     aria-pressed={listening}
                     className={cn(
                       'p-1.5 rounded-md transition-colors',
@@ -273,7 +275,7 @@ export function SearchCommand() {
                 <button
                   type="button"
                   onClick={close}
-                  aria-label="Close search"
+                  aria-label={t('closeSearch')}
                   className="p-1.5 rounded-md text-[color:var(--fg-muted)] hover:bg-[color:var(--bg-soft)]"
                 >
                   <X className="w-4 h-4" />
@@ -283,7 +285,7 @@ export function SearchCommand() {
               <div className="max-h-[50vh] overflow-y-auto">
                 {voiceConfirm ? (
                   <div className="px-4 py-6">
-                    <p className="text-xs text-[color:var(--fg-muted)] mb-3">Did you mean:</p>
+                    <p className="text-xs text-[color:var(--fg-muted)] mb-3">{t('didYouMean')}</p>
                     <div className="flex items-center gap-3 p-3 rounded-xl border border-[color:var(--border)] mb-4">
                       <span className="relative w-12 h-14 rounded-md overflow-hidden bg-[color:var(--bg-soft)] shrink-0">
                         {voiceConfirm.product.images?.[0]?.url && (
@@ -307,26 +309,26 @@ export function SearchCommand() {
                               : voiceConfirm.product.price,
                             voiceConfirm.product.currency,
                           )}{' '}
-                          each
+                          {t('each')}
                         </div>
                       </div>
                     </div>
                     <div className="flex gap-2">
                       <button type="button" onClick={confirmAddToCart} className="btn-primary flex-1 justify-center">
-                        <ShoppingCart className="w-4 h-4" /> Add to cart
+                        <ShoppingCart className="w-4 h-4" /> {t('addToCart')}
                       </button>
                       <button type="button" onClick={searchInstead} className="btn-ghost flex-1 justify-center">
-                        Search instead
+                        {t('searchInstead')}
                       </button>
                     </div>
                   </div>
                 ) : query.trim().length < 2 ? (
                   <p className="px-4 py-8 text-center text-sm text-[color:var(--fg-muted)]">
-                    Type at least 2 characters to search the catalog.
+                    {t('typeAtLeastTwoChars')}
                   </p>
                 ) : results.length === 0 && !loading ? (
                   <p className="px-4 py-8 text-center text-sm text-[color:var(--fg-muted)]">
-                    No products match “{query.trim()}”.
+                    {t('noProductsMatch', { query: query.trim() })}
                   </p>
                 ) : (
                   <ul className="py-2">
@@ -369,9 +371,9 @@ export function SearchCommand() {
 
               <div className="flex items-center justify-between px-4 py-2.5 border-t border-[color:var(--border)] text-[11px] text-[color:var(--fg-muted)]">
                 <span className="inline-flex items-center gap-1.5">
-                  <CornerDownLeft className="w-3 h-3" /> See all results
+                  <CornerDownLeft className="w-3 h-3" /> {t('seeAllResults')}
                 </span>
-                <span>Esc to close</span>
+                <span>{t('escToClose')}</span>
               </div>
             </motion.div>
           </motion.div>

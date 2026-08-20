@@ -20,5 +20,21 @@
     "about": "About",
     "contact": "Contact",
     "allRightsReserved": "All rights reserved."
+  },
+  "search": {
+    "searchLabel": "Search",
+    "searchPlaceholder": "Search products…",
+    "searchByVoice": "Search by voice",
+    "stopVoiceSearch": "Stop voice search",
+    "closeSearch": "Close search",
+    "didYouMean": "Did you mean:",
+    "each": "each",
+    "addToCart": "Add to cart",
+    "searchInstead": "Search instead",
+    "typeAtLeastTwoChars": "Type at least 2 characters to search the catalog.",
+    "noProductsMatch": "No products match \"{query}\".",
+    "seeAllResults": "See all results",
+    "escToClose": "Esc to close",
+    "addedToCartToast": "Added {quantity} × {product} to cart"
   }
 }
