@@ -82,5 +82,18 @@
     "sortPriceAsc": "দাম ↑",
     "sortPriceDesc": "দাম ↓",
     "sortRating": "সেরা রেটিং"
+  },
+  "pdp": {
+    "shop": "শপ",
+    "reviewsCount": "{count}টি রিভিউ",
+    "outOfStock": "স্টকে নেই",
+    "onlyLeftInStock": "মাত্র {stock}টি স্টকে আছে",
+    "inStock": "স্টকে আছে",
+    "description": "বিবরণ",
+    "watchItInAction": "কার্যক্ষমতা দেখুন",
+    "specifications": "স্পেসিফিকেশন",
+    "frequentlyBoughtTogether": "একসাথে যা কেনা হয়",
+    "youMightAlsoLike": "আপনার আরও পছন্দ হতে পারে",
+    "offBadge": "−{discount}% ছাড়"
   }
 }

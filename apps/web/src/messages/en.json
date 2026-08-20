@@ -82,5 +82,18 @@
     "sortPriceAsc": "Price ↑",
     "sortPriceDesc": "Price ↓",
     "sortRating": "Top rated"
+  },
+  "pdp": {
+    "shop": "Shop",
+    "reviewsCount": "{count} reviews",
+    "outOfStock": "Out of stock",
+    "onlyLeftInStock": "Only {stock} left in stock",
+    "inStock": "In stock",
+    "description": "Description",
+    "watchItInAction": "Watch it in action",
+    "specifications": "Specifications",
+    "frequentlyBoughtTogether": "Frequently bought together",
+    "youMightAlsoLike": "You might also like",
+    "offBadge": "−{discount}% OFF"
   }
 }
