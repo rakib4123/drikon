@@ -3,6 +3,7 @@ import { cache } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { ArrowLeft, Star, ShieldCheck, Truck, RefreshCw } from 'lucide-react';
 import { apiGet, ApiError } from '@/lib/api-client';
 import { SITE_URL } from '@/lib/site';
@@ -99,6 +100,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
   if (!product) notFound();
 
+  const t = await getTranslations('pdp');
+
   const frequentlyBoughtTogether = await getFrequentlyBoughtTogether(product.id);
   const related =
     frequentlyBoughtTogether.length > 0
@@ -158,7 +161,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
       {/* Breadcrumb */}
       <nav className="text-xs text-[color:var(--fg-muted)] mb-8 flex items-center gap-1.5 flex-wrap">
         <Link href="/products" className="hover:text-[color:var(--fg)] inline-flex items-center gap-1">
-          <ArrowLeft className="w-3 h-3" /> Shop
+          <ArrowLeft className="w-3 h-3" /> {t('shop')}
         </Link>
         <span>/</span>
         <Link href={`/products?category=${product.category.slug}`} className="hover:text-[color:var(--fg)]">
@@ -186,7 +189,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
           )}
           {onSale && (
             <span className="absolute top-4 left-4 px-3 py-1.5 text-xs font-bold rounded-md bg-[color:var(--accent)] text-white">
-              −{discount}% OFF
+              {t('offBadge', { discount })}
             </span>
           )}
         </div>
@@ -205,7 +208,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
             <div className="flex items-center gap-1.5 mb-5 text-sm">
               <Star className="w-4 h-4 fill-[color:var(--accent-2)] text-[color:var(--accent-2)]" />
               <span className="font-medium">{product.averageRating.toFixed(1)}</span>
-              <span className="text-[color:var(--fg-muted)]">({product.reviewCount} reviews)</span>
+              <span className="text-[color:var(--fg-muted)]">{t('reviewsCount', { count: product.reviewCount })}</span>
             </div>
           )}
 
@@ -227,15 +230,15 @@ export default async function ProductDetailPage({ params }: PageProps) {
           <div className="mb-6 text-sm">
             {product.stock === 0 ? (
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/10 text-red-600 border border-red-500/30">
-                Out of stock
+                {t('outOfStock')}
               </span>
             ) : product.stock <= 5 ? (
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/30">
-                Only {product.stock} left in stock
+                {t('onlyLeftInStock', { stock: product.stock })}
               </span>
             ) : (
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/10 text-green-600 border border-green-500/30">
-                In stock
+                {t('inStock')}
               </span>
             )}
           </div>
@@ -284,7 +287,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
       {/* Description */}
       <section className="mb-16">
-        <h2 className="display text-2xl mb-4">Description</h2>
+        <h2 className="display text-2xl mb-4">{t('description')}</h2>
         <p className="text-[color:var(--fg-muted)] leading-relaxed max-w-3xl whitespace-pre-wrap">
           {product.description}
         </p>
@@ -293,7 +296,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
       {/* Video (if any) */}
       {product.videoUrl && (
         <section className="mb-16">
-          <h2 className="display text-2xl mb-4">Watch it in action</h2>
+          <h2 className="display text-2xl mb-4">{t('watchItInAction')}</h2>
           <div className="max-w-3xl">
             <VideoEmbed url={product.videoUrl} />
           </div>
@@ -303,7 +306,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
       {/* Attributes (if any) */}
       {product.attributes && Object.keys(product.attributes).length > 0 && (
         <section className="mb-16">
-          <h2 className="display text-2xl mb-4">Specifications</h2>
+          <h2 className="display text-2xl mb-4">{t('specifications')}</h2>
           <dl className="grid sm:grid-cols-2 gap-x-8 gap-y-3 max-w-3xl text-sm">
             {Object.entries(product.attributes).map(([key, value]) => (
               <div key={key} className="flex justify-between gap-4 border-b border-[color:var(--border)] py-2">
@@ -324,7 +327,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
       {related.length > 0 && (
         <section>
           <h2 className="display text-2xl mb-6">
-            {frequentlyBoughtTogether.length > 0 ? 'Frequently bought together' : 'You might also like'}
+            {frequentlyBoughtTogether.length > 0 ? t('frequentlyBoughtTogether') : t('youMightAlsoLike')}
           </h2>
           <ProductGrid products={related} />
         </section>
