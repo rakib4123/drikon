@@ -7,6 +7,7 @@ import { useAuthStore, useIsAdmin } from '@/store/auth-store';
 import { useCartStore } from '@/store/cart-store';
 import { useWishlistStore } from '@/store/wishlist-store';
 import { SearchCommand } from '@/components/shop/search-command';
+import { LanguageSwitcher } from '@/components/layout/language-switcher';
 import { BrandMark } from '@/components/layout/brand-mark';
 import { MegaMenu } from '@/components/layout/mega-menu';
 import { MobileMenu } from '@/components/layout/mobile-menu';
@@ -59,6 +60,7 @@ export function Navbar({ brand, categories }: { brand: BrandInfo; categories: Na
         </nav>
 
         <div className="flex items-center gap-2">
+          <LanguageSwitcher />
           <SearchCommand />
 
           <Link
