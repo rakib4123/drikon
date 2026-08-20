@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { ShoppingBag, User, Heart } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useAuthStore, useIsAdmin } from '@/store/auth-store';
 import { useCartStore } from '@/store/cart-store';
 import { useWishlistStore } from '@/store/wishlist-store';
@@ -17,6 +18,7 @@ import type { NavCategory } from '@/lib/catalog';
 
 export function Navbar({ brand, categories }: { brand: BrandInfo; categories: NavCategory[] }) {
   const [mounted, setMounted] = useState(false);
+  const t = useTranslations('nav');
   const user = useAuthStore((s) => s.user);
   const isAdmin = useIsAdmin();
   const fetchMe = useAuthStore((s) => s.fetchMe);
@@ -47,14 +49,14 @@ export function Navbar({ brand, categories }: { brand: BrandInfo; categories: Na
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
           <MegaMenu categories={categories} />
           <Link href="/showcase" className="hover:text-[color:var(--accent)] transition-colors">
-            Featured
+            {t('featured')}
           </Link>
           <Link href="/products" className="hover:text-[color:var(--accent)] transition-colors">
-            All products
+            {t('allProducts')}
           </Link>
           {isAdmin && (
             <Link href="/admin" className="text-[color:var(--accent)] hover:underline transition-colors">
-              Admin
+              {t('admin')}
             </Link>
           )}
         </nav>
@@ -65,7 +67,7 @@ export function Navbar({ brand, categories }: { brand: BrandInfo; categories: Na
 
           <Link
             href="/wishlist"
-            aria-label="Wishlist"
+            aria-label={t('wishlist')}
             className="p-2 rounded-lg hover:bg-[color:var(--bg-soft)] transition-colors relative hidden sm:inline-flex"
           >
             <Heart className="w-5 h-5" />
@@ -74,7 +76,7 @@ export function Navbar({ brand, categories }: { brand: BrandInfo; categories: Na
 
           <Link
             href="/cart"
-            aria-label="Cart"
+            aria-label={t('cart')}
             className="p-2 rounded-lg hover:bg-[color:var(--bg-soft)] transition-colors relative"
           >
             <ShoppingBag className="w-5 h-5" />
@@ -92,10 +94,10 @@ export function Navbar({ brand, categories }: { brand: BrandInfo; categories: Na
           ) : (
             <div className="hidden sm:flex items-center gap-2">
               <Link href="/login" className="btn-ghost text-sm py-2 px-3">
-                Sign in
+                {t('signIn')}
               </Link>
               <Link href="/register" className="btn-primary text-sm py-2 px-3">
-                Get started
+                {t('getStarted')}
               </Link>
             </div>
           )}

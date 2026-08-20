@@ -1,5 +1,24 @@
 {
   "common": {
     "skipToContent": "মূল কনটেন্টে যান"
+  },
+  "nav": {
+    "featured": "ফিচার্ড",
+    "allProducts": "সকল পণ্য",
+    "admin": "অ্যাডমিন",
+    "wishlist": "ইচ্ছেতালিকা",
+    "cart": "কার্ট",
+    "signIn": "সাইন ইন",
+    "getStarted": "শুরু করুন",
+    "trackOrder": "অর্ডার ট্র্যাক করুন",
+    "shop": "শপ",
+    "company": "কোম্পানি",
+    "legal": "আইনি তথ্য",
+    "shippingReturns": "শিপিং ও রিটার্ন",
+    "termsOfService": "ব্যবহারের শর্তাবলী",
+    "privacyPolicy": "গোপনীয়তা নীতি",
+    "about": "আমাদের সম্পর্কে",
+    "contact": "যোগাযোগ",
+    "allRightsReserved": "সর্বস্বত্ব সংরক্ষিত।"
   }
 }

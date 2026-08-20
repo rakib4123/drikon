@@ -1,5 +1,24 @@
 {
   "common": {
     "skipToContent": "Skip to content"
+  },
+  "nav": {
+    "featured": "Featured",
+    "allProducts": "All products",
+    "admin": "Admin",
+    "wishlist": "Wishlist",
+    "cart": "Cart",
+    "signIn": "Sign in",
+    "getStarted": "Get started",
+    "trackOrder": "Track order",
+    "shop": "Shop",
+    "company": "Company",
+    "legal": "Legal",
+    "shippingReturns": "Shipping & Returns",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "about": "About",
+    "contact": "Contact",
+    "allRightsReserved": "All rights reserved."
   }
 }

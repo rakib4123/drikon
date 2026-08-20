@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { Facebook, Instagram, Mail, Truck } from 'lucide-react';
+import { getTranslations } from 'next-intl/server';
 
-export function TopBar({
+export async function TopBar({
   supportEmail,
   facebook,
   instagram,
@@ -12,6 +13,8 @@ export function TopBar({
   instagram?: string | null;
   promo: string;
 }) {
+  const t = await getTranslations('nav');
+
   return (
     <div className="hidden sm:block border-b border-[color:var(--border)] bg-[color:var(--bg-soft)]/40 text-xs">
       <div className="max-w-7xl mx-auto px-6 h-9 flex items-center justify-between">
@@ -21,7 +24,7 @@ export function TopBar({
         </div>
 
         <div className="flex items-center gap-4 text-[color:var(--fg-muted)]">
-          <Link href="/orders" className="hover:text-[color:var(--fg)] transition-colors">Track order</Link>
+          <Link href="/orders" className="hover:text-[color:var(--fg)] transition-colors">{t('trackOrder')}</Link>
           {supportEmail && (
             <a href={`mailto:${supportEmail}`} className="hover:text-[color:var(--fg)] transition-colors inline-flex items-center gap-1.5">
               <Mail className="w-3.5 h-3.5" /> {supportEmail}
