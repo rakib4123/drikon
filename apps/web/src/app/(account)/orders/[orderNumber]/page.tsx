@@ -5,11 +5,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'motion/react';
-import { CheckCircle2, ArrowLeft, Loader2, Package } from 'lucide-react';
+import { CheckCircle2, ArrowLeft, Loader2, Package, Printer } from 'lucide-react';
 import type { OrderSummary } from '@drikon/shared-types';
 import { apiGet, ApiError } from '@/lib/api-client';
 import { formatPrice } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth-store';
+import { useBrand } from '@/components/layout/settings-context';
 import { OrderStatusBadge } from '@/components/shop/order-status-badge';
 
 interface OrderDetail extends OrderSummary {
@@ -42,6 +43,7 @@ export default function OrderDetailPage({
   const searchParams = useSearchParams();
   const isNew = searchParams.get('new') === '1';
 
+  const brand = useBrand();
   const { user, initialized, fetchMe } = useAuthStore();
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -102,12 +104,21 @@ export default function OrderDetailPage({
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-14">
-      <Link
-        href="/orders"
-        className="text-xs text-[color:var(--fg-muted)] hover:text-[color:var(--fg)] inline-flex items-center gap-1 mb-8"
-      >
-        <ArrowLeft className="w-3 h-3" /> All orders
-      </Link>
+      <div className="flex items-center justify-between mb-8">
+        <Link
+          href="/orders"
+          className="text-xs text-[color:var(--fg-muted)] hover:text-[color:var(--fg)] inline-flex items-center gap-1"
+        >
+          <ArrowLeft className="w-3 h-3" /> All orders
+        </Link>
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="text-xs text-[color:var(--fg-muted)] hover:text-[color:var(--fg)] inline-flex items-center gap-1.5"
+        >
+          <Printer className="w-3.5 h-3.5" /> Print receipt
+        </button>
+      </div>
 
       {isNew && (
         <motion.div
@@ -131,6 +142,12 @@ export default function OrderDetailPage({
           </div>
         </motion.div>
       )}
+
+      <div id="receipt">
+      <div className="hidden print:block mb-8">
+        <div className="text-xl font-semibold">{brand.siteName}</div>
+        <div className="text-sm text-[color:var(--fg-muted)]">Order receipt</div>
+      </div>
 
       <div className="flex items-center justify-between flex-wrap gap-3 mb-8">
         <div>
@@ -195,6 +212,7 @@ export default function OrderDetailPage({
             label="Shipping"
             value={Number(order.shipping) === 0 ? 'Free' : formatPrice(order.shipping, order.currency)}
           />
+          {Number(order.tax) > 0 && <Row label="Tax" value={formatPrice(order.tax, order.currency)} />}
           {Number(order.discount) > 0 && (
             <Row label="Discount" value={`− ${formatPrice(order.discount, order.currency)}`} />
           )}
@@ -219,6 +237,7 @@ export default function OrderDetailPage({
             </address>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

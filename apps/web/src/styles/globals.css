@@ -288,3 +288,23 @@ select.input {
   .aurora::before, .aurora::after, .animate-float, .animate-glow-pulse, .skeleton::after { animation: none; }
   .btn-primary::after { transition: none; }
 }
+
+/* ─── Print (receipts) ───
+   Show only the element with id="receipt"; everything else on the page
+   (buttons, toasts, banners) is hidden regardless of where it lives in
+   the tree, so printable pages don't need to know about each other.
+   header/footer (site nav/footer) are hidden outright rather than just
+   made invisible, so they don't reserve blank space on the printed page.
+   Deliberately NOT position:absolute on #receipt — that would stop its
+   height from driving the page's layout, risking clipped content on a
+   long order; a little residual blank space from other still-in-flow
+   invisible elements is a smaller cost than that. */
+@media print {
+  header, footer { display: none !important; }
+  body * { visibility: hidden; }
+  #receipt, #receipt * { visibility: visible; }
+  html, body { background: #fff !important; }
+  #receipt { background: #fff; color: #000; }
+  #receipt * { color: #000 !important; background: transparent !important; box-shadow: none !important; }
+  #receipt .card { border: 1px solid #ccc !important; }
+}
