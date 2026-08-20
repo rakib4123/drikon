@@ -49,5 +49,16 @@
     "statDispatch": "একই দিনে পাঠানো",
     "statAuthentic": "আসল ডিভাইস",
     "statSupport": "ডিভাইস সাপোর্ট"
+  },
+  "product": {
+    "soldOut": "স্টক শেষ",
+    "addedToCartToastTitle": "কার্টে যোগ করা হয়েছে",
+    "addToCartAria": "কার্টে যোগ করুন",
+    "addedQtyToCart": "কার্টে {qty}টি যোগ করা হয়েছে",
+    "decreaseQuantity": "পরিমাণ কমান",
+    "increaseQuantity": "পরিমাণ বাড়ান",
+    "soldOutButton": "স্টক শেষ",
+    "outOfStockButton": "স্টকে নেই",
+    "addToCart": "কার্টে যোগ করুন"
   }
 }

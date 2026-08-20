@@ -49,5 +49,16 @@
     "statDispatch": "Same-day dispatch",
     "statAuthentic": "Authentic devices",
     "statSupport": "Device support"
+  },
+  "product": {
+    "soldOut": "SOLD OUT",
+    "addedToCartToastTitle": "Added to cart",
+    "addToCartAria": "Add to cart",
+    "addedQtyToCart": "Added {qty} to cart",
+    "decreaseQuantity": "Decrease quantity",
+    "increaseQuantity": "Increase quantity",
+    "soldOutButton": "Sold out",
+    "outOfStockButton": "Out of stock",
+    "addToCart": "Add to cart"
   }
 }

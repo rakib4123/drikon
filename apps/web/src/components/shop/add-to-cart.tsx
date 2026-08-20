@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Minus, Plus, ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import { useCartStore } from '@/store/cart-store';
 
 export interface AddToCartProduct {
@@ -26,6 +27,7 @@ export function AddToCart({
   /** Button-only (no quantity stepper) — for tight spots like sticky headers. */
   compact?: boolean;
 }) {
+  const t = useTranslations('product');
   const add = useCartStore((s) => s.add);
   const [qty, setQty] = useState(1);
   const soldOut = product.stock === 0;
@@ -43,7 +45,7 @@ export function AddToCart({
       },
       qty,
     );
-    toast.success(`Added ${qty} to cart`, { description: product.name });
+    toast.success(t('addedQtyToCart', { qty }), { description: product.name });
   };
 
   if (compact) {
@@ -56,7 +58,7 @@ export function AddToCart({
         className={`btn-primary whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed ${className ?? ''}`}
       >
         <ShoppingBag className="w-4 h-4 shrink-0" />
-        {soldOut ? 'Sold out' : 'Add to cart'}
+        {soldOut ? t('soldOutButton') : t('addToCart')}
       </motion.button>
     );
   }
@@ -67,7 +69,7 @@ export function AddToCart({
       <div className="inline-flex items-center border border-[color:var(--border)] rounded-xl overflow-hidden shrink-0 self-start">
         <button
           type="button"
-          aria-label="Decrease quantity"
+          aria-label={t('decreaseQuantity')}
           disabled={soldOut || qty <= 1}
           onClick={() => setQty((q) => Math.max(1, q - 1))}
           className="p-3 hover:bg-[color:var(--bg-soft)] transition-colors disabled:opacity-40"
@@ -77,7 +79,7 @@ export function AddToCart({
         <span className="px-4 text-sm font-medium min-w-[3rem] text-center tabular-nums">{qty}</span>
         <button
           type="button"
-          aria-label="Increase quantity"
+          aria-label={t('increaseQuantity')}
           disabled={soldOut || qty >= max}
           onClick={() => setQty((q) => Math.min(max, q + 1))}
           className="p-3 hover:bg-[color:var(--bg-soft)] transition-colors disabled:opacity-40"
@@ -94,7 +96,7 @@ export function AddToCart({
         className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <ShoppingBag className="w-4 h-4" />
-        {soldOut ? 'Out of stock' : 'Add to cart'}
+        {soldOut ? t('outOfStockButton') : t('addToCart')}
       </motion.button>
     </div>
   );
