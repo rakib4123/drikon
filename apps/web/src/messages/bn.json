@@ -60,5 +60,27 @@
     "soldOutButton": "স্টক শেষ",
     "outOfStockButton": "স্টকে নেই",
     "addToCart": "কার্টে যোগ করুন"
+  },
+  "products": {
+    "search": "সার্চ",
+    "shop": "শপ",
+    "allProducts": "সকল পণ্য",
+    "productsCount": "{count}টি পণ্য",
+    "all": "সব",
+    "couldntLoadProducts": "পণ্য লোড করা যায়নি",
+    "failedToLoadProducts": "পণ্য লোড করতে ব্যর্থ হয়েছে",
+    "tryAgain": "আবার চেষ্টা করুন",
+    "noProductsMatch": "কোনো পণ্য মেলেনি",
+    "noResultsForFilters": "এই ফিল্টারগুলোর জন্য এখানে কিছু নেই — মুছে ফেলার চেষ্টা করুন।",
+    "noProductsYet": "এখনো কোনো পণ্য যোগ করা হয়নি। শীঘ্রই আবার দেখুন।",
+    "clearFilters": "ফিল্টার মুছুন",
+    "previous": "← আগের",
+    "next": "পরের →",
+    "pageOf": "{totalPages} এর মধ্যে {page} পৃষ্ঠা",
+    "sortNewest": "নতুন",
+    "sortPopular": "সবচেয়ে জনপ্রিয়",
+    "sortPriceAsc": "দাম ↑",
+    "sortPriceDesc": "দাম ↓",
+    "sortRating": "সেরা রেটিং"
   }
 }

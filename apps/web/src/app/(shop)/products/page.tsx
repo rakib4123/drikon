@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { PackageX, SearchX } from 'lucide-react';
+import { getTranslations } from 'next-intl/server';
 import { apiGet, ApiError } from '@/lib/api-client';
 import { getCategories } from '@/lib/catalog';
 import { ProductGrid } from '@/components/shop/product-grid';
@@ -14,6 +15,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function ProductsPage({ searchParams }: PageProps) {
   const params = await searchParams;
+  const t = await getTranslations('products');
   const qs = new URLSearchParams();
   for (const [k, v] of Object.entries(params)) {
     if (typeof v === 'string' && v) qs.set(k, v);
@@ -24,7 +26,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   try {
     data = await apiGet<ProductListResponse>(`/api/v1/products?${qs.toString()}`);
   } catch (e) {
-    error = e instanceof ApiError ? e.message : 'Failed to load products';
+    error = e instanceof ApiError ? e.message : t('failedToLoadProducts');
   }
 
   const allCats = await getCategories();
@@ -40,29 +42,29 @@ export default async function ProductsPage({ searchParams }: PageProps) {
       <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
         <div>
           <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
-            {currentSearch ? 'Search' : currentCategory ? currentCategory : 'Shop'}
+            {currentSearch ? t('search') : currentCategory ? currentCategory : t('shop')}
           </div>
           <h1 className="display text-4xl md:text-5xl">
             {currentSearch
               ? `“${currentSearch}”`
               : currentCategory
                 ? capitalize(currentCategory)
-                : 'All products'}
+                : t('allProducts')}
           </h1>
           {data && (
             <p className="text-sm text-[color:var(--fg-muted)] mt-2">
-              {data.pagination.total} products
+              {t('productsCount', { count: data.pagination.total })}
             </p>
           )}
         </div>
 
         {/* ─── Sort ─── */}
-        <SortLinks current={currentSort} params={params} />
+        <SortLinks current={currentSort} params={params} t={t} />
       </div>
 
       {/* ─── Quick category chips ─── */}
       <div className="flex flex-wrap gap-2 mb-10">
-        <CategoryChip active={!currentCategory} href="/products">All</CategoryChip>
+        <CategoryChip active={!currentCategory} href="/products">{t('all')}</CategoryChip>
         {topCats.map((c) => (
           <CategoryChip key={c.id} active={currentCategory === c.slug} href={`/products?category=${c.slug}`}>
             {c.name}
@@ -74,18 +76,18 @@ export default async function ProductsPage({ searchParams }: PageProps) {
         <div className="card !p-0">
           <EmptyState
             icon={<PackageX className="w-6 h-6" />}
-            title="Couldn’t load products"
+            title={t('couldntLoadProducts')}
             description={error}
-            action={<Link href="/products" className="btn-primary">Try again</Link>}
+            action={<Link href="/products" className="btn-primary">{t('tryAgain')}</Link>}
           />
         </div>
       ) : !data || data.items.length === 0 ? (
         <div className="card !p-0">
           <EmptyState
             icon={<SearchX className="w-6 h-6" />}
-            title="No products match"
-            description={currentSearch || currentCategory ? 'Nothing here for those filters yet — try clearing them.' : 'No products have been added yet. Check back soon.'}
-            action={(currentSearch || currentCategory) && <Link href="/products" className="btn-primary">Clear filters</Link>}
+            title={t('noProductsMatch')}
+            description={currentSearch || currentCategory ? t('noResultsForFilters') : t('noProductsYet')}
+            action={(currentSearch || currentCategory) && <Link href="/products" className="btn-primary">{t('clearFilters')}</Link>}
           />
         </div>
       ) : (
@@ -98,13 +100,13 @@ export default async function ProductsPage({ searchParams }: PageProps) {
           {data.pagination.totalPages > 1 && (
             <div className="mt-12 flex items-center justify-center gap-2">
               {data.pagination.hasPrev && (
-                <PageLink params={params} page={page - 1}>← Previous</PageLink>
+                <PageLink params={params} page={page - 1}>{t('previous')}</PageLink>
               )}
               <span className="px-4 py-2 text-sm text-[color:var(--fg-muted)]">
-                Page {page} of {data.pagination.totalPages}
+                {t('pageOf', { page, totalPages: data.pagination.totalPages })}
               </span>
               {data.pagination.hasNext && (
-                <PageLink params={params} page={page + 1}>Next →</PageLink>
+                <PageLink params={params} page={page + 1}>{t('next')}</PageLink>
               )}
             </div>
           )}
@@ -136,16 +138,18 @@ function CategoryChip({ active, href, children }: { active: boolean; href: strin
 function SortLinks({
   current,
   params,
+  t,
 }: {
   current: string;
   params: Record<string, string | string[] | undefined>;
+  t: Awaited<ReturnType<typeof getTranslations<'products'>>>;
 }) {
   const options: Array<{ value: string; label: string }> = [
-    { value: 'newest', label: 'Newest' },
-    { value: 'popular', label: 'Most popular' },
-    { value: 'price_asc', label: 'Price ↑' },
-    { value: 'price_desc', label: 'Price ↓' },
-    { value: 'rating', label: 'Top rated' },
+    { value: 'newest', label: t('sortNewest') },
+    { value: 'popular', label: t('sortPopular') },
+    { value: 'price_asc', label: t('sortPriceAsc') },
+    { value: 'price_desc', label: t('sortPriceDesc') },
+    { value: 'rating', label: t('sortRating') },
   ];
   return (
     <div className="flex gap-1.5 text-sm overflow-x-auto scrollbar-none max-w-full [&>*]:shrink-0">
