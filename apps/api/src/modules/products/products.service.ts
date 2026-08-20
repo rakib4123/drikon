@@ -13,6 +13,25 @@ import type {
   ProductQueryDto,
 } from './dto/product.dto';
 
+/**
+ * Requires every word of the query to appear *somewhere* in name/description/sku
+ * (any order, any field) rather than the whole phrase appearing as one contiguous
+ * substring — "spigen case" only matches "Spigen Core Armor Case" under word
+ * matching, since "spigen case" is never a literal substring of that name.
+ */
+function buildSearchFilter(search: string): Prisma.ProductWhereInput {
+  const words = search.trim().split(/\s+/).filter(Boolean);
+  return {
+    AND: words.map((word) => ({
+      OR: [
+        { name: { contains: word, mode: 'insensitive' as const } },
+        { description: { contains: word, mode: 'insensitive' as const } },
+        { sku: { contains: word, mode: 'insensitive' as const } },
+      ],
+    })),
+  };
+}
+
 @Injectable()
 export class ProductsService {
   private readonly logger = new Logger(ProductsService.name);
@@ -32,13 +51,7 @@ export class ProductsService {
     const where: Prisma.ProductWhereInput = {
       // Admins see every product (incl. inactive) so they can manage/re-activate them.
       ...(opts.admin ? {} : { isActive: true }),
-      ...(search && {
-        OR: [
-          { name: { contains: search, mode: 'insensitive' } },
-          { description: { contains: search, mode: 'insensitive' } },
-          { sku: { contains: search, mode: 'insensitive' } },
-        ],
-      }),
+      ...(search && buildSearchFilter(search)),
       ...(category && { category: { slug: category } }),
       ...(brand && { brand: { slug: brand } }),
       ...(minPrice !== undefined || maxPrice !== undefined
