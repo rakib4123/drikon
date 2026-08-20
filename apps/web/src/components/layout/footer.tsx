@@ -1,9 +1,11 @@
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { BrandMark } from '@/components/layout/brand-mark';
 import type { BrandInfo } from '@/lib/settings';
 import type { NavCategory } from '@/lib/catalog';
 
-export function Footer({ brand, categories = [], note }: { brand: BrandInfo; categories?: NavCategory[]; note?: string }) {
+export async function Footer({ brand, categories = [], note }: { brand: BrandInfo; categories?: NavCategory[]; note?: string }) {
+  const t = await getTranslations('nav');
   const topCats = categories.filter((c) => !c.parentId).slice(0, 5);
   return (
     <footer className="mt-24 border-t border-[color:var(--border)]">
@@ -18,9 +20,9 @@ export function Footer({ brand, categories = [], note }: { brand: BrandInfo; cat
         </div>
 
         <div>
-          <div className="text-sm font-semibold mb-3">Shop</div>
+          <div className="text-sm font-semibold mb-3">{t('shop')}</div>
           <ul className="space-y-2 text-sm text-[color:var(--fg-muted)]">
-            <li><Link href="/products" className="hover:text-[color:var(--fg)]">All products</Link></li>
+            <li><Link href="/products" className="hover:text-[color:var(--fg)]">{t('allProducts')}</Link></li>
             {topCats.map((c) => (
               <li key={c.id}>
                 <Link href={`/products?category=${c.slug}`} className="hover:text-[color:var(--fg)]">
@@ -32,25 +34,25 @@ export function Footer({ brand, categories = [], note }: { brand: BrandInfo; cat
         </div>
 
         <div>
-          <div className="text-sm font-semibold mb-3">Company</div>
+          <div className="text-sm font-semibold mb-3">{t('company')}</div>
           <ul className="space-y-2 text-sm text-[color:var(--fg-muted)]">
-            <li><Link href="/about" className="hover:text-[color:var(--fg)]">About</Link></li>
-            <li><Link href="/contact" className="hover:text-[color:var(--fg)]">Contact</Link></li>
+            <li><Link href="/about" className="hover:text-[color:var(--fg)]">{t('about')}</Link></li>
+            <li><Link href="/contact" className="hover:text-[color:var(--fg)]">{t('contact')}</Link></li>
           </ul>
         </div>
 
         <div>
-          <div className="text-sm font-semibold mb-3">Legal</div>
+          <div className="text-sm font-semibold mb-3">{t('legal')}</div>
           <ul className="space-y-2 text-sm text-[color:var(--fg-muted)]">
-            <li><Link href="/shipping-returns" className="hover:text-[color:var(--fg)]">Shipping &amp; Returns</Link></li>
-            <li><Link href="/terms" className="hover:text-[color:var(--fg)]">Terms of Service</Link></li>
-            <li><Link href="/privacy" className="hover:text-[color:var(--fg)]">Privacy Policy</Link></li>
+            <li><Link href="/shipping-returns" className="hover:text-[color:var(--fg)]">{t('shippingReturns')}</Link></li>
+            <li><Link href="/terms" className="hover:text-[color:var(--fg)]">{t('termsOfService')}</Link></li>
+            <li><Link href="/privacy" className="hover:text-[color:var(--fg)]">{t('privacyPolicy')}</Link></li>
           </ul>
         </div>
       </div>
       <div className="border-t border-[color:var(--border)] py-6">
         <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between gap-2 text-xs text-[color:var(--fg-muted)]">
-          <span>© {new Date().getFullYear()} {brand.siteName}. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} {brand.siteName}. {t('allRightsReserved')}</span>
           {note && <span>{note}</span>}
         </div>
       </div>
