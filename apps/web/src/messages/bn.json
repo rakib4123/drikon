@@ -32,7 +32,7 @@
     "addToCart": "কার্টে যোগ করুন",
     "searchInstead": "এর পরিবর্তে সার্চ করুন",
     "typeAtLeastTwoChars": "ক্যাটালগ খুঁজতে অন্তত ২টি অক্ষর টাইপ করুন।",
-    "noProductsMatch": "\"{query}\" এর সাথে মিলে এমন কোনো পণ্য নেই।",
+    "noProductsMatch": "“{query}” এর সাথে মিলে এমন কোনো পণ্য নেই।",
     "seeAllResults": "সব ফলাফল দেখুন",
     "escToClose": "বন্ধ করতে Esc চাপুন",
     "addedToCartToast": "কার্টে {quantity} × {product} যোগ করা হয়েছে"
