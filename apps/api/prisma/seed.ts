@@ -77,6 +77,16 @@ async function main() {
     update: {},
     create: { name: 'Chargers & Power', slug: 'power', description: 'Fast chargers, MagSafe, power banks' },
   });
+  const audio = await prisma.category.upsert({
+    where: { slug: 'audio' },
+    update: {},
+    create: { name: 'Audio', slug: 'audio', description: 'Headphones, earbuds, speakers' },
+  });
+  const wearables = await prisma.category.upsert({
+    where: { slug: 'wearables' },
+    update: {},
+    create: { name: 'Wearables', slug: 'wearables', description: 'Smartwatches and fitness bands' },
+  });
 
   console.log('  ✓ categories');
 
@@ -101,106 +111,617 @@ async function main() {
     update: {},
     create: { name: 'Anker', slug: 'anker' },
   });
+  const google = await prisma.brand.upsert({
+    where: { slug: 'google' },
+    update: {},
+    create: { name: 'Google', slug: 'google' },
+  });
+  const xiaomi = await prisma.brand.upsert({
+    where: { slug: 'xiaomi' },
+    update: {},
+    create: { name: 'Xiaomi', slug: 'xiaomi' },
+  });
+  const jbl = await prisma.brand.upsert({
+    where: { slug: 'jbl' },
+    update: {},
+    create: { name: 'JBL', slug: 'jbl' },
+  });
+  const sony = await prisma.brand.upsert({
+    where: { slug: 'sony' },
+    update: {},
+    create: { name: 'Sony', slug: 'sony' },
+  });
 
   console.log('  ✓ brands');
 
   // ─── Products ───
-  const products: Array<Prisma.ProductCreateInput> = [
+  // reviewTarget: how many real Review rows to generate for this product below.
+  // averageRating/reviewCount are NOT set here — they're computed from the
+  // actual seeded reviews after the fact, so the two never drift apart.
+  const products: Array<{ data: Prisma.ProductCreateInput; reviewTarget: number }> = [
     {
-      name: 'iPhone 15 Pro Titanium',
-      slug: 'iphone-15-pro-titanium',
-      sku: 'APL-IP15P-256-NT',
-      description:
-        'Forged in aerospace-grade titanium. Features the A17 Pro chip, a customizable Action button, and the most powerful iPhone camera system ever.',
-      shortDescription: 'Aerospace-grade titanium, A17 Pro chip, Pro camera system.',
-      price: new Prisma.Decimal(139990),
-      compareAtPrice: new Prisma.Decimal(149990),
-      stock: 42,
-      isFeatured: true,
-      category: { connect: { id: smartphones.id } },
-      brand: { connect: { id: apple.id } },
-      images: {
-        create: [
-          { url: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=800', position: 0, alt: 'iPhone 15 Pro' },
-        ],
+      reviewTarget: 9,
+      data: {
+        name: 'iPhone 15 Pro Titanium',
+        slug: 'iphone-15-pro-titanium',
+        sku: 'APL-IP15P-256-NT',
+        description:
+          'Forged in aerospace-grade titanium. Features the A17 Pro chip, a customizable Action button, and the most powerful iPhone camera system ever.',
+        shortDescription: 'Aerospace-grade titanium, A17 Pro chip, Pro camera system.',
+        price: new Prisma.Decimal(139990),
+        compareAtPrice: new Prisma.Decimal(149990),
+        stock: 42,
+        isFeatured: true,
+        category: { connect: { id: smartphones.id } },
+        brand: { connect: { id: apple.id } },
+        images: {
+          create: [
+            { url: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=800', position: 0, alt: 'iPhone 15 Pro' },
+          ],
+        },
+        attributes: { storage: ['128GB', '256GB', '512GB', '1TB'], color: ['Natural Titanium', 'Blue Titanium', 'Black Titanium'] },
       },
-      attributes: { storage: ['128GB', '256GB', '512GB', '1TB'], color: ['Natural Titanium', 'Blue Titanium', 'Black Titanium'] },
-      averageRating: 4.9,
-      reviewCount: 312,
     },
     {
-      name: 'Samsung Galaxy S24 Ultra',
-      slug: 'samsung-galaxy-s24-ultra',
-      sku: 'SAM-S24U-512-TI',
-      description:
-        'Welcome to the era of mobile AI. The Galaxy S24 Ultra unleashes new levels of creativity, productivity, and possibility, starting with the most important device in your life.',
-      shortDescription: 'Titanium exterior, Galaxy AI, 200MP camera, built-in S Pen.',
-      price: new Prisma.Decimal(154990),
-      stock: 35,
-      isFeatured: true,
-      category: { connect: { id: smartphones.id } },
-      brand: { connect: { id: samsung.id } },
-      images: {
-        create: [
-          { url: 'https://images.unsplash.com/photo-1678911820864-e2c567c655d7?w=800', position: 0, alt: 'Galaxy S24 Ultra' },
-        ],
+      reviewTarget: 8,
+      data: {
+        name: 'Samsung Galaxy S24 Ultra',
+        slug: 'samsung-galaxy-s24-ultra',
+        sku: 'SAM-S24U-512-TI',
+        description:
+          'Welcome to the era of mobile AI. The Galaxy S24 Ultra unleashes new levels of creativity, productivity, and possibility, starting with the most important device in your life.',
+        shortDescription: 'Titanium exterior, Galaxy AI, 200MP camera, built-in S Pen.',
+        price: new Prisma.Decimal(154990),
+        stock: 35,
+        isFeatured: true,
+        category: { connect: { id: smartphones.id } },
+        brand: { connect: { id: samsung.id } },
+        images: {
+          create: [
+            { url: 'https://images.unsplash.com/photo-1678911820864-e2c567c655d7?w=800', position: 0, alt: 'Galaxy S24 Ultra' },
+          ],
+        },
+        attributes: { storage: ['256GB', '512GB', '1TB'], color: ['Titanium Gray', 'Titanium Black'] },
       },
-      attributes: { storage: ['256GB', '512GB', '1TB'], color: ['Titanium Gray', 'Titanium Black'] },
-      averageRating: 4.8,
-      reviewCount: 245,
     },
     {
-      name: 'Spigen Core Armor Case',
-      slug: 'spigen-core-armor-iphone-15-pro',
-      sku: 'SPG-CA-IP15P-MB',
-      description:
-        'Suit up. The Core Armor provides absolute protection with its signature shock-absorbing design and tactile grip. Keeps your device pristine in every drop.',
-      shortDescription: 'Slim shock-absorbing protection, matte black finish.',
-      price: new Prisma.Decimal(2490),
-      stock: 120,
-      isFeatured: false,
-      category: { connect: { id: cases.id } },
-      brand: { connect: { id: spigen.id } },
-      images: {
-        create: [
-          { url: 'https://images.unsplash.com/photo-1605170439002-90845e8c0137?w=800', position: 0, alt: 'Spigen Case' },
-        ],
+      reviewTarget: 6,
+      data: {
+        name: 'Spigen Core Armor Case',
+        slug: 'spigen-core-armor-iphone-15-pro',
+        sku: 'SPG-CA-IP15P-MB',
+        description:
+          'Suit up. The Core Armor provides absolute protection with its signature shock-absorbing design and tactile grip. Keeps your device pristine in every drop.',
+        shortDescription: 'Slim shock-absorbing protection, matte black finish.',
+        price: new Prisma.Decimal(2490),
+        stock: 120,
+        isFeatured: false,
+        category: { connect: { id: cases.id } },
+        brand: { connect: { id: spigen.id } },
+        images: {
+          create: [
+            { url: 'https://images.unsplash.com/photo-1605170439002-90845e8c0137?w=800', position: 0, alt: 'Spigen Case' },
+          ],
+        },
       },
-      averageRating: 4.7,
-      reviewCount: 512,
     },
     {
-      name: 'Anker MagGo Power Bank (10K)',
-      slug: 'anker-maggo-power-bank-10k',
-      sku: 'ANK-MAG-10K-WHT',
-      description:
-        'Qi2-certified 15W ultra-fast wireless charging. With a 10,000mAh capacity, it secures perfectly to your MagSafe-compatible iPhone for a full recharge on the go.',
-      shortDescription: 'Qi2 15W wireless, 10000mAh capacity, MagSafe compatible.',
-      price: new Prisma.Decimal(6490),
-      compareAtPrice: new Prisma.Decimal(7990),
-      stock: 85,
-      isFeatured: true,
-      category: { connect: { id: power.id } },
-      brand: { connect: { id: anker.id } },
-      images: {
-        create: [
-          { url: 'https://images.unsplash.com/photo-1615526653198-d102e7df88e5?w=800', position: 0, alt: 'Anker Power Bank' },
-        ],
+      reviewTarget: 7,
+      data: {
+        name: 'Anker MagGo Power Bank (10K)',
+        slug: 'anker-maggo-power-bank-10k',
+        sku: 'ANK-MAG-10K-WHT',
+        description:
+          'Qi2-certified 15W ultra-fast wireless charging. With a 10,000mAh capacity, it secures perfectly to your MagSafe-compatible iPhone for a full recharge on the go.',
+        shortDescription: 'Qi2 15W wireless, 10000mAh capacity, MagSafe compatible.',
+        price: new Prisma.Decimal(6490),
+        compareAtPrice: new Prisma.Decimal(7990),
+        stock: 85,
+        isFeatured: true,
+        category: { connect: { id: power.id } },
+        brand: { connect: { id: anker.id } },
+        images: {
+          create: [
+            { url: 'https://images.unsplash.com/photo-1615526653198-d102e7df88e5?w=800', position: 0, alt: 'Anker Power Bank' },
+          ],
+        },
       },
-      averageRating: 4.9,
-      reviewCount: 420,
+    },
+    // ─ Smartphones (new) ─
+    {
+      reviewTarget: 6,
+      data: {
+        name: 'Google Pixel 8 Pro',
+        slug: 'google-pixel-8-pro',
+        sku: 'GGL-P8P-256-OBS',
+        description:
+          'The most helpful Pixel yet. With Google AI built in, a Pro-level camera system, and a stunning Super Actua display, Pixel 8 Pro helps you get more done.',
+        shortDescription: 'Google AI built in, Pro camera system, Super Actua display.',
+        price: new Prisma.Decimal(114990),
+        stock: 28,
+        isFeatured: false,
+        category: { connect: { id: smartphones.id } },
+        brand: { connect: { id: google.id } },
+        images: { create: [{ url: 'https://images.unsplash.com/photo-1706412703794-d944cd3625b3?w=800', position: 0, alt: 'Google Pixel 8 Pro smartphone with visible camera bar and G logo' }] },
+        attributes: { storage: ['128GB', '256GB', '512GB'], color: ['Obsidian', 'Porcelain', 'Bay'] },
+      },
+    },
+    {
+      reviewTarget: 5,
+      data: {
+        name: 'Xiaomi 14 Ultra',
+        slug: 'xiaomi-14-ultra',
+        sku: 'XMI-14U-512-BLK',
+        description:
+          'Co-engineered with Leica. A quad-camera system built for professional photography, wrapped in a design that feels as premium as it performs.',
+        shortDescription: 'Leica co-engineered quad camera, flagship performance.',
+        price: new Prisma.Decimal(124990),
+        stock: 22,
+        isFeatured: false,
+        category: { connect: { id: smartphones.id } },
+        brand: { connect: { id: xiaomi.id } },
+        images: { create: [{ url: 'https://images.unsplash.com/photo-1655802334467-5591938e0c62?w=800', position: 0, alt: 'Xiaomi 14 Ultra premium smartphone with prominent circular camera module' }] },
+        attributes: { storage: ['256GB', '512GB'], color: ['Black'] },
+      },
+    },
+    {
+      reviewTarget: 4,
+      data: {
+        name: 'Samsung Galaxy A55',
+        slug: 'samsung-galaxy-a55',
+        sku: 'SAM-A55-128-LIL',
+        description:
+          'Awesome is for everyone. The Galaxy A55 brings a sleek metal frame, a bright display, and a versatile camera to the mid-range lineup.',
+        shortDescription: 'Metal frame, bright display, versatile everyday camera.',
+        price: new Prisma.Decimal(42990),
+        stock: 60,
+        isFeatured: false,
+        category: { connect: { id: smartphones.id } },
+        brand: { connect: { id: samsung.id } },
+        images: { create: [{ url: 'https://images.unsplash.com/photo-1565967249821-083c4775e5bc?w=800', position: 0, alt: 'Samsung Galaxy A55 smartphone, silver finish' }] },
+        attributes: { storage: ['128GB', '256GB'], color: ['Awesome Lilac', 'Awesome Navy'] },
+      },
+    },
+    {
+      reviewTarget: 5,
+      data: {
+        name: 'iPhone SE',
+        slug: 'iphone-se',
+        sku: 'APL-SE-128-MID',
+        description:
+          'The most affordable way into iPhone. Compact, powerful, and ready for anything with a chip that keeps it fast for years to come.',
+        shortDescription: 'Compact design, powerful chip, affordable entry to iPhone.',
+        price: new Prisma.Decimal(49990),
+        stock: 45,
+        isFeatured: false,
+        category: { connect: { id: smartphones.id } },
+        brand: { connect: { id: apple.id } },
+        images: { create: [{ url: 'https://images.unsplash.com/photo-1634403665481-74948d815f03?w=800', position: 0, alt: 'iPhone SE compact smartphone with blank display' }] },
+        attributes: { storage: ['64GB', '128GB', '256GB'], color: ['Midnight', 'Starlight', 'Red'] },
+      },
+    },
+    // ─ Cases & Protection (new) ─
+    {
+      reviewTarget: 6,
+      data: {
+        name: 'Spigen Tempered Glass Screen Protector',
+        slug: 'spigen-tempered-glass-screen-protector',
+        sku: 'SPG-TG-UNI-2PK',
+        description:
+          '9H hardness tempered glass with an easy-install tray for a perfectly centered, bubble-free application every time. Case-friendly edges.',
+        shortDescription: '9H hardness, bubble-free install tray, case-friendly fit.',
+        price: new Prisma.Decimal(990),
+        stock: 200,
+        isFeatured: false,
+        category: { connect: { id: cases.id } },
+        brand: { connect: { id: spigen.id } },
+        images: { create: [{ url: 'https://images.unsplash.com/photo-1726900303636-fb7447fce40d?w=800', position: 0, alt: 'Smartphone with glossy protected screen, close-up product shot' }] },
+      },
+    },
+    {
+      reviewTarget: 4,
+      data: {
+        name: 'Anker MagSafe Wallet Case',
+        slug: 'anker-magsafe-wallet-case',
+        sku: 'ANK-MSW-IP15-BLK',
+        description:
+          'A slim case with a built-in MagSafe-compatible card holder that snaps on and off securely. Carry your cards without carrying a separate wallet.',
+        shortDescription: 'Built-in MagSafe card holder, slim protective shell.',
+        price: new Prisma.Decimal(3290),
+        stock: 70,
+        isFeatured: false,
+        category: { connect: { id: cases.id } },
+        brand: { connect: { id: anker.id } },
+        images: { create: [{ url: 'https://images.unsplash.com/photo-1688378707062-9a56a951d28d?w=800', position: 0, alt: 'Phone case with attached MagSafe card wallet holder' }] },
+      },
+    },
+    {
+      reviewTarget: 5,
+      data: {
+        name: 'Spigen Slim Armor Case',
+        slug: 'spigen-slim-armor-case',
+        sku: 'SPG-SA-GS24U-GY',
+        description:
+          'Dual-layer protection with a kickstand built in. Slim enough for everyday carry, tough enough for the days things don’t go as planned.',
+        shortDescription: 'Dual-layer protection with a built-in kickstand.',
+        price: new Prisma.Decimal(2790),
+        stock: 90,
+        isFeatured: false,
+        category: { connect: { id: cases.id } },
+        brand: { connect: { id: spigen.id } },
+        images: { create: [{ url: 'https://images.unsplash.com/photo-1625465329894-9cfaf8a63332?w=800', position: 0, alt: 'Rugged black and gray phone case with textured grip' }] },
+      },
+    },
+    {
+      reviewTarget: 3,
+      data: {
+        name: 'Clear Silicone Case',
+        slug: 'clear-silicone-case',
+        sku: 'GEN-CLR-UNI-TRN',
+        description:
+          'Show off your phone’s original design with a soft-touch clear case that resists yellowing and adds just enough grip and drop protection.',
+        shortDescription: 'Yellow-resistant clear silicone, soft-touch grip.',
+        price: new Prisma.Decimal(1290),
+        stock: 150,
+        isFeatured: false,
+        category: { connect: { id: cases.id } },
+        brand: { connect: { id: spigen.id } },
+        images: { create: [{ url: 'https://images.unsplash.com/photo-1771142061210-95e97225641e?w=800', position: 0, alt: 'Clear transparent phone case with magnetic charging ring' }] },
+      },
+    },
+    // ─ Chargers & Power (new) ─
+    {
+      reviewTarget: 7,
+      data: {
+        name: 'Anker 65W GaN Charger',
+        slug: 'anker-65w-gan-charger',
+        sku: 'ANK-GAN65-BLK',
+        description:
+          'Charge a laptop and two phones at once from a charger smaller than your palm. GaN II technology packs 65W into a compact, cool-running shell.',
+        shortDescription: 'Compact 65W GaN charger, 3 ports, laptop-capable.',
+        price: new Prisma.Decimal(3990),
+        stock: 110,
+        isFeatured: true,
+        category: { connect: { id: power.id } },
+        brand: { connect: { id: anker.id } },
+        images: { create: [{ url: 'https://images.unsplash.com/photo-1763161786687-43d0c9babdf0?w=800', position: 0, alt: 'Compact black GaN wall charger with multiple ports' }] },
+      },
+    },
+    {
+      reviewTarget: 5,
+      data: {
+        name: 'Anker MagGo Power Bank (20K)',
+        slug: 'anker-maggo-power-bank-20k',
+        sku: 'ANK-MAG-20K-WHT',
+        description:
+          'Double the capacity of the 10K for road trips and long days out. Qi2-certified 15W wireless charging, plus a USB-C port for wired top-ups.',
+        shortDescription: 'Qi2 15W wireless, 20000mAh capacity, USB-C port.',
+        price: new Prisma.Decimal(9990),
+        compareAtPrice: new Prisma.Decimal(11990),
+        stock: 55,
+        isFeatured: false,
+        category: { connect: { id: power.id } },
+        brand: { connect: { id: anker.id } },
+        images: { create: [{ url: 'https://images.unsplash.com/photo-1566554738544-d962991c3fee?w=800', position: 0, alt: 'Portable power bank charging a smartphone' }] },
+      },
+    },
+    {
+      reviewTarget: 4,
+      data: {
+        name: 'Anker USB-C Cable (3-Pack)',
+        slug: 'anker-usb-c-cable-3-pack',
+        sku: 'ANK-CBL-C2C-3PK',
+        description:
+          'Braided nylon USB-C to USB-C cables rated for 100W and 10,000+ bend life. One for the desk, one for the bag, one for the car.',
+        shortDescription: 'Braided nylon, 100W rated, 3 cables per pack.',
+        price: new Prisma.Decimal(1690),
+        stock: 130,
+        isFeatured: false,
+        category: { connect: { id: power.id } },
+        brand: { connect: { id: anker.id } },
+        images: { create: [{ url: 'https://images.unsplash.com/photo-1595756630452-736bc8ef3693?w=800', position: 0, alt: 'Black USB-C charging cable with braided sleeve' }] },
+      },
+    },
+    {
+      reviewTarget: 5,
+      data: {
+        name: 'Apple 20W USB-C Power Adapter',
+        slug: 'apple-20w-usb-c-power-adapter',
+        sku: 'APL-PWR-20W-WHT',
+        description:
+          'A compact, efficient power adapter that fast-charges your iPhone and works great with any USB-C device. No cable included.',
+        shortDescription: 'Compact 20W USB-C fast-charging power adapter.',
+        price: new Prisma.Decimal(2490),
+        stock: 95,
+        isFeatured: false,
+        category: { connect: { id: power.id } },
+        brand: { connect: { id: apple.id } },
+        images: { create: [{ url: 'https://images.unsplash.com/photo-1517320069935-381614f8c1e5?w=800', position: 0, alt: 'Small white USB-C power adapter cube' }] },
+      },
+    },
+    // ─ Audio (new category) ─
+    {
+      reviewTarget: 6,
+      data: {
+        name: 'JBL Tune 510BT',
+        slug: 'jbl-tune-510bt',
+        sku: 'JBL-T510BT-BLK',
+        description:
+          'Pure JBL sound wireless. Up to 40 hours of battery life on a single charge means the music keeps going long after everything else stops.',
+        shortDescription: 'Wireless over-ear, 40-hour battery, JBL Pure Bass sound.',
+        price: new Prisma.Decimal(3990),
+        stock: 75,
+        isFeatured: false,
+        category: { connect: { id: audio.id } },
+        brand: { connect: { id: jbl.id } },
+        images: { create: [{ url: 'https://images.unsplash.com/photo-1622473776277-c57c423daf63?w=800', position: 0, alt: 'JBL over-ear wireless headphones, close-up on branded ear cup' }] },
+      },
+    },
+    {
+      reviewTarget: 9,
+      data: {
+        name: 'Sony WH-1000XM5',
+        slug: 'sony-wh-1000xm5',
+        sku: 'SNY-WH1000XM5-BLK',
+        description:
+          'Industry-leading noise cancellation meets exceptional sound quality. Two processors and eight microphones work together to filter out the world.',
+        shortDescription: 'Industry-leading ANC, all-day comfort, premium sound.',
+        price: new Prisma.Decimal(34990),
+        compareAtPrice: new Prisma.Decimal(39990),
+        stock: 40,
+        isFeatured: true,
+        category: { connect: { id: audio.id } },
+        brand: { connect: { id: sony.id } },
+        images: {
+          create: [
+            { url: 'https://images.unsplash.com/photo-1621208587196-0b2a7d2aeb03?w=800', position: 0, alt: 'Sony WH-1000XM5 premium noise-cancelling over-ear headphones' },
+            { url: 'https://images.unsplash.com/photo-1642622039751-f74f2d1a0280?w=800', position: 1, alt: 'Sony over-ear headphones resting on a wooden table, alternate angle' },
+          ],
+        },
+      },
+    },
+    {
+      reviewTarget: 8,
+      data: {
+        name: 'Apple AirPods Pro (2nd gen)',
+        slug: 'apple-airpods-pro-2',
+        sku: 'APL-APP2-USBC',
+        description:
+          'Adaptive Audio, richer sound, and up to 2x more Active Noise Cancellation. Personalized to your ear for a seal that’s comfortable and secure.',
+        shortDescription: 'Adaptive Audio, 2x ANC, personalized fit.',
+        price: new Prisma.Decimal(29990),
+        stock: 50,
+        isFeatured: true,
+        category: { connect: { id: audio.id } },
+        brand: { connect: { id: apple.id } },
+        images: { create: [{ url: 'https://images.unsplash.com/photo-1505236273191-1dce886b01e9?w=800', position: 0, alt: 'Apple AirPods Pro white wireless earbuds in charging case' }] },
+      },
+    },
+    {
+      reviewTarget: 5,
+      data: {
+        name: 'JBL Flip 6 Speaker',
+        slug: 'jbl-flip-6-speaker',
+        sku: 'JBL-FLIP6-BLU',
+        description:
+          'Bold JBL Original Pro Sound in a rugged, IP67 waterproof and dustproof body. Toss it in a bag, take it anywhere, turn it up.',
+        shortDescription: 'IP67 waterproof, bold sound, portable design.',
+        price: new Prisma.Decimal(11990),
+        stock: 45,
+        isFeatured: false,
+        category: { connect: { id: audio.id } },
+        brand: { connect: { id: jbl.id } },
+        images: { create: [{ url: 'https://images.unsplash.com/photo-1588131153911-a4ea5189fe19?w=800', position: 0, alt: 'JBL Flip portable cylindrical bluetooth speaker with carabiner' }] },
+      },
+    },
+    {
+      reviewTarget: 4,
+      data: {
+        name: 'Sony WF-C700N Earbuds',
+        slug: 'sony-wf-c700n-earbuds',
+        sku: 'SNY-WFC700N-BLK',
+        description:
+          'Compact noise-cancelling earbuds that don’t compromise on sound. Lightweight comfort for all-day listening, indoors or out.',
+        shortDescription: 'Compact ANC earbuds, lightweight, all-day comfort.',
+        price: new Prisma.Decimal(8990),
+        stock: 65,
+        isFeatured: false,
+        category: { connect: { id: audio.id } },
+        brand: { connect: { id: sony.id } },
+        images: { create: [{ url: 'https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?w=800', position: 0, alt: 'Small black wireless earbuds with charging case' }] },
+      },
+    },
+    // ─ Wearables (new category) ─
+    {
+      reviewTarget: 7,
+      data: {
+        name: 'Apple Watch Series 9',
+        slug: 'apple-watch-series-9',
+        sku: 'APL-AWS9-45-MID',
+        description:
+          'A magical new way to use your Apple Watch without touching the screen, a brighter display, and our most powerful chip yet.',
+        shortDescription: 'Double Tap gesture, brighter display, S9 chip.',
+        price: new Prisma.Decimal(44990),
+        stock: 38,
+        isFeatured: true,
+        category: { connect: { id: wearables.id } },
+        brand: { connect: { id: apple.id } },
+        images: { create: [{ url: 'https://images.unsplash.com/photo-1637160151663-a410315e4e75?w=800', position: 0, alt: 'Apple Watch Series 9 smartwatch displaying the time, black band' }] },
+        attributes: { size: ['41mm', '45mm'], color: ['Midnight', 'Starlight', 'Pink'] },
+      },
+    },
+    {
+      reviewTarget: 5,
+      data: {
+        name: 'Samsung Galaxy Watch 6',
+        slug: 'samsung-galaxy-watch-6',
+        sku: 'SAM-GW6-44-GPH',
+        description:
+          'A sleeker design with a bigger screen and a rotating bezel-inspired touch experience. Detailed sleep coaching helps you rest better.',
+        shortDescription: 'Bigger screen, sleep coaching, comfortable all-day fit.',
+        price: new Prisma.Decimal(32990),
+        stock: 42,
+        isFeatured: false,
+        category: { connect: { id: wearables.id } },
+        brand: { connect: { id: samsung.id } },
+        images: { create: [{ url: 'https://images.unsplash.com/photo-1722152845711-be94a0751c8c?w=800', position: 0, alt: 'Samsung Galaxy Watch 6, circular face, worn on wrist' }] },
+        attributes: { size: ['40mm', '44mm'], color: ['Graphite', 'Silver'] },
+      },
+    },
+    {
+      reviewTarget: 6,
+      data: {
+        name: 'Xiaomi Smart Band 8',
+        slug: 'xiaomi-smart-band-8',
+        sku: 'XMI-SB8-BLK',
+        description:
+          'A slim, lightweight tracker with a vivid AMOLED display, 150+ workout modes, and up to 16 days of battery life on a single charge.',
+        shortDescription: 'AMOLED display, 150+ workout modes, 16-day battery.',
+        price: new Prisma.Decimal(4490),
+        stock: 100,
+        isFeatured: false,
+        category: { connect: { id: wearables.id } },
+        brand: { connect: { id: xiaomi.id } },
+        images: { create: [{ url: 'https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=800', position: 0, alt: 'Xiaomi Smart Band fitness tracker with colorful display' }] },
+      },
+    },
+    {
+      reviewTarget: 4,
+      data: {
+        name: 'Google Pixel Watch 2',
+        slug: 'google-pixel-watch-2',
+        sku: 'GGL-PW2-41-OBS',
+        description:
+          'Helpful insights, all day battery, and Fitbit’s most advanced health features yet, wrapped in a beautifully domed design.',
+        shortDescription: 'Fitbit health features, all-day battery, domed design.',
+        price: new Prisma.Decimal(38990),
+        stock: 30,
+        isFeatured: false,
+        category: { connect: { id: wearables.id } },
+        brand: { connect: { id: google.id } },
+        images: { create: [{ url: 'https://images.unsplash.com/photo-1683714152903-a17197c2347c?w=800', position: 0, alt: 'Round-faced smartwatch showing time and weather, Pixel Watch style' }] },
+        attributes: { size: ['41mm'], color: ['Matte Black', 'Polished Silver'] },
+      },
     },
   ];
 
+  const productsBySlug = new Map<string, { id: string; reviewTarget: number }>();
   for (const p of products) {
-    await prisma.product.upsert({
-      where: { slug: p.slug },
+    const rec = await prisma.product.upsert({
+      where: { slug: p.data.slug! },
       update: {},
-      create: p,
+      create: p.data,
     });
+    productsBySlug.set(p.data.slug!, { id: rec.id, reviewTarget: p.reviewTarget });
   }
 
   console.log(`  ✓ products (${products.length})`);
+
+  // ─── Review authors ───
+  // Distinct fake customer accounts so reviews look like real shoppers, not
+  // one account posting everywhere. Cheap argon2 params here (not `demo`'s
+  // login-quality hash) since these accounts are never meant to log in.
+  const reviewerNames = [
+    'Rafiq Ahmed',
+    'Nusrat Jahan',
+    'Tanvir Hasan',
+    'Farhana Akter',
+    'Imran Kabir',
+    'Sadia Islam',
+    'Mahin Chowdhury',
+    'Priya Sharma',
+    'Alex Morgan',
+    'Michael Chen',
+  ];
+  const reviewerHash = await argon2.hash('not-a-real-login', { type: argon2.argon2id, memoryCost: 8192, timeCost: 2, parallelism: 1 });
+  const reviewers = [];
+  for (const [i, name] of reviewerNames.entries()) {
+    const email = `reviewer${i + 1}@drikon-demo.example`;
+    const user = await prisma.user.upsert({
+      where: { email },
+      update: {},
+      create: { email, name, passwordHash: reviewerHash, role: Role.USER, emailVerified: new Date() },
+    });
+    reviewers.push(user);
+  }
+
+  console.log(`  ✓ review authors (${reviewers.length})`);
+
+  // ─── Reviews ───
+  // A shared pool of realistic, product-agnostic review text. Each product
+  // draws `reviewTarget` entries from it (rotating start offset per product
+  // so no two products get an identical set), paired with a rotating
+  // reviewer so (userId, productId) stays unique.
+  const reviewPool: Array<{ rating: number; title: string; body: string }> = [
+    { rating: 5, title: 'Exceeded expectations', body: 'Works perfectly and arrived faster than I expected. Build quality feels premium.' },
+    { rating: 5, title: 'Worth every taka', body: 'Was hesitant about the price but this is genuinely excellent. No regrets.' },
+    { rating: 5, title: 'Exactly as described', body: 'Matches the listing perfectly. Packaging was solid too.' },
+    { rating: 5, title: 'My new daily driver', body: "Been using this for a few weeks now and it's become part of my routine." },
+    { rating: 5, title: 'Great value', body: 'Does everything I need without any fuss. Highly recommend.' },
+    { rating: 5, title: 'Impressed', body: "Didn't expect this level of quality at this price point." },
+    { rating: 5, title: 'Five stars, easy', body: 'No complaints at all. Fast delivery, product works as advertised.' },
+    { rating: 5, title: 'Solid purchase', body: 'Been reliable so far, no issues to report.' },
+    { rating: 5, title: 'Better than expected', body: "The reviews convinced me and I'm glad I trusted them." },
+    { rating: 5, title: 'Love it', body: 'Genuinely happy with this purchase, would buy again.' },
+    { rating: 5, title: 'Exactly what I needed', body: 'Fit my use case perfectly, no surprises.' },
+    { rating: 5, title: 'Reliable', body: 'Been using this daily without a single issue.' },
+    { rating: 4, title: 'Very good, minor nitpick', body: 'Great overall, just wish the box included a better manual.' },
+    { rating: 4, title: 'Almost perfect', body: 'Does the job well, only docking a star for the slightly slow delivery.' },
+    { rating: 4, title: 'Good but not flawless', body: 'Works well day to day, a bit bulkier than I expected from photos.' },
+    { rating: 4, title: 'Solid, a few small issues', body: 'Overall satisfied, had a minor hiccup on first setup that resolved itself.' },
+    { rating: 4, title: 'Recommended with a caveat', body: 'Good product, just make sure you read the sizing/specs carefully first.' },
+    { rating: 4, title: 'Happy customer', body: 'Works great, wish it came in more color options.' },
+    { rating: 4, title: 'Does what it says', body: "No major complaints, does exactly what's promised." },
+    { rating: 4, title: 'Good purchase', body: 'Solid quality, took a bit to get used to but works well now.' },
+    { rating: 3, title: "It's okay", body: 'Does the basic job but nothing special. Expected a bit more for the price.' },
+    { rating: 3, title: 'Mixed feelings', body: 'Some things work great, others feel like an afterthought.' },
+    { rating: 3, title: 'Average', body: 'Not bad, not amazing. Gets the job done.' },
+    { rating: 3, title: 'Decent, room to improve', body: "Functional but I've used better at similar price points before." },
+  ];
+
+  let reviewsCreated = 0;
+  let offset = 0;
+  for (const [slug, product] of productsBySlug) {
+    for (let i = 0; i < product.reviewTarget; i++) {
+      const entry = reviewPool[(offset + i) % reviewPool.length];
+      const reviewer = reviewers[(offset + i) % reviewers.length];
+      await prisma.review.upsert({
+        where: { userId_productId: { userId: reviewer.id, productId: product.id } },
+        update: {},
+        create: {
+          userId: reviewer.id,
+          productId: product.id,
+          rating: entry.rating,
+          title: entry.title,
+          body: entry.body,
+          isVerified: true,
+        },
+      });
+      reviewsCreated += 1;
+    }
+    offset += 3; // shift the pool window so consecutive products don't share an identical set
+    void slug;
+  }
+
+  // Recompute averageRating/reviewCount from the real rows so the two never
+  // drift apart (the site previously showed rating badges with no reviews
+  // behind them — this keeps card badges and the PDP reviews section honest).
+  for (const [, product] of productsBySlug) {
+    const agg = await prisma.review.aggregate({
+      where: { productId: product.id },
+      _avg: { rating: true },
+      _count: true,
+    });
+    await prisma.product.update({
+      where: { id: product.id },
+      data: {
+        averageRating: agg._avg.rating ?? 0,
+        reviewCount: agg._count,
+      },
+    });
+  }
+
+  console.log(`  ✓ reviews (${reviewsCreated}), ratings recomputed from real rows`);
 
   // ─── Demo orders (for the Apriori-based recommendations feature) ───
   // Deliberate co-purchase patterns so Apriori has real signal to mine:
