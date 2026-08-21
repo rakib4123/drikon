@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getTranslations, getLocale } from 'next-intl/server';
 import { BrandMark } from '@/components/layout/brand-mark';
+import { BrandWatermark } from '@/components/layout/brand-watermark';
 import type { BrandInfo } from '@/lib/settings';
 import type { NavCategory } from '@/lib/catalog';
 import { localize } from '@/lib/localize';
@@ -53,6 +54,7 @@ export async function Footer({ brand, categories = [], note }: { brand: BrandInf
           </ul>
         </div>
       </div>
+      <BrandWatermark text={brand.siteName?.toUpperCase() || 'DRIKON'} />
       <div className="border-t border-[color:var(--border)] py-6">
         <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between gap-2 text-xs text-[color:var(--fg-muted)]">
           <span>© {new Date().getFullYear()} {brand.siteName}. {t('allRightsReserved')}</span>
