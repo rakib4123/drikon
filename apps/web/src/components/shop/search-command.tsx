@@ -26,6 +26,8 @@ const SPEECH_ERROR_MESSAGES: Record<string, string> = {
   network: 'Voice search needs an internet connection.',
   'language-not-supported':
     "Your phone doesn't have speech recognition installed for this language. On Android, open the Google app → Settings → Voice → Languages and download it, or type your search instead.",
+  aborted:
+    "Your phone's speech recognition service couldn't start — this isn't a permission issue. Try updating the Google app from the Play Store, or type your search instead.",
 };
 
 export function SearchCommand() {
@@ -223,7 +225,11 @@ export function SearchCommand() {
       // the user with no feedback at all when they tap the mic.
       if (e.error === 'aborted' && stoppedByUserRef.current) return;
       const message = SPEECH_ERROR_MESSAGES[e.error] ?? `Voice search failed (${e.error}). Please try again.`;
-      const longMessage = e.error === 'not-allowed' || e.error === 'service-not-allowed' || e.error === 'language-not-supported';
+      const longMessage =
+        e.error === 'not-allowed' ||
+        e.error === 'service-not-allowed' ||
+        e.error === 'language-not-supported' ||
+        e.error === 'aborted';
       toast.error(message, { duration: longMessage ? 10000 : 4000 });
     };
     recognition.onend = () => setListening(false);
