@@ -26,6 +26,7 @@
     "searchPlaceholder": "Search products…",
     "searchByVoice": "Search by voice",
     "stopVoiceSearch": "Stop voice search",
+    "listeningHint": "Listening… speak now",
     "micBlocked": "Microphone blocked for this site — click for instructions",
     "closeSearch": "Close search",
     "didYouMean": "Did you mean:",
