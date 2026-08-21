@@ -112,7 +112,9 @@ export function MegaMenu({ categories = [] }: { categories?: NavCategory[] }) {
                     </div>
                   ) : (
                     <div className="text-sm text-[color:var(--fg-muted)]">
-                      {active?.description || `Explore ${active?._count?.products ?? 0} products in ${active?.name}.`}
+                      {active?.description
+                        ? localize(active.description, active.descriptionBn, locale)
+                        : `Explore ${active?._count?.products ?? 0} products in ${active ? localize(active.name, active.nameBn, locale) : ''}.`}
                       <div className="mt-3">
                         <Link href={`/products?category=${active?.slug}`} className="btn-ghost !py-2 !px-4 text-sm">
                           Shop {active ? localize(active.name, active.nameBn, locale) : ''} <ArrowRight className="w-4 h-4" />
