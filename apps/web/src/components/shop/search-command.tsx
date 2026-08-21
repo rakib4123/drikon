@@ -44,6 +44,7 @@ export function SearchCommand() {
   const [voiceConfirm, setVoiceConfirm] = useState<{ quantity: number; product: ProductSummary } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const stoppedByUserRef = useRef(false);
   const cartAdd = useCartStore((s) => s.add);
 
   useEffect(() => setMounted(true), []);
@@ -217,19 +218,24 @@ export function SearchCommand() {
     recognition.onerror = (e) => {
       setListening(false);
       if (e.error === 'not-allowed') setMicBlocked(true);
-      if (e.error === 'aborted') return; // user-initiated stop, not a failure
+      // Only swallow 'aborted' when WE triggered the stop — some phones fire
+      // 'aborted' for a genuine failure too, and silently eating that leaves
+      // the user with no feedback at all when they tap the mic.
+      if (e.error === 'aborted' && stoppedByUserRef.current) return;
       const message = SPEECH_ERROR_MESSAGES[e.error] ?? `Voice search failed (${e.error}). Please try again.`;
       const longMessage = e.error === 'not-allowed' || e.error === 'service-not-allowed' || e.error === 'language-not-supported';
       toast.error(message, { duration: longMessage ? 10000 : 4000 });
     };
     recognition.onend = () => setListening(false);
 
+    stoppedByUserRef.current = false;
     recognitionRef.current = recognition;
     setListening(true);
     recognition.start();
   }, [handleVoiceTranscript, locale]);
 
   const stopListening = useCallback(() => {
+    stoppedByUserRef.current = true;
     recognitionRef.current?.stop();
   }, []);
 
