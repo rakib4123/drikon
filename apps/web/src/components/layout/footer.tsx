@@ -12,8 +12,9 @@ export async function Footer({ brand, categories = [], note }: { brand: BrandInf
   const locale = (await getLocale()) as Locale;
   const topCats = categories.filter((c) => !c.parentId).slice(0, 5);
   return (
-    <footer className="mt-24 border-t border-[color:var(--border)]">
-      <div className="max-w-7xl mx-auto px-6 py-14 grid gap-10 md:grid-cols-5">
+    <footer className="relative mt-24 border-t border-[color:var(--border)] overflow-hidden">
+      <BrandWatermark text={brand.siteName?.toUpperCase() || 'DRIKON'} />
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-14 grid gap-10 md:grid-cols-5">
         <div className="md:col-span-2">
           <div className="mb-3">
             <BrandMark brand={brand} href={null} showTagline />
@@ -54,8 +55,7 @@ export async function Footer({ brand, categories = [], note }: { brand: BrandInf
           </ul>
         </div>
       </div>
-      <BrandWatermark text={brand.siteName?.toUpperCase() || 'DRIKON'} />
-      <div className="border-t border-[color:var(--border)] py-6">
+      <div className="relative z-10 border-t border-[color:var(--border)] py-6">
         <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between gap-2 text-xs text-[color:var(--fg-muted)]">
           <span>© {new Date().getFullYear()} {brand.siteName}. {t('allRightsReserved')}</span>
           {note && <span>{note}</span>}
