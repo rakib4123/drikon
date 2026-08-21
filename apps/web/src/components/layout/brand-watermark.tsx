@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from 'motion/react';
 
-/** Huge, colorful gradient-fill brand wordmark — sits behind the footer content as a decorative backdrop. */
+/** Huge, faint monochrome brand wordmark — sits behind the footer content as a decorative backdrop. */
 export function BrandWatermark({ text }: { text: string }) {
   const reduceMotion = useReducedMotion();
 
@@ -13,11 +13,8 @@ export function BrandWatermark({ text }: { text: string }) {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-40px' }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        className="display text-center leading-none text-[36vw] sm:text-[30vw] md:text-[24vw] lg:text-[20vw] tracking-tight bg-clip-text text-transparent [-webkit-text-stroke:1px_color-mix(in_srgb,var(--accent)_18%,transparent)]"
-        style={{
-          backgroundImage:
-            'linear-gradient(100deg, rgba(59,130,246,0.32), rgba(168,85,247,0.32), rgba(236,72,153,0.32), rgba(249,115,22,0.32))',
-        }}
+        className="display text-center leading-none text-[36vw] sm:text-[30vw] md:text-[24vw] lg:text-[20vw] tracking-tight text-transparent [-webkit-text-stroke:1px_var(--border)]"
+        style={{ WebkitTextFillColor: 'color-mix(in srgb, var(--fg) 4%, transparent)' }}
       >
         {text}
       </motion.div>
