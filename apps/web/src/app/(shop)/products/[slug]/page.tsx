@@ -26,6 +26,7 @@ interface PageProps {
 
 interface ProductDetail extends ProductSummary {
   description: string;
+  descriptionBn?: string | null;
   sku: string;
   attributes?: Record<string, unknown> | null;
   brandId?: string | null;

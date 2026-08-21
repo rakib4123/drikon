@@ -5,6 +5,8 @@ export interface Banner {
   id: string;
   heading: string;
   subheading?: string | null;
+  headingBn?: string | null;
+  subheadingBn?: string | null;
   imageUrl?: string | null;
   ctaLabel?: string | null;
   ctaHref?: string | null;

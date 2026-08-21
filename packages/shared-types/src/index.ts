@@ -109,6 +109,8 @@ export interface ProductSummary {
   name: string;
   slug: string;
   shortDescription?: string | null;
+  nameBn?: string | null;
+  shortDescriptionBn?: string | null;
   price: string | number;
   compareAtPrice?: string | number | null;
   currency: string;

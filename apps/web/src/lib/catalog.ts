@@ -6,6 +6,8 @@ export interface NavCategory {
   name: string;
   slug: string;
   description?: string | null;
+  nameBn?: string | null;
+  descriptionBn?: string | null;
   imageUrl?: string | null;
   parentId?: string | null;
   _count?: { products: number };
