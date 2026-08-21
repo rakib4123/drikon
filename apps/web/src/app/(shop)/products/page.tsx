@@ -1,10 +1,12 @@
 import Link from 'next/link';
 import { PackageX, SearchX } from 'lucide-react';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, getLocale } from 'next-intl/server';
 import { apiGet, ApiError } from '@/lib/api-client';
 import { getCategories } from '@/lib/catalog';
 import { ProductGrid } from '@/components/shop/product-grid';
 import { EmptyState } from '@/components/ui/empty-state';
+import { localize } from '@/lib/localize';
+import type { Locale } from '@/i18n/request';
 import type { ProductListResponse } from '@drikon/shared-types';
 
 interface PageProps {
@@ -16,6 +18,7 @@ export const dynamic = 'force-dynamic';
 export default async function ProductsPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const t = await getTranslations('products');
+  const locale = (await getLocale()) as Locale;
   const qs = new URLSearchParams();
   for (const [k, v] of Object.entries(params)) {
     if (typeof v === 'string' && v) qs.set(k, v);
@@ -67,7 +70,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
         <CategoryChip active={!currentCategory} href="/products">{t('all')}</CategoryChip>
         {topCats.map((c) => (
           <CategoryChip key={c.id} active={currentCategory === c.slug} href={`/products?category=${c.slug}`}>
-            {c.name}
+            {localize(c.name, c.nameBn, locale)}
           </CategoryChip>
         ))}
       </div>

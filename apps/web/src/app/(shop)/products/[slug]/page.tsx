@@ -3,7 +3,7 @@ import { cache } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, getLocale } from 'next-intl/server';
 import { ArrowLeft, Star, ShieldCheck, Truck, RefreshCw } from 'lucide-react';
 import { apiGet, ApiError } from '@/lib/api-client';
 import { SITE_URL } from '@/lib/site';
@@ -16,6 +16,8 @@ import { VideoEmbed } from '@/components/shop/video-embed';
 import { PremiumProductPage } from '@/components/shop/premium-product-page';
 import { formatPrice } from '@/lib/utils';
 import { getSettings, resolveContent } from '@/lib/settings';
+import { localize } from '@/lib/localize';
+import type { Locale } from '@/i18n/request';
 import type { ProductSummary } from '@drikon/shared-types';
 
 export const dynamic = 'force-dynamic';
@@ -102,6 +104,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
   if (!product) notFound();
 
   const t = await getTranslations('pdp');
+  const locale = (await getLocale()) as Locale;
 
   const frequentlyBoughtTogether = await getFrequentlyBoughtTogether(product.id);
   const related =
@@ -119,6 +122,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const discount = onSale && compareAt ? Math.round(((compareAt - price) / compareAt) * 100) : 0;
 
   const content = resolveContent(await getSettings());
+
+  const name = localize(product.name, product.nameBn, locale);
+  const description = localize(product.description, product.descriptionBn, locale);
 
   const isPremium = product.attributes && typeof product.attributes === 'object' && 'template' in product.attributes && product.attributes.template === 'premium';
 
@@ -169,7 +175,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
           {product.category.name}
         </Link>
         <span>/</span>
-        <span className="text-[color:var(--fg)]">{product.name}</span>
+        <span className="text-[color:var(--fg)]">{name}</span>
       </nav>
 
       {/* Main grid */}
@@ -203,7 +209,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
             </div>
           )}
 
-          <h1 className="display text-3xl md:text-4xl mb-3">{product.name}</h1>
+          <h1 className="display text-3xl md:text-4xl mb-3">{name}</h1>
 
           {product.averageRating > 0 && (
             <div className="flex items-center gap-1.5 mb-5 text-sm">
@@ -214,7 +220,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
           )}
 
           {product.shortDescription && (
-            <p className="text-[color:var(--fg-muted)] mb-6">{product.shortDescription}</p>
+            <p className="text-[color:var(--fg-muted)] mb-6">
+              {localize(product.shortDescription, product.shortDescriptionBn, locale)}
+            </p>
           )}
 
           {/* Price */}
@@ -290,7 +298,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
       <section className="mb-16">
         <h2 className="display text-2xl mb-4">{t('description')}</h2>
         <p className="text-[color:var(--fg-muted)] leading-relaxed max-w-3xl whitespace-pre-wrap">
-          {product.description}
+          {description}
         </p>
       </section>
 

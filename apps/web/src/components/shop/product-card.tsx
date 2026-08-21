@@ -5,16 +5,20 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import { ShoppingBag, Star } from 'lucide-react';
 import { toast } from 'sonner';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import type { ProductSummary } from '@drikon/shared-types';
 import { formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/store/cart-store';
+import { localize } from '@/lib/localize';
+import type { Locale } from '@/i18n/request';
 import { WishlistButton } from './wishlist-button';
 import { CompareButton } from './compare-button';
 
 export function ProductCard({ product }: { product: ProductSummary }) {
   const t = useTranslations('product');
+  const locale = useLocale() as Locale;
   const add = useCartStore((s) => s.add);
+  const name = localize(product.name, product.nameBn, locale);
   const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
   const compareAt = product.compareAtPrice
     ? typeof product.compareAtPrice === 'string'
@@ -31,7 +35,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
           {product.images?.[0]?.url ? (
             <Image
               src={product.images[0].url}
-              alt={product.images[0].alt ?? product.name}
+              alt={product.images[0].alt ?? name}
               fill
               sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
               className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -54,7 +58,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
         )}
         <WishlistButton
           productId={product.id}
-          productName={product.name}
+          productName={name}
           variant="overlay"
           className="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 aria-[pressed=true]:opacity-100 transition-opacity"
         />
@@ -71,7 +75,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
         </div>
         <Link href={`/products/${product.slug}`}>
           <h3 className="text-[15px] font-semibold leading-snug line-clamp-2 hover:text-[color:var(--accent)] transition-colors">
-            {product.name}
+            {name}
           </h3>
         </Link>
 
@@ -102,13 +106,13 @@ export function ProductCard({ product }: { product: ProductSummary }) {
               e.preventDefault();
               add({
                 productId: product.id,
-                name: product.name,
+                name,
                 slug: product.slug,
                 image: product.images?.[0]?.url,
                 unitPrice: price,
                 currency: product.currency,
               });
-              toast.success(t('addedToCartToastTitle'), { description: product.name });
+              toast.success(t('addedToCartToastTitle'), { description: name });
             }}
             className="p-2.5 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] hover:bg-[color:var(--accent)] hover:text-white hover:border-[color:var(--accent)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             aria-label={t('addToCartAria')}
