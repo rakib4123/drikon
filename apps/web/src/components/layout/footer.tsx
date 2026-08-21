@@ -1,11 +1,14 @@
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, getLocale } from 'next-intl/server';
 import { BrandMark } from '@/components/layout/brand-mark';
 import type { BrandInfo } from '@/lib/settings';
 import type { NavCategory } from '@/lib/catalog';
+import { localize } from '@/lib/localize';
+import type { Locale } from '@/i18n/request';
 
 export async function Footer({ brand, categories = [], note }: { brand: BrandInfo; categories?: NavCategory[]; note?: string }) {
   const t = await getTranslations('nav');
+  const locale = (await getLocale()) as Locale;
   const topCats = categories.filter((c) => !c.parentId).slice(0, 5);
   return (
     <footer className="mt-24 border-t border-[color:var(--border)]">
@@ -26,7 +29,7 @@ export async function Footer({ brand, categories = [], note }: { brand: BrandInf
             {topCats.map((c) => (
               <li key={c.id}>
                 <Link href={`/products?category=${c.slug}`} className="hover:text-[color:var(--fg)]">
-                  {c.name}
+                  {localize(c.name, c.nameBn, locale)}
                 </Link>
               </li>
             ))}

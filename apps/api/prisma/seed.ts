@@ -709,11 +709,7 @@ async function main() {
   for (const p of products) {
     const rec = await prisma.product.upsert({
       where: { slug: p.data.slug! },
-      update: {
-        nameBn: p.data.nameBn,
-        descriptionBn: p.data.descriptionBn,
-        shortDescriptionBn: p.data.shortDescriptionBn,
-      },
+      update: {},
       create: p.data,
     });
     productsBySlug.set(p.data.slug!, { id: rec.id, reviewTarget: p.reviewTarget });

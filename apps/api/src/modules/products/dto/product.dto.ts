@@ -6,7 +6,7 @@ export const CreateProductSchema = z.object({
   slug: z.string().regex(/^[a-z0-9-]+$/).optional(),
   description: z.string().min(10).max(10_000),
   shortDescription: z.string().max(500).optional(),
-  nameBn: z.string().min(2).max(200).optional(),
+  nameBn: z.string().max(200).optional().or(z.literal('')),
   shortDescriptionBn: z.string().max(500).optional(),
   descriptionBn: z.string().min(10).max(10_000).optional(),
   sku: z.string().min(2).max(64),
