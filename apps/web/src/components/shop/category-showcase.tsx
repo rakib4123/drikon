@@ -88,7 +88,7 @@ export function CategoryShowcase({
         <h2 className="display text-3xl md:text-4xl">Shop by category</h2>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 auto-rows-[180px]">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-5 auto-rows-[150px] sm:auto-rows-[180px]">
         {tiles.map((tile, i) => (
           <motion.div
             key={tile.href}

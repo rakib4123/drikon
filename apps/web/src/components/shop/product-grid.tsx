@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 import type { ProductSummary } from '@drikon/shared-types';
 import { ProductCard } from './product-card';
 
-const DEFAULT_GRID = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6';
+const DEFAULT_GRID = 'grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6';
 
 /**
  * A product grid whose cards stagger-reveal as they scroll into view.

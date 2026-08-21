@@ -61,13 +61,13 @@ export default async function HomePage() {
         <HeroSlider slides={banners} />
       ) : (
       <section className="relative overflow-hidden">
-        <div className="relative z-10 max-w-3xl mx-auto px-6 pt-20 pb-16 md:pt-28 md:pb-20 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[color:var(--border)] text-xs font-medium text-[color:var(--fg-muted)] mb-8 animate-fade-up">
+        <div className="relative z-10 max-w-3xl mx-auto px-6 pt-12 pb-10 md:pt-28 md:pb-20 text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[color:var(--border)] text-xs font-medium text-[color:var(--fg-muted)] mb-6 md:mb-8 animate-fade-up">
             <Sparkles className="w-3.5 h-3.5" />
             <span>{c.heroBadge}</span>
           </div>
 
-          <h1 className="display text-5xl md:text-6xl lg:text-7xl animate-fade-up" style={{ animationDelay: '120ms' }}>
+          <h1 className="display text-4xl md:text-6xl lg:text-7xl animate-fade-up" style={{ animationDelay: '120ms' }}>
             {c.heroTitle.split('\n').map((line, i, arr) => (
               <span key={i}>
                 {line}
