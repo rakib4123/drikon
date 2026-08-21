@@ -148,6 +148,10 @@ async function main() {
         description:
           'Forged in aerospace-grade titanium. Features the A17 Pro chip, a customizable Action button, and the most powerful iPhone camera system ever.',
         shortDescription: 'Aerospace-grade titanium, A17 Pro chip, Pro camera system.',
+        nameBn: 'আইফোন ১৫ প্রো টাইটানিয়াম',
+        shortDescriptionBn: 'অ্যারোস্পেস-গ্রেড টাইটানিয়াম, A17 Pro চিপ, প্রো ক্যামেরা সিস্টেম।',
+        descriptionBn:
+          'অ্যারোস্পেস-গ্রেড টাইটানিয়ামে তৈরি। রয়েছে A17 Pro চিপ, কাস্টমাইজযোগ্য অ্যাকশন বাটন, এবং আইফোনের সবচেয়ে শক্তিশালী ক্যামেরা সিস্টেম।',
         price: new Prisma.Decimal(139990),
         compareAtPrice: new Prisma.Decimal(149990),
         stock: 42,
@@ -171,6 +175,10 @@ async function main() {
         description:
           'Welcome to the era of mobile AI. The Galaxy S24 Ultra unleashes new levels of creativity, productivity, and possibility, starting with the most important device in your life.',
         shortDescription: 'Titanium exterior, Galaxy AI, 200MP camera, built-in S Pen.',
+        nameBn: 'স্যামসাং গ্যালাক্সি S24 আল্ট্রা',
+        shortDescriptionBn: 'টাইটানিয়াম বডি, Galaxy AI, ২০০MP ক্যামেরা, বিল্ট-ইন S Pen।',
+        descriptionBn:
+          'মোবাইল AI-এর যুগে স্বাগতম। Galaxy S24 আল্ট্রা আপনার জীবনের সবচেয়ে গুরুত্বপূর্ণ ডিভাইস থেকে শুরু করে সৃজনশীলতা, উৎপাদনশীলতা এবং সম্ভাবনার নতুন মাত্রা উন্মোচন করে।',
         price: new Prisma.Decimal(154990),
         stock: 35,
         isFeatured: true,
@@ -193,6 +201,10 @@ async function main() {
         description:
           'Suit up. The Core Armor provides absolute protection with its signature shock-absorbing design and tactile grip. Keeps your device pristine in every drop.',
         shortDescription: 'Slim shock-absorbing protection, matte black finish.',
+        nameBn: 'স্পিজেন কোর আর্মার কেস',
+        shortDescriptionBn: 'স্লিম শক-অ্যাবজর্বিং প্রোটেকশন, ম্যাট ব্ল্যাক ফিনিশ।',
+        descriptionBn:
+          'প্রস্তুত হোন। কোর আর্মার এর সিগনেচার শক-অ্যাবজর্বিং ডিজাইন ও টাচাইল গ্রিপ দিয়ে সম্পূর্ণ সুরক্ষা দেয়। প্রতিটি পড়ে যাওয়াতেও আপনার ডিভাইস রাখে অক্ষত।',
         price: new Prisma.Decimal(2490),
         stock: 120,
         isFeatured: false,
@@ -214,6 +226,10 @@ async function main() {
         description:
           'Qi2-certified 15W ultra-fast wireless charging. With a 10,000mAh capacity, it secures perfectly to your MagSafe-compatible iPhone for a full recharge on the go.',
         shortDescription: 'Qi2 15W wireless, 10000mAh capacity, MagSafe compatible.',
+        nameBn: 'অ্যাংকার ম্যাগগো পাওয়ার ব্যাংক (১০K)',
+        shortDescriptionBn: 'Qi2 15W ওয়্যারলেস, ১০০০০mAh ক্যাপাসিটি, ম্যাগসেফ কম্প্যাটিবল।',
+        descriptionBn:
+          'Qi2-সার্টিফায়েড 15W আল্ট্রা-ফাস্ট ওয়্যারলেস চার্জিং। ১০,০০০mAh ক্যাপাসিটি নিয়ে এটি আপনার ম্যাগসেফ-কম্প্যাটিবল আইফোনের সাথে নিখুঁতভাবে আটকে পূর্ণ রিচার্জ দেয়, যেখানেই থাকুন।',
         price: new Prisma.Decimal(6490),
         compareAtPrice: new Prisma.Decimal(7990),
         stock: 85,
@@ -237,6 +253,10 @@ async function main() {
         description:
           'The most helpful Pixel yet. With Google AI built in, a Pro-level camera system, and a stunning Super Actua display, Pixel 8 Pro helps you get more done.',
         shortDescription: 'Google AI built in, Pro camera system, Super Actua display.',
+        nameBn: 'গুগল পিক্সেল ৮ প্রো',
+        shortDescriptionBn: 'বিল্ট-ইন Google AI, প্রো ক্যামেরা সিস্টেম, Super Actua ডিসপ্লে।',
+        descriptionBn:
+          'সবচেয়ে সহায়ক পিক্সেল এখন পর্যন্ত। বিল্ট-ইন Google AI, প্রো-লেভেল ক্যামেরা সিস্টেম এবং অসাধারণ Super Actua ডিসপ্লে নিয়ে, Pixel 8 Pro আপনাকে আরও বেশি কাজ সম্পন্ন করতে সাহায্য করে।',
         price: new Prisma.Decimal(114990),
         stock: 28,
         isFeatured: false,
@@ -255,6 +275,10 @@ async function main() {
         description:
           'Co-engineered with Leica. A quad-camera system built for professional photography, wrapped in a design that feels as premium as it performs.',
         shortDescription: 'Leica co-engineered quad camera, flagship performance.',
+        nameBn: 'শাওমি ১৪ আল্ট্রা',
+        shortDescriptionBn: 'Leica-এর সাথে কো-ইঞ্জিনিয়ার্ড কোয়াড ক্যামেরা, ফ্ল্যাগশিপ পারফরম্যান্স।',
+        descriptionBn:
+          'Leica-এর সাথে যৌথভাবে ইঞ্জিনিয়ার্ড। পেশাদার ফটোগ্রাফির জন্য তৈরি একটি কোয়াড-ক্যামেরা সিস্টেম, যা যতটা প্রিমিয়াম দেখায় ততটাই পারফর্ম করে।',
         price: new Prisma.Decimal(124990),
         stock: 22,
         isFeatured: false,
@@ -273,6 +297,10 @@ async function main() {
         description:
           'Awesome is for everyone. The Galaxy A55 brings a sleek metal frame, a bright display, and a versatile camera to the mid-range lineup.',
         shortDescription: 'Metal frame, bright display, versatile everyday camera.',
+        nameBn: 'স্যামসাং গ্যালাক্সি A55',
+        shortDescriptionBn: 'মেটাল ফ্রেম, উজ্জ্বল ডিসপ্লে, বহুমুখী প্রতিদিনের ক্যামেরা।',
+        descriptionBn:
+          'সবার জন্য অসাধারণ। Galaxy A55 মিড-রেঞ্জ লাইনআপে নিয়ে আসে একটি স্লিক মেটাল ফ্রেম, উজ্জ্বল ডিসপ্লে এবং বহুমুখী ক্যামেরা।',
         price: new Prisma.Decimal(42990),
         stock: 60,
         isFeatured: false,
@@ -291,6 +319,10 @@ async function main() {
         description:
           'The most affordable way into iPhone. Compact, powerful, and ready for anything with a chip that keeps it fast for years to come.',
         shortDescription: 'Compact design, powerful chip, affordable entry to iPhone.',
+        nameBn: 'আইফোন SE',
+        shortDescriptionBn: 'কমপ্যাক্ট ডিজাইন, শক্তিশালী চিপ, আইফোনে সাশ্রয়ী প্রবেশ।',
+        descriptionBn:
+          'আইফোনে প্রবেশের সবচেয়ে সাশ্রয়ী উপায়। কমপ্যাক্ট, শক্তিশালী, এবং এমন একটি চিপ নিয়ে প্রস্তুত যা বছরের পর বছর ধরে এটিকে দ্রুত রাখে।',
         price: new Prisma.Decimal(49990),
         stock: 45,
         isFeatured: false,
@@ -310,6 +342,10 @@ async function main() {
         description:
           '9H hardness tempered glass with an easy-install tray for a perfectly centered, bubble-free application every time. Case-friendly edges.',
         shortDescription: '9H hardness, bubble-free install tray, case-friendly fit.',
+        nameBn: 'স্পিজেন টেম্পারড গ্লাস স্ক্রিন প্রোটেক্টর',
+        shortDescriptionBn: '9H হার্ডনেস, বাবল-ফ্রি ইনস্টল ট্রে, কেস-ফ্রেন্ডলি ফিট।',
+        descriptionBn:
+          '9H হার্ডনেসের টেম্পারড গ্লাস, সাথে একটি সহজ-ইনস্টল ট্রে যা প্রতিবার নিখুঁতভাবে কেন্দ্রীভূত, বাবল-ফ্রি প্রয়োগ নিশ্চিত করে। কেস-ফ্রেন্ডলি প্রান্ত।',
         price: new Prisma.Decimal(990),
         stock: 200,
         isFeatured: false,
@@ -327,6 +363,10 @@ async function main() {
         description:
           'A slim case with a built-in MagSafe-compatible card holder that snaps on and off securely. Carry your cards without carrying a separate wallet.',
         shortDescription: 'Built-in MagSafe card holder, slim protective shell.',
+        nameBn: 'অ্যাংকার ম্যাগসেফ ওয়ালেট কেস',
+        shortDescriptionBn: 'বিল্ট-ইন ম্যাগসেফ কার্ড হোল্ডার, স্লিম প্রোটেক্টিভ শেল।',
+        descriptionBn:
+          'একটি স্লিম কেস যাতে বিল্ট-ইন ম্যাগসেফ-কম্প্যাটিবল কার্ড হোল্ডার রয়েছে, যা নিরাপদে আটকে যায় ও খোলা যায়। আলাদা ওয়ালেট ছাড়াই আপনার কার্ড বহন করুন।',
         price: new Prisma.Decimal(3290),
         stock: 70,
         isFeatured: false,
@@ -344,6 +384,10 @@ async function main() {
         description:
           'Dual-layer protection with a kickstand built in. Slim enough for everyday carry, tough enough for the days things don’t go as planned.',
         shortDescription: 'Dual-layer protection with a built-in kickstand.',
+        nameBn: 'স্পিজেন স্লিম আর্মার কেস',
+        shortDescriptionBn: 'বিল্ট-ইন কিকস্ট্যান্ডসহ ডুয়াল-লেয়ার প্রোটেকশন।',
+        descriptionBn:
+          'বিল্ট-ইন কিকস্ট্যান্ডসহ ডুয়াল-লেয়ার প্রোটেকশন। প্রতিদিনের বহনের জন্য যথেষ্ট স্লিম, আবার পরিস্থিতি প্রতিকূল হলেও যথেষ্ট টেকসই।',
         price: new Prisma.Decimal(2790),
         stock: 90,
         isFeatured: false,
@@ -361,6 +405,10 @@ async function main() {
         description:
           'Show off your phone’s original design with a soft-touch clear case that resists yellowing and adds just enough grip and drop protection.',
         shortDescription: 'Yellow-resistant clear silicone, soft-touch grip.',
+        nameBn: 'ক্লিয়ার সিলিকন কেস',
+        shortDescriptionBn: 'হলুদ-প্রতিরোধী ক্লিয়ার সিলিকন, সফট-টাচ গ্রিপ।',
+        descriptionBn:
+          'একটি সফট-টাচ ক্লিয়ার কেস দিয়ে আপনার ফোনের আসল ডিজাইন প্রদর্শন করুন, যা হলুদ হওয়া প্রতিরোধ করে এবং পর্যাপ্ত গ্রিপ ও ড্রপ প্রোটেকশন যোগ করে।',
         price: new Prisma.Decimal(1290),
         stock: 150,
         isFeatured: false,
@@ -379,6 +427,10 @@ async function main() {
         description:
           'Charge a laptop and two phones at once from a charger smaller than your palm. GaN II technology packs 65W into a compact, cool-running shell.',
         shortDescription: 'Compact 65W GaN charger, 3 ports, laptop-capable.',
+        nameBn: 'অ্যাংকার ৬৫W GaN চার্জার',
+        shortDescriptionBn: 'কমপ্যাক্ট 65W GaN চার্জার, ৩টি পোর্ট, ল্যাপটপ-সক্ষম।',
+        descriptionBn:
+          'একটি ল্যাপটপ এবং দুটি ফোন একসাথে চার্জ করুন, এমন একটি চার্জার দিয়ে যা আপনার হাতের তালুর চেয়েও ছোট। GaN II প্রযুক্তি একটি কমপ্যাক্ট, ঠাণ্ডা-চলমান শেলে 65W প্যাক করে।',
         price: new Prisma.Decimal(3990),
         stock: 110,
         isFeatured: true,
@@ -396,6 +448,10 @@ async function main() {
         description:
           'Double the capacity of the 10K for road trips and long days out. Qi2-certified 15W wireless charging, plus a USB-C port for wired top-ups.',
         shortDescription: 'Qi2 15W wireless, 20000mAh capacity, USB-C port.',
+        nameBn: 'অ্যাংকার ম্যাগগো পাওয়ার ব্যাংক (২০K)',
+        shortDescriptionBn: 'Qi2 15W ওয়্যারলেস, ২০০০০mAh ক্যাপাসিটি, USB-C পোর্ট।',
+        descriptionBn:
+          'রোড ট্রিপ ও দীর্ঘ দিনের জন্য 10K-এর দ্বিগুণ ক্যাপাসিটি। Qi2-সার্টিফায়েড 15W ওয়্যারলেস চার্জিং, সাথে ওয়্যার্ড টপ-আপের জন্য একটি USB-C পোর্ট।',
         price: new Prisma.Decimal(9990),
         compareAtPrice: new Prisma.Decimal(11990),
         stock: 55,
@@ -414,6 +470,10 @@ async function main() {
         description:
           'Braided nylon USB-C to USB-C cables rated for 100W and 10,000+ bend life. One for the desk, one for the bag, one for the car.',
         shortDescription: 'Braided nylon, 100W rated, 3 cables per pack.',
+        nameBn: 'অ্যাংকার USB-C কেবল (৩-প্যাক)',
+        shortDescriptionBn: 'ব্রেইডেড নাইলন, 100W রেটেড, প্যাকে ৩টি কেবল।',
+        descriptionBn:
+          'ব্রেইডেড নাইলন USB-C থেকে USB-C কেবল, 100W এবং ১০,০০০+ বাঁক-সহনশীলতার জন্য রেট করা। একটি ডেস্কের জন্য, একটি ব্যাগের জন্য, একটি গাড়ির জন্য।',
         price: new Prisma.Decimal(1690),
         stock: 130,
         isFeatured: false,
@@ -431,6 +491,10 @@ async function main() {
         description:
           'A compact, efficient power adapter that fast-charges your iPhone and works great with any USB-C device. No cable included.',
         shortDescription: 'Compact 20W USB-C fast-charging power adapter.',
+        nameBn: 'অ্যাপল ২০W USB-C পাওয়ার অ্যাডাপ্টার',
+        shortDescriptionBn: 'কমপ্যাক্ট 20W USB-C ফাস্ট-চার্জিং পাওয়ার অ্যাডাপ্টার।',
+        descriptionBn:
+          'একটি কমপ্যাক্ট, কার্যকর পাওয়ার অ্যাডাপ্টার যা আপনার আইফোন দ্রুত চার্জ করে এবং যেকোনো USB-C ডিভাইসের সাথে দারুণভাবে কাজ করে। কেবল অন্তর্ভুক্ত নয়।',
         price: new Prisma.Decimal(2490),
         stock: 95,
         isFeatured: false,
@@ -449,6 +513,10 @@ async function main() {
         description:
           'Pure JBL sound wireless. Up to 40 hours of battery life on a single charge means the music keeps going long after everything else stops.',
         shortDescription: 'Wireless over-ear, 40-hour battery, JBL Pure Bass sound.',
+        nameBn: 'জেবিএল টিউন ৫১০BT',
+        shortDescriptionBn: 'ওয়্যারলেস ওভার-ইয়ার, ৪০-ঘণ্টা ব্যাটারি, JBL Pure Bass সাউন্ড।',
+        descriptionBn:
+          'বিশুদ্ধ JBL সাউন্ড, ওয়্যারলেসে। একবার চার্জে ৪০ ঘণ্টা পর্যন্ত ব্যাটারি লাইফ মানে বাকি সবকিছু থেমে যাওয়ার অনেক পরেও গান চলতে থাকে।',
         price: new Prisma.Decimal(3990),
         stock: 75,
         isFeatured: false,
@@ -466,6 +534,10 @@ async function main() {
         description:
           'Industry-leading noise cancellation meets exceptional sound quality. Two processors and eight microphones work together to filter out the world.',
         shortDescription: 'Industry-leading ANC, all-day comfort, premium sound.',
+        nameBn: 'সনি WH-1000XM5',
+        shortDescriptionBn: 'ইন্ডাস্ট্রি-লিডিং ANC, সারাদিনের আরাম, প্রিমিয়াম সাউন্ড।',
+        descriptionBn:
+          'ইন্ডাস্ট্রি-লিডিং নয়েজ ক্যান্সেলেশন এবং অসাধারণ সাউন্ড কোয়ালিটির মিশ্রণ। দুটি প্রসেসর ও আটটি মাইক্রোফোন একসাথে কাজ করে বাইরের জগৎ থেকে আপনাকে আলাদা করে।',
         price: new Prisma.Decimal(34990),
         compareAtPrice: new Prisma.Decimal(39990),
         stock: 40,
@@ -489,6 +561,10 @@ async function main() {
         description:
           'Adaptive Audio, richer sound, and up to 2x more Active Noise Cancellation. Personalized to your ear for a seal that’s comfortable and secure.',
         shortDescription: 'Adaptive Audio, 2x ANC, personalized fit.',
+        nameBn: 'অ্যাপল এয়ারপডস প্রো (২য় প্রজন্ম)',
+        shortDescriptionBn: 'Adaptive Audio, 2x ANC, ব্যক্তিগতকৃত ফিট।',
+        descriptionBn:
+          'Adaptive Audio, সমৃদ্ধ সাউন্ড, এবং ২ গুণ বেশি Active Noise Cancellation। আপনার কানের জন্য ব্যক্তিগতকৃত, আরামদায়ক ও নিরাপদ ফিটের জন্য।',
         price: new Prisma.Decimal(29990),
         stock: 50,
         isFeatured: true,
@@ -506,6 +582,10 @@ async function main() {
         description:
           'Bold JBL Original Pro Sound in a rugged, IP67 waterproof and dustproof body. Toss it in a bag, take it anywhere, turn it up.',
         shortDescription: 'IP67 waterproof, bold sound, portable design.',
+        nameBn: 'জেবিএল ফ্লিপ ৬ স্পিকার',
+        shortDescriptionBn: 'IP67 ওয়াটারপ্রুফ, বোল্ড সাউন্ড, পোর্টেবল ডিজাইন।',
+        descriptionBn:
+          'একটি রাগেড, IP67 ওয়াটারপ্রুফ ও ডাস্টপ্রুফ বডিতে বোল্ড JBL Original Pro Sound। ব্যাগে ভরুন, যেকোনো জায়গায় নিয়ে যান, ভলিউম বাড়িয়ে দিন।',
         price: new Prisma.Decimal(11990),
         stock: 45,
         isFeatured: false,
@@ -523,6 +603,10 @@ async function main() {
         description:
           'Compact noise-cancelling earbuds that don’t compromise on sound. Lightweight comfort for all-day listening, indoors or out.',
         shortDescription: 'Compact ANC earbuds, lightweight, all-day comfort.',
+        nameBn: 'সনি WF-C700N ইয়ারবাডস',
+        shortDescriptionBn: 'কমপ্যাক্ট ANC ইয়ারবাডস, হালকা, সারাদিনের আরাম।',
+        descriptionBn:
+          'কমপ্যাক্ট নয়েজ-ক্যান্সেলিং ইয়ারবাডস যা সাউন্ডে কোনো আপস করে না। সারাদিন শোনার জন্য হালকা আরাম, ঘরে বা বাইরে।',
         price: new Prisma.Decimal(8990),
         stock: 65,
         isFeatured: false,
@@ -541,6 +625,10 @@ async function main() {
         description:
           'A magical new way to use your Apple Watch without touching the screen, a brighter display, and our most powerful chip yet.',
         shortDescription: 'Double Tap gesture, brighter display, S9 chip.',
+        nameBn: 'অ্যাপল ওয়াচ সিরিজ ৯',
+        shortDescriptionBn: 'Double Tap জেসচার, উজ্জ্বল ডিসপ্লে, S9 চিপ।',
+        descriptionBn:
+          'স্ক্রিন স্পর্শ না করেই আপনার অ্যাপল ওয়াচ ব্যবহারের এক জাদুকরী নতুন উপায়, একটি উজ্জ্বল ডিসপ্লে, এবং এখন পর্যন্ত আমাদের সবচেয়ে শক্তিশালী চিপ।',
         price: new Prisma.Decimal(44990),
         stock: 38,
         isFeatured: true,
@@ -559,6 +647,10 @@ async function main() {
         description:
           'A sleeker design with a bigger screen and a rotating bezel-inspired touch experience. Detailed sleep coaching helps you rest better.',
         shortDescription: 'Bigger screen, sleep coaching, comfortable all-day fit.',
+        nameBn: 'স্যামসাং গ্যালাক্সি ওয়াচ ৬',
+        shortDescriptionBn: 'বড় স্ক্রিন, স্লিপ কোচিং, আরামদায়ক সারাদিনের ফিট।',
+        descriptionBn:
+          'বড় স্ক্রিন এবং রোটেটিং বেজেল-অনুপ্রাণিত টাচ অভিজ্ঞতাসহ আরও স্লিক ডিজাইন। বিস্তারিত স্লিপ কোচিং আপনাকে ভালো ঘুমাতে সাহায্য করে।',
         price: new Prisma.Decimal(32990),
         stock: 42,
         isFeatured: false,
@@ -577,6 +669,10 @@ async function main() {
         description:
           'A slim, lightweight tracker with a vivid AMOLED display, 150+ workout modes, and up to 16 days of battery life on a single charge.',
         shortDescription: 'AMOLED display, 150+ workout modes, 16-day battery.',
+        nameBn: 'শাওমি স্মার্ট ব্যান্ড ৮',
+        shortDescriptionBn: 'AMOLED ডিসপ্লে, ১৫০+ ওয়ার্কআউট মোড, ১৬-দিনের ব্যাটারি।',
+        descriptionBn:
+          'একটি স্লিম, হালকা ট্র্যাকার যাতে রয়েছে উজ্জ্বল AMOLED ডিসপ্লে, ১৫০+ ওয়ার্কআউট মোড, এবং একবার চার্জে ১৬ দিন পর্যন্ত ব্যাটারি লাইফ।',
         price: new Prisma.Decimal(4490),
         stock: 100,
         isFeatured: false,
@@ -594,6 +690,10 @@ async function main() {
         description:
           'Helpful insights, all day battery, and Fitbit’s most advanced health features yet, wrapped in a beautifully domed design.',
         shortDescription: 'Fitbit health features, all-day battery, domed design.',
+        nameBn: 'গুগল পিক্সেল ওয়াচ ২',
+        shortDescriptionBn: 'Fitbit স্বাস্থ্য ফিচার, সারাদিনের ব্যাটারি, ডোমড ডিজাইন।',
+        descriptionBn:
+          'সহায়ক ইনসাইট, সারাদিনের ব্যাটারি, এবং Fitbit-এর এখন পর্যন্ত সবচেয়ে উন্নত স্বাস্থ্য ফিচার, একটি সুন্দর ডোমড ডিজাইনে মোড়ানো।',
         price: new Prisma.Decimal(38990),
         stock: 30,
         isFeatured: false,
@@ -609,7 +709,11 @@ async function main() {
   for (const p of products) {
     const rec = await prisma.product.upsert({
       where: { slug: p.data.slug! },
-      update: {},
+      update: {
+        nameBn: p.data.nameBn,
+        descriptionBn: p.data.descriptionBn,
+        shortDescriptionBn: p.data.shortDescriptionBn,
+      },
       create: p.data,
     });
     productsBySlug.set(p.data.slug!, { id: rec.id, reviewTarget: p.reviewTarget });
