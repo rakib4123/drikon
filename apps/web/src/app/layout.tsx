@@ -3,7 +3,6 @@ import '../styles/globals.css';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import { Providers } from '@/components/layout/providers';
-import { ScrollProgress } from '@/components/layout/scroll-progress';
 import { TopBar } from '@/components/layout/top-bar';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
@@ -62,7 +61,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className="min-h-screen flex flex-col">
         {accentCss && <style dangerouslySetInnerHTML={{ __html: accentCss }} />}
-        <ScrollProgress />
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-[color:var(--accent)] focus:text-white focus:font-medium"
