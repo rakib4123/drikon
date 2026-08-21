@@ -258,7 +258,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
               <AddToCart
                 product={{
                   id: product.id,
-                  name: product.name,
+                  name,
                   slug: product.slug,
                   image: product.images?.[0]?.url,
                   price,
@@ -269,7 +269,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
             </div>
             <WishlistButton
               productId={product.id}
-              productName={product.name}
+              productName={name}
               variant="inline"
               className="self-start"
             />
@@ -330,7 +330,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
       )}
 
       {/* Reviews */}
-      <ProductReviews productId={product.id} productName={product.name} />
+      <ProductReviews productId={product.id} productName={name} />
 
       {/* Related */}
       {related.length > 0 && (
