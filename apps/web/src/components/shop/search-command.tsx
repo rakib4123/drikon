@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Search, X, Loader2, CornerDownLeft, Mic, MicOff, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLocale, useTranslations } from 'next-intl';
@@ -30,6 +30,7 @@ export function SearchCommand() {
   const router = useRouter();
   const t = useTranslations('search');
   const locale = useLocale() as Locale;
+  const reduceMotion = useReducedMotion();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ProductSummary[]>([]);
@@ -294,23 +295,43 @@ export function SearchCommand() {
                   className="flex-1 bg-transparent py-4 text-[15px] outline-none placeholder:text-[color:var(--fg-muted)]"
                 />
                 {speechSupported && (
-                  <button
-                    type="button"
-                    onClick={handleMicClick}
-                    aria-label={micBlocked ? t('micBlocked') : listening ? t('stopVoiceSearch') : t('searchByVoice')}
-                    aria-pressed={listening}
-                    title={micBlocked ? t('micBlocked') : undefined}
-                    className={cn(
-                      'p-1.5 rounded-md transition-colors',
-                      micBlocked
-                        ? 'text-red-500 hover:bg-red-500/10'
-                        : listening
-                          ? 'text-[color:var(--accent)] bg-[color:var(--bg-soft)] animate-pulse'
-                          : 'text-[color:var(--fg-muted)] hover:bg-[color:var(--bg-soft)]',
-                    )}
-                  >
-                    {micBlocked ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                  </button>
+                  <div className="relative">
+                    <AnimatePresence>
+                      {listening && (
+                        <motion.div
+                          role="status"
+                          initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
+                          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                          className="absolute bottom-full right-0 mb-2 flex items-center gap-1.5 whitespace-nowrap rounded-full bg-[color:var(--fg)] px-3 py-1.5 text-xs font-medium text-[color:var(--bg)] shadow-lg"
+                        >
+                          <span className="relative flex h-2 w-2">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+                            <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
+                          </span>
+                          {t('listeningHint')}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                    <button
+                      type="button"
+                      onClick={handleMicClick}
+                      aria-label={micBlocked ? t('micBlocked') : listening ? t('stopVoiceSearch') : t('searchByVoice')}
+                      aria-pressed={listening}
+                      title={micBlocked ? t('micBlocked') : undefined}
+                      className={cn(
+                        'p-1.5 rounded-md transition-colors',
+                        micBlocked
+                          ? 'text-red-500 hover:bg-red-500/10'
+                          : listening
+                            ? 'text-[color:var(--accent)] bg-[color:var(--bg-soft)] animate-pulse'
+                            : 'text-[color:var(--fg-muted)] hover:bg-[color:var(--bg-soft)]',
+                      )}
+                    >
+                      {micBlocked ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                    </button>
+                  </div>
                 )}
                 <button
                   type="button"
