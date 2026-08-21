@@ -161,9 +161,12 @@ export class ProductsService {
       return await this.products.create({
         data: {
           name: dto.name,
+          nameBn: dto.nameBn,
           slug,
           description: dto.description,
+          descriptionBn: dto.descriptionBn,
           shortDescription: dto.shortDescription,
+          shortDescriptionBn: dto.shortDescriptionBn,
           sku: dto.sku,
           price: new Prisma.Decimal(dto.price),
           compareAtPrice: dto.compareAtPrice ? new Prisma.Decimal(dto.compareAtPrice) : null,
