@@ -295,43 +295,23 @@ export function SearchCommand() {
                   className="flex-1 bg-transparent py-4 text-[15px] outline-none placeholder:text-[color:var(--fg-muted)]"
                 />
                 {speechSupported && (
-                  <div className="relative">
-                    <AnimatePresence>
-                      {listening && (
-                        <motion.div
-                          role="status"
-                          initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
-                          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                          className="absolute bottom-full right-0 mb-2 flex items-center gap-1.5 whitespace-nowrap rounded-full bg-[color:var(--fg)] px-3 py-1.5 text-xs font-medium text-[color:var(--bg)] shadow-lg"
-                        >
-                          <span className="relative flex h-2 w-2">
-                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
-                            <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
-                          </span>
-                          {t('listeningHint')}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                    <button
-                      type="button"
-                      onClick={handleMicClick}
-                      aria-label={micBlocked ? t('micBlocked') : listening ? t('stopVoiceSearch') : t('searchByVoice')}
-                      aria-pressed={listening}
-                      title={micBlocked ? t('micBlocked') : undefined}
-                      className={cn(
-                        'p-1.5 rounded-md transition-colors',
-                        micBlocked
-                          ? 'text-red-500 hover:bg-red-500/10'
-                          : listening
-                            ? 'text-[color:var(--accent)] bg-[color:var(--bg-soft)] animate-pulse'
-                            : 'text-[color:var(--fg-muted)] hover:bg-[color:var(--bg-soft)]',
-                      )}
-                    >
-                      {micBlocked ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={handleMicClick}
+                    aria-label={micBlocked ? t('micBlocked') : listening ? t('stopVoiceSearch') : t('searchByVoice')}
+                    aria-pressed={listening}
+                    title={micBlocked ? t('micBlocked') : undefined}
+                    className={cn(
+                      'p-1.5 rounded-md transition-colors',
+                      micBlocked
+                        ? 'text-red-500 hover:bg-red-500/10'
+                        : listening
+                          ? 'text-[color:var(--accent)] bg-[color:var(--bg-soft)] animate-pulse'
+                          : 'text-[color:var(--fg-muted)] hover:bg-[color:var(--bg-soft)]',
+                    )}
+                  >
+                    {micBlocked ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                  </button>
                 )}
                 <button
                   type="button"
@@ -344,7 +324,21 @@ export function SearchCommand() {
               </div>
 
               <div className="max-h-[50vh] overflow-y-auto">
-                {voiceConfirm ? (
+                {listening ? (
+                  <motion.p
+                    role="status"
+                    initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                    className="px-4 py-8 flex items-center justify-center gap-2 text-sm text-[color:var(--fg-muted)]"
+                  >
+                    <span className="relative flex h-2 w-2 shrink-0">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
+                    </span>
+                    {t('listeningHint')}
+                  </motion.p>
+                ) : voiceConfirm ? (
                   <div className="px-4 py-6">
                     <p className="text-xs text-[color:var(--fg-muted)] mb-3">{t('didYouMean')}</p>
                     <div className="flex items-center gap-3 p-3 rounded-xl border border-[color:var(--border)] mb-4">
