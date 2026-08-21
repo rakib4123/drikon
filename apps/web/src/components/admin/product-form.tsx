@@ -14,9 +14,12 @@ interface Option {
 
 interface ProductFormState {
   name: string;
+  nameBn: string;
   slug: string;
   description: string;
+  descriptionBn: string;
   shortDescription: string;
+  shortDescriptionBn: string;
   sku: string;
   price: string;
   compareAtPrice: string;
@@ -51,6 +54,9 @@ interface ProductPayload {
   categoryId: string;
   slug?: string;
   shortDescription?: string;
+  nameBn?: string;
+  descriptionBn?: string;
+  shortDescriptionBn?: string;
   compareAtPrice?: number;
   brandId?: string;
   videoUrl?: string;
@@ -59,9 +65,12 @@ interface ProductPayload {
 
 const emptyState: ProductFormState = {
   name: '',
+  nameBn: '',
   slug: '',
   description: '',
+  descriptionBn: '',
   shortDescription: '',
+  shortDescriptionBn: '',
   sku: '',
   price: '',
   compareAtPrice: '',
@@ -80,6 +89,7 @@ const emptyState: ProductFormState = {
 export function ProductForm({ mode, productId, initial }: ProductFormProps) {
   const router = useRouter();
   const [state, setState] = useState<ProductFormState>({ ...emptyState, ...initial });
+  const [lang, setLang] = useState<'en' | 'bn'>('en');
   const [categories, setCategories] = useState<Option[]>([]);
   const [brands, setBrands] = useState<Option[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -128,6 +138,9 @@ export function ProductForm({ mode, productId, initial }: ProductFormProps) {
 
       if (state.slug.trim()) payload.slug = state.slug.trim();
       if (state.shortDescription.trim()) payload.shortDescription = state.shortDescription.trim();
+      if (state.nameBn.trim()) payload.nameBn = state.nameBn.trim();
+      if (state.descriptionBn.trim()) payload.descriptionBn = state.descriptionBn.trim();
+      if (state.shortDescriptionBn.trim()) payload.shortDescriptionBn = state.shortDescriptionBn.trim();
       if (state.compareAtPrice.trim()) payload.compareAtPrice = parseFloat(state.compareAtPrice);
       if (state.brandId) payload.brandId = state.brandId;
       payload.videoUrl = state.videoUrl.trim();
@@ -167,16 +180,44 @@ export function ProductForm({ mode, productId, initial }: ProductFormProps) {
 
   return (
     <form onSubmit={onSubmit} className="space-y-6 max-w-3xl">
+      <div className="flex gap-2 border-b border-[color:var(--border)] pb-3">
+        <button
+          type="button"
+          onClick={() => setLang('en')}
+          className={`px-3 py-1.5 rounded-lg text-sm font-medium ${lang === 'en' ? 'bg-[color:var(--accent)] text-white' : 'text-[color:var(--fg-muted)] hover:bg-[color:var(--bg-soft)]'}`}
+        >
+          English
+        </button>
+        <button
+          type="button"
+          onClick={() => setLang('bn')}
+          className={`px-3 py-1.5 rounded-lg text-sm font-medium ${lang === 'bn' ? 'bg-[color:var(--accent)] text-white' : 'text-[color:var(--fg-muted)] hover:bg-[color:var(--bg-soft)]'}`}
+        >
+          বাংলা
+        </button>
+      </div>
+
       <div className="grid sm:grid-cols-2 gap-5">
-        <Field label="Name" required>
-          <input
-            type="text"
-            value={state.name}
-            onChange={(e) => update('name', e.target.value)}
-            required
-            className="input"
-          />
-        </Field>
+        {lang === 'en' ? (
+          <Field label="Name" required>
+            <input
+              type="text"
+              value={state.name}
+              onChange={(e) => update('name', e.target.value)}
+              required
+              className="input"
+            />
+          </Field>
+        ) : (
+          <Field label="নাম (বাংলা)">
+            <input
+              type="text"
+              value={state.nameBn}
+              onChange={(e) => update('nameBn', e.target.value)}
+              className="input"
+            />
+          </Field>
+        )}
         <Field label="Slug (optional — auto-generated)">
           <input
             type="text"
@@ -198,26 +239,49 @@ export function ProductForm({ mode, productId, initial }: ProductFormProps) {
         />
       </Field>
 
-      <Field label="Short description (max 500 chars)">
-        <input
-          type="text"
-          maxLength={500}
-          value={state.shortDescription}
-          onChange={(e) => update('shortDescription', e.target.value)}
-          className="input"
-        />
-      </Field>
+      {lang === 'en' ? (
+        <Field label="Short description (max 500 chars)">
+          <input
+            type="text"
+            maxLength={500}
+            value={state.shortDescription}
+            onChange={(e) => update('shortDescription', e.target.value)}
+            className="input"
+          />
+        </Field>
+      ) : (
+        <Field label="সংক্ষিপ্ত বিবরণ (বাংলা)">
+          <input
+            type="text"
+            maxLength={500}
+            value={state.shortDescriptionBn}
+            onChange={(e) => update('shortDescriptionBn', e.target.value)}
+            className="input"
+          />
+        </Field>
+      )}
 
-      <Field label="Full description" required>
-        <textarea
-          rows={5}
-          value={state.description}
-          onChange={(e) => update('description', e.target.value)}
-          required
-          minLength={10}
-          className="input resize-y"
-        />
-      </Field>
+      {lang === 'en' ? (
+        <Field label="Full description" required>
+          <textarea
+            rows={5}
+            value={state.description}
+            onChange={(e) => update('description', e.target.value)}
+            required
+            minLength={10}
+            className="input resize-y"
+          />
+        </Field>
+      ) : (
+        <Field label="সম্পূর্ণ বিবরণ (বাংলা)">
+          <textarea
+            rows={5}
+            value={state.descriptionBn}
+            onChange={(e) => update('descriptionBn', e.target.value)}
+            className="input resize-y"
+          />
+        </Field>
+      )}
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Field label="Price (BDT)" required>

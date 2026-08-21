@@ -12,9 +12,12 @@ interface PageProps {
 
 interface AdminProductDetail {
   name: string;
+  nameBn?: string | null;
   slug: string;
   description: string;
+  descriptionBn?: string | null;
   shortDescription?: string | null;
+  shortDescriptionBn?: string | null;
   sku: string;
   price: string | number;
   compareAtPrice?: string | number | null;
@@ -76,9 +79,12 @@ export default function AdminProductEditPage({ params }: PageProps) {
         productId={id}
         initial={{
           name: product.name,
+          nameBn: product.nameBn ?? '',
           slug: product.slug,
           description: product.description,
+          descriptionBn: product.descriptionBn ?? '',
           shortDescription: product.shortDescription ?? '',
+          shortDescriptionBn: product.shortDescriptionBn ?? '',
           sku: product.sku,
           price: String(product.price),
           compareAtPrice: product.compareAtPrice ? String(product.compareAtPrice) : '',
