@@ -24,6 +24,8 @@ const SPEECH_ERROR_MESSAGES: Record<string, string> = {
   'no-speech': "Didn't catch that — try again.",
   'audio-capture': 'No microphone found.',
   network: 'Voice search needs an internet connection.',
+  'language-not-supported':
+    "Your phone doesn't have speech recognition installed for this language. On Android, open the Google app → Settings → Voice → Languages and download it, or type your search instead.",
 };
 
 export function SearchCommand() {
@@ -200,7 +202,12 @@ export function SearchCommand() {
 
     setVoiceConfirm(null);
     const recognition = new SpeechRecognitionCtor();
-    recognition.lang = 'en-US';
+    // Match the phone/browser's installed speech-recognition language to the
+    // site locale — requesting 'en-US' on a device only set up for Bengali
+    // recognition throws 'language-not-supported' before the mic permission
+    // prompt ever appears. The search API already matches nameBn/descriptionBn,
+    // so a Bangla transcript still finds the right products.
+    recognition.lang = locale === 'bn' ? 'bn-BD' : 'en-US';
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
     recognition.onresult = (e) => {
@@ -210,8 +217,9 @@ export function SearchCommand() {
     recognition.onerror = (e) => {
       setListening(false);
       if (e.error === 'not-allowed') setMicBlocked(true);
-      const message = SPEECH_ERROR_MESSAGES[e.error] ?? 'Voice search failed. Please try again.';
-      const longMessage = e.error === 'not-allowed' || e.error === 'service-not-allowed';
+      if (e.error === 'aborted') return; // user-initiated stop, not a failure
+      const message = SPEECH_ERROR_MESSAGES[e.error] ?? `Voice search failed (${e.error}). Please try again.`;
+      const longMessage = e.error === 'not-allowed' || e.error === 'service-not-allowed' || e.error === 'language-not-supported';
       toast.error(message, { duration: longMessage ? 10000 : 4000 });
     };
     recognition.onend = () => setListening(false);
@@ -219,7 +227,7 @@ export function SearchCommand() {
     recognitionRef.current = recognition;
     setListening(true);
     recognition.start();
-  }, [handleVoiceTranscript]);
+  }, [handleVoiceTranscript, locale]);
 
   const stopListening = useCallback(() => {
     recognitionRef.current?.stop();
