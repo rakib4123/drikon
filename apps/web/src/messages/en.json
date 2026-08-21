@@ -42,6 +42,7 @@
   "home": {
     "featuredDevices": "Featured devices",
     "trendingDevices": "Trending devices",
+    "shopPrefix": "Shop",
     "shopAll": "Shop all",
     "noFeaturedYet": "No featured devices yet.",
     "markFeaturedHint": "Mark products as featured in the admin to show them here.",
