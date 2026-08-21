@@ -1,74 +1,63 @@
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { getSettings } from '@/lib/settings';
 
 export default async function ShippingReturnsPage() {
   const settings = await getSettings();
   const brand = settings.siteName || 'Drikon';
+  const t = await getTranslations('shippingReturns');
 
   return (
     <section className="max-w-3xl mx-auto px-6 py-20">
       <div className="text-center mb-14">
         <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--fg-muted)] mb-3">
-          Delivery &amp; policy
+          {t('eyebrow')}
         </div>
-        <h1 className="display text-4xl md:text-5xl">Shipping &amp; Returns</h1>
+        <h1 className="display text-4xl md:text-5xl">{t('heading')}</h1>
       </div>
 
       <div className="space-y-12 text-[color:var(--fg-muted)] leading-relaxed">
-        <Section title="Shipping">
+        <Section title={t('shippingTitle')}>
+          <p>{t('shippingP1')}</p>
           <p>
-            Every order is dispatched within 24 hours and ships with tracking, nationwide. Shipping is free on
-            orders of ৳3,000 or more; orders below that ship for a flat ৳60.
-          </p>
-          <p>
-            You&apos;ll get a tracking link by email once your order leaves our warehouse, and you can always check
-            an order&apos;s status from your account&apos;s{' '}
+            {t('shippingP2Prefix')}{' '}
             <Link href="/orders" className="underline hover:text-[color:var(--fg)]">
-              order history
+              {t('shippingP2LinkLabel')}
             </Link>
             .
           </p>
         </Section>
 
-        <Section title="Payment methods">
+        <Section title={t('paymentTitle')}>
           <p>
-            We currently accept <strong className="text-[color:var(--fg)]">bKash (Send Money)</strong> and{' '}
-            <strong className="text-[color:var(--fg)]">Cash on Delivery</strong>. For bKash, send the order total to
-            the number shown at checkout and enter the Transaction ID — our team verifies it manually, usually within
-            a few hours, and you&apos;ll see the update on your order page. For Cash on Delivery, simply pay when
-            your order arrives.
+            {t('paymentBodyPrefix')}{' '}
+            <strong className="text-[color:var(--fg)]">{t('paymentBodyBkash')}</strong>{' '}
+            {t('paymentBodyMiddle')}{' '}
+            <strong className="text-[color:var(--fg)]">{t('paymentBodyCod')}</strong>
+            {t('paymentBodySuffix')}
           </p>
         </Section>
 
-        <Section title="Returns">
+        <Section title={t('returnsTitle')}>
           <p>
-            If something isn&apos;t right, you can return it within <strong className="text-[color:var(--fg)]">14
-            days</strong> of delivery for a full refund or exchange, as long as the item is unused, in its original
-            packaging, and includes all accessories it shipped with.
+            {t('returnsP1Prefix')} <strong className="text-[color:var(--fg)]">{t('returnsP1Days')}</strong>{' '}
+            {t('returnsP1Suffix')}
           </p>
           <p>
-            To start a return, contact us at{' '}
+            {t('returnsP2Prefix')}{' '}
             <a href="/contact" className="underline hover:text-[color:var(--fg)]">
-              our support email
+              {t('returnsP2LinkLabel')}
             </a>{' '}
-            with your order number. We&apos;ll confirm the details and arrange pickup or drop-off.
+            {t('returnsP2Suffix')}
           </p>
         </Section>
 
-        <Section title="Refunds">
-          <p>
-            Once we receive and inspect a returned item, refunds are issued to the original payment method — back
-            to your bKash account for bKash orders, or by bank transfer/mobile wallet for Cash on Delivery orders,
-            arranged with our support team. Refunds are typically processed within 5-7 business days of approval.
-          </p>
+        <Section title={t('refundsTitle')}>
+          <p>{t('refundsBody')}</p>
         </Section>
 
-        <Section title="Warranty">
-          <p>
-            Every device sold on {brand} is genuine and covered by its official manufacturer warranty. Warranty
-            claims are handled directly through the manufacturer&apos;s local service channel; we&apos;re happy to
-            help you get started — just reach out.
-          </p>
+        <Section title={t('warrantyTitle')}>
+          <p>{t('warrantyBody', { brand })}</p>
         </Section>
       </div>
     </section>
