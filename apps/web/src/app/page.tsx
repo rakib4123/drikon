@@ -1,12 +1,13 @@
 export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, getLocale } from 'next-intl/server';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { ProductGrid } from '@/components/shop/product-grid';
 import { CategoryShowcase } from '@/components/shop/category-showcase';
 import { FlashSaleSection } from '@/components/shop/flash-sale-section';
 import { HeroSlider } from '@/components/shop/hero-slider';
+import { RotatingTagline } from '@/components/shop/rotating-tagline';
 import { BrandStrip } from '@/components/shop/brand-strip';
 import { StatsBand } from '@/components/shop/stats-band';
 import { RecommendedForYou } from '@/components/shop/recommended-for-you';
@@ -15,6 +16,8 @@ import { apiGet } from '@/lib/api-client';
 import { getSettings, resolveContent } from '@/lib/settings';
 import { getBanners } from '@/lib/banners';
 import { getCategories } from '@/lib/catalog';
+import { localize } from '@/lib/localize';
+import type { Locale } from '@/i18n/request';
 import type { ProductListResponse } from '@drikon/shared-types';
 
 interface BrandLite { id: string; name: string; slug: string; logoUrl?: string | null }
@@ -45,6 +48,11 @@ export default async function HomePage() {
   ]);
   const t = await getTranslations('home');
   const c = resolveContent(settings);
+  const locale = (await getLocale()) as Locale;
+  const categoryPhrases = categories
+    .filter((cat) => !cat.parentId)
+    .slice(0, 6)
+    .map((cat) => localize(cat.name, cat.nameBn, locale));
 
   return (
     <>
@@ -92,6 +100,12 @@ export default async function HomePage() {
           />
         </div>
       </section>
+      )}
+
+      {categoryPhrases.length > 0 && (
+        <div className="max-w-3xl mx-auto px-6 -mt-8 mb-8 md:-mt-12 md:mb-12 text-center">
+          <RotatingTagline prefix={t('shopPrefix')} phrases={categoryPhrases} />
+        </div>
       )}
 
       {/* ─── FEATURE STRIP ─── */}

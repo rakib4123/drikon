@@ -42,6 +42,7 @@
   "home": {
     "featuredDevices": "ফিচার্ড ডিভাইস",
     "trendingDevices": "ট্রেন্ডিং ডিভাইস",
+    "shopPrefix": "কিনুন",
     "shopAll": "সব দেখুন",
     "noFeaturedYet": "এখনো কোনো ফিচার্ড ডিভাইস নেই।",
     "markFeaturedHint": "এখানে দেখাতে অ্যাডমিন থেকে পণ্যগুলো ফিচার্ড হিসেবে চিহ্নিত করুন।",
