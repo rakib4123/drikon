@@ -4,14 +4,18 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'motion/react';
+import { useLocale } from 'next-intl';
 import { Menu, X, ChevronRight, Heart, ShoppingBag, LayoutDashboard, Sparkles, Package } from 'lucide-react';
 import { useAuthStore, useIsAdmin } from '@/store/auth-store';
 import { useWishlistStore } from '@/store/wishlist-store';
 import { BrandMark } from '@/components/layout/brand-mark';
 import type { BrandInfo } from '@/lib/settings';
 import type { NavCategory } from '@/lib/catalog';
+import { localize } from '@/lib/localize';
+import type { Locale } from '@/i18n/request';
 
 export function MobileMenu({ brand, categories }: { brand: BrandInfo; categories: NavCategory[] }) {
+  const locale = useLocale() as Locale;
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const user = useAuthStore((s) => s.user);
@@ -83,14 +87,14 @@ export function MobileMenu({ brand, categories }: { brand: BrandInfo; categories
                       return (
                         <div key={cat.id} className="mb-1">
                           <Link href={`/products?category=${cat.slug}`} onClick={close} className="flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium hover:bg-[color:var(--bg-soft)]">
-                            {cat.name}
+                            {localize(cat.name, cat.nameBn, locale)}
                             <ChevronRight className="w-4 h-4 text-[color:var(--fg-muted)]" />
                           </Link>
                           {kids.length > 0 && (
                             <div className="pl-4">
                               {kids.map((k) => (
                                 <Link key={k.id} href={`/products?category=${k.slug}`} onClick={close} className="block px-3 py-1.5 rounded-lg text-sm text-[color:var(--fg-muted)] hover:text-[color:var(--fg)] hover:bg-[color:var(--bg-soft)]">
-                                  {k.name}
+                                  {localize(k.name, k.nameBn, locale)}
                                 </Link>
                               ))}
                             </div>

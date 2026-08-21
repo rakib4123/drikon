@@ -3,10 +3,14 @@
 import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'motion/react';
+import { useLocale } from 'next-intl';
 import { ChevronDown, ChevronRight, ArrowRight, LayoutGrid } from 'lucide-react';
 import type { NavCategory } from '@/lib/catalog';
+import { localize } from '@/lib/localize';
+import type { Locale } from '@/i18n/request';
 
 export function MegaMenu({ categories = [] }: { categories?: NavCategory[] }) {
+  const locale = useLocale() as Locale;
   const [open, setOpen] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -69,7 +73,7 @@ export function MegaMenu({ categories = [] }: { categories?: NavCategory[] }) {
                               : 'text-[color:var(--fg-muted)] hover:text-[color:var(--fg)]'
                           }`}
                         >
-                          <span className="truncate">{cat.name}</span>
+                          <span className="truncate">{localize(cat.name, cat.nameBn, locale)}</span>
                           <ChevronRight className="w-3.5 h-3.5 shrink-0" />
                         </Link>
                       </li>
@@ -87,7 +91,7 @@ export function MegaMenu({ categories = [] }: { categories?: NavCategory[] }) {
                       <span className="w-6 h-6 rounded-md bg-[color:var(--accent)]/10 grid place-items-center text-[color:var(--accent)]">
                         <LayoutGrid className="w-3.5 h-3.5" />
                       </span>
-                      {active?.name}
+                      {active ? localize(active.name, active.nameBn, locale) : ''}
                     </Link>
                     <Link href={`/products?category=${active?.slug}`} className="text-xs text-[color:var(--accent)] inline-flex items-center gap-1 hover:gap-1.5 transition-all">
                       View all <ArrowRight className="w-3.5 h-3.5" />
@@ -102,7 +106,7 @@ export function MegaMenu({ categories = [] }: { categories?: NavCategory[] }) {
                           href={`/products?category=${k.slug}`}
                           className="text-sm text-[color:var(--fg-muted)] hover:text-[color:var(--accent)] transition-colors border-b border-[color:var(--border)] py-1.5"
                         >
-                          {k.name}
+                          {localize(k.name, k.nameBn, locale)}
                         </Link>
                       ))}
                     </div>
@@ -111,7 +115,7 @@ export function MegaMenu({ categories = [] }: { categories?: NavCategory[] }) {
                       {active?.description || `Explore ${active?._count?.products ?? 0} products in ${active?.name}.`}
                       <div className="mt-3">
                         <Link href={`/products?category=${active?.slug}`} className="btn-ghost !py-2 !px-4 text-sm">
-                          Shop {active?.name} <ArrowRight className="w-4 h-4" />
+                          Shop {active ? localize(active.name, active.nameBn, locale) : ''} <ArrowRight className="w-4 h-4" />
                         </Link>
                       </div>
                     </div>
