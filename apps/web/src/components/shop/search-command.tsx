@@ -7,12 +7,14 @@ import Image from 'next/image';
 import { AnimatePresence, motion } from 'motion/react';
 import { Search, X, Loader2, CornerDownLeft, Mic, MicOff, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import type { ProductListResponse, ProductSummary } from '@drikon/shared-types';
 import { apiGet } from '@/lib/api-client';
 import { cn, formatPrice } from '@/lib/utils';
 import { parseVoiceCommand } from '@/lib/voice-command';
 import { useCartStore } from '@/store/cart-store';
+import { localize } from '@/lib/localize';
+import type { Locale } from '@/i18n/request';
 
 const SPEECH_ERROR_MESSAGES: Record<string, string> = {
   'not-allowed':
@@ -27,6 +29,7 @@ const SPEECH_ERROR_MESSAGES: Record<string, string> = {
 export function SearchCommand() {
   const router = useRouter();
   const t = useTranslations('search');
+  const locale = useLocale() as Locale;
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ProductSummary[]>([]);
@@ -172,10 +175,11 @@ export function SearchCommand() {
     if (!voiceConfirm) return;
     const { quantity, product } = voiceConfirm;
     const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
+    const name = localize(product.name, product.nameBn, locale);
     cartAdd(
       {
         productId: product.id,
-        name: product.name,
+        name,
         slug: product.slug,
         image: product.images?.[0]?.url,
         unitPrice: price,
@@ -183,9 +187,9 @@ export function SearchCommand() {
       },
       quantity,
     );
-    toast.success(t('addedToCartToast', { quantity, product: product.name }));
+    toast.success(t('addedToCartToast', { quantity, product: name }));
     close();
-  }, [voiceConfirm, cartAdd, close, t]);
+  }, [voiceConfirm, cartAdd, close, t, locale]);
 
   const searchInstead = useCallback(() => setVoiceConfirm(null), []);
 
@@ -327,7 +331,10 @@ export function SearchCommand() {
                         {voiceConfirm.product.images?.[0]?.url && (
                           <Image
                             src={voiceConfirm.product.images[0].url}
-                            alt={voiceConfirm.product.images[0].alt ?? voiceConfirm.product.name}
+                            alt={
+                              voiceConfirm.product.images[0].alt ??
+                              localize(voiceConfirm.product.name, voiceConfirm.product.nameBn, locale)
+                            }
                             fill
                             sizes="48px"
                             className="object-cover"
@@ -336,7 +343,7 @@ export function SearchCommand() {
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium line-clamp-2">
-                          {voiceConfirm.quantity} × {voiceConfirm.product.name}
+                          {voiceConfirm.quantity} × {localize(voiceConfirm.product.name, voiceConfirm.product.nameBn, locale)}
                         </div>
                         <div className="text-xs text-[color:var(--fg-muted)] mt-0.5">
                           {formatPrice(
@@ -370,6 +377,7 @@ export function SearchCommand() {
                   <ul className="py-2">
                     {results.map((p) => {
                       const price = typeof p.price === 'string' ? parseFloat(p.price) : p.price;
+                      const name = localize(p.name, p.nameBn, locale);
                       return (
                         <li key={p.id}>
                           <button
@@ -381,7 +389,7 @@ export function SearchCommand() {
                               {p.images?.[0]?.url && (
                                 <Image
                                   src={p.images[0].url}
-                                  alt={p.images[0].alt ?? p.name}
+                                  alt={p.images[0].alt ?? name}
                                   fill
                                   sizes="40px"
                                   className="object-cover"
@@ -389,7 +397,7 @@ export function SearchCommand() {
                               )}
                             </span>
                             <span className="flex-1 min-w-0">
-                              <span className="block text-sm font-medium line-clamp-1">{p.name}</span>
+                              <span className="block text-sm font-medium line-clamp-1">{name}</span>
                               <span className="block text-xs text-[color:var(--fg-muted)]">
                                 {p.brand?.name ?? p.category.name}
                               </span>

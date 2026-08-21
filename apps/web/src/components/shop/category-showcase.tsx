@@ -2,9 +2,12 @@
 
 import Link from 'next/link';
 import { motion } from 'motion/react';
+import { useLocale } from 'next-intl';
 import { ArrowUpRight, LayoutGrid, Zap, Smartphone, ShieldCheck, BatteryCharging } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { NavCategory } from '@/lib/catalog';
+import { localize } from '@/lib/localize';
+import type { Locale } from '@/i18n/request';
 
 // Map known catalog category slugs to fitting icons (falls back to a grid).
 const CATEGORY_ICONS: Record<string, ReactNode> = {
@@ -46,13 +49,18 @@ export function CategoryShowcase({
   dealsBlurb?: string;
   dealsImage?: string;
 }) {
+  const locale = useLocale() as Locale;
   const cats = (categories ?? []).filter((c) => !c.parentId).slice(0, 5);
   if (cats.length === 0) return null;
 
   const tiles: Tile[] = [
     ...cats.map((c, i) => ({
-      title: c.name,
-      blurb: c.description || `${c._count?.products ?? 0} product${(c._count?.products ?? 0) === 1 ? '' : 's'}`,
+      title: localize(c.name, c.nameBn, locale),
+      blurb: localize(
+        c.description || `${c._count?.products ?? 0} product${(c._count?.products ?? 0) === 1 ? '' : 's'}`,
+        c.descriptionBn,
+        locale,
+      ),
       href: `/products?category=${c.slug}`,
       icon: iconFor(c.slug),
       span: i === 0 ? 'sm:col-span-2 sm:row-span-2' : '',

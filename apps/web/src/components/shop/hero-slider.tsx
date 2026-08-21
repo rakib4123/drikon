@@ -4,13 +4,17 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, useReducedMotion } from 'motion/react';
+import { useLocale } from 'next-intl';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import type { Banner } from '@/lib/banners';
+import { localize } from '@/lib/localize';
+import type { Locale } from '@/i18n/request';
 
 const AUTOPLAY_MS = 6000;
 
 export function HeroSlider({ slides }: { slides: Banner[] }) {
   const reduce = useReducedMotion();
+  const locale = useLocale() as Locale;
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const count = slides.length;
@@ -67,9 +71,11 @@ export function HeroSlider({ slides }: { slides: Banner[] }) {
                 animate={active && !reduce ? { opacity: 1, y: 0 } : reduce ? {} : { opacity: 0, y: 24 }}
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: active ? 0.18 : 0 }}
               >
-                <h1 className="display text-4xl md:text-6xl mb-4 text-glow">{b.heading}</h1>
+                <h1 className="display text-4xl md:text-6xl mb-4 text-glow">{localize(b.heading, b.headingBn, locale)}</h1>
                 {b.subheading && (
-                  <p className="text-white/85 text-base md:text-lg mb-7 max-w-lg">{b.subheading}</p>
+                  <p className="text-white/85 text-base md:text-lg mb-7 max-w-lg">
+                    {localize(b.subheading, b.subheadingBn, locale)}
+                  </p>
                 )}
                 {b.ctaLabel && (
                   <Link
