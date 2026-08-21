@@ -9,15 +9,25 @@ import { CloudinaryUploader } from '@/components/admin/cloudinary-uploader';
 interface Category {
   id: string;
   name: string;
+  nameBn: string | null;
   slug: string;
   description: string | null;
+  descriptionBn: string | null;
   imageUrl: string | null;
   parentId: string | null;
   _count: { products: number };
 }
 
-type Draft = { name: string; slug: string; description: string; imageUrl: string; parentId: string };
-const EMPTY: Draft = { name: '', slug: '', description: '', imageUrl: '', parentId: '' };
+type Draft = {
+  name: string;
+  nameBn: string;
+  slug: string;
+  description: string;
+  descriptionBn: string;
+  imageUrl: string;
+  parentId: string;
+};
+const EMPTY: Draft = { name: '', nameBn: '', slug: '', description: '', descriptionBn: '', imageUrl: '', parentId: '' };
 
 export default function AdminCategoriesPage() {
   const [items, setItems] = useState<Category[]>([]);
@@ -41,7 +51,15 @@ export default function AdminCategoriesPage() {
 
   const startEdit = (c: Category) => {
     setEditingId(c.id);
-    setDraft({ name: c.name, slug: c.slug, description: c.description ?? '', imageUrl: c.imageUrl ?? '', parentId: c.parentId ?? '' });
+    setDraft({
+      name: c.name,
+      nameBn: c.nameBn ?? '',
+      slug: c.slug,
+      description: c.description ?? '',
+      descriptionBn: c.descriptionBn ?? '',
+      imageUrl: c.imageUrl ?? '',
+      parentId: c.parentId ?? '',
+    });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   const reset = () => {
@@ -59,8 +77,10 @@ export default function AdminCategoriesPage() {
     setSaving(true);
     const body = {
       name: draft.name.trim(),
+      nameBn: draft.nameBn.trim(),
       slug: draft.slug.trim() || undefined,
       description: draft.description.trim(),
+      descriptionBn: draft.descriptionBn.trim(),
       imageUrl: draft.imageUrl.trim(),
       parentId: draft.parentId,
     };
@@ -110,6 +130,7 @@ export default function AdminCategoriesPage() {
             )}
           </div>
           <input className="input" aria-label="Category name" placeholder="Name" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
+          <input className="input" aria-label="Category name (Bangla)" placeholder="নাম (বাংলা)" value={draft.nameBn} onChange={(e) => setDraft({ ...draft, nameBn: e.target.value })} />
           <input className="input font-mono text-xs" aria-label="Category slug" placeholder="slug (optional)" value={draft.slug} onChange={(e) => setDraft({ ...draft, slug: e.target.value })} />
           <select className="input" aria-label="Parent category" value={draft.parentId} onChange={(e) => setDraft({ ...draft, parentId: e.target.value })}>
             <option value="">No parent (top level)</option>
@@ -122,6 +143,7 @@ export default function AdminCategoriesPage() {
               ))}
           </select>
           <textarea className="input" aria-label="Category description" rows={2} placeholder="Description (optional)" value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} />
+          <textarea className="input" aria-label="Category description (Bangla)" rows={2} placeholder="বিবরণ (বাংলা, ঐচ্ছিক)" value={draft.descriptionBn} onChange={(e) => setDraft({ ...draft, descriptionBn: e.target.value })} />
           <CloudinaryUploader
             label="Category image (optional)"
             value={draft.imageUrl || null}

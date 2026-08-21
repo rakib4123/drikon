@@ -10,7 +10,9 @@ import { CloudinaryUploader } from '@/components/admin/cloudinary-uploader';
 interface Banner {
   id: string;
   heading: string;
+  headingBn: string | null;
   subheading: string | null;
+  subheadingBn: string | null;
   imageUrl: string | null;
   ctaLabel: string | null;
   ctaHref: string | null;
@@ -20,7 +22,9 @@ interface Banner {
 
 type Draft = {
   heading: string;
+  headingBn: string;
   subheading: string;
+  subheadingBn: string;
   imageUrl: string;
   ctaLabel: string;
   ctaHref: string;
@@ -29,7 +33,9 @@ type Draft = {
 };
 const EMPTY: Draft = {
   heading: '',
+  headingBn: '',
   subheading: '',
+  subheadingBn: '',
   imageUrl: '',
   ctaLabel: 'Shop now',
   ctaHref: '/products',
@@ -61,7 +67,9 @@ export default function AdminBannersPage() {
     setEditingId(b.id);
     setDraft({
       heading: b.heading,
+      headingBn: b.headingBn ?? '',
       subheading: b.subheading ?? '',
+      subheadingBn: b.subheadingBn ?? '',
       imageUrl: b.imageUrl ?? '',
       ctaLabel: b.ctaLabel ?? '',
       ctaHref: b.ctaHref ?? '',
@@ -85,7 +93,9 @@ export default function AdminBannersPage() {
     setSaving(true);
     const body = {
       heading: draft.heading.trim(),
+      headingBn: draft.headingBn.trim(),
       subheading: draft.subheading.trim(),
+      subheadingBn: draft.subheadingBn.trim(),
       imageUrl: draft.imageUrl.trim(),
       ctaLabel: draft.ctaLabel.trim(),
       ctaHref: draft.ctaHref.trim(),
@@ -158,7 +168,9 @@ export default function AdminBannersPage() {
           <input className="input text-xs" aria-label="Banner background image URL" placeholder="…or paste image URL" value={draft.imageUrl} onChange={(e) => setDraft({ ...draft, imageUrl: e.target.value })} />
 
           <input className="input" aria-label="Banner heading" placeholder="Heading" value={draft.heading} onChange={(e) => setDraft({ ...draft, heading: e.target.value })} />
+          <input className="input" aria-label="Banner heading (Bangla)" placeholder="হেডিং (বাংলা)" value={draft.headingBn} onChange={(e) => setDraft({ ...draft, headingBn: e.target.value })} />
           <textarea className="input" aria-label="Banner subheading" rows={2} placeholder="Subheading (optional)" value={draft.subheading} onChange={(e) => setDraft({ ...draft, subheading: e.target.value })} />
+          <textarea className="input" aria-label="Banner subheading (Bangla)" rows={2} placeholder="সাবহেডিং (বাংলা, ঐচ্ছিক)" value={draft.subheadingBn} onChange={(e) => setDraft({ ...draft, subheadingBn: e.target.value })} />
           <div className="grid grid-cols-2 gap-3">
             <input className="input" aria-label="CTA button label" placeholder="CTA label" value={draft.ctaLabel} onChange={(e) => setDraft({ ...draft, ctaLabel: e.target.value })} />
             <input className="input text-xs" aria-label="CTA button link" placeholder="CTA link (/products)" value={draft.ctaHref} onChange={(e) => setDraft({ ...draft, ctaHref: e.target.value })} />
