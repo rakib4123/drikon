@@ -26,6 +26,8 @@ function buildSearchFilter(search: string): Prisma.ProductWhereInput {
       OR: [
         { name: { contains: word, mode: 'insensitive' as const } },
         { description: { contains: word, mode: 'insensitive' as const } },
+        { nameBn: { contains: word, mode: 'insensitive' as const } },
+        { descriptionBn: { contains: word, mode: 'insensitive' as const } },
         { sku: { contains: word, mode: 'insensitive' as const } },
       ],
     })),
