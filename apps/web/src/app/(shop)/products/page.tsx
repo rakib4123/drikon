@@ -4,6 +4,8 @@ import { getTranslations, getLocale } from 'next-intl/server';
 import { apiGet, ApiError } from '@/lib/api-client';
 import { getCategories } from '@/lib/catalog';
 import { ProductGrid } from '@/components/shop/product-grid';
+import { ProductSort } from '@/components/shop/product-sort';
+import { ProductFilters, type FilterBrand } from '@/components/shop/product-filters';
 import { EmptyState } from '@/components/ui/empty-state';
 import { localize } from '@/lib/localize';
 import type { Locale } from '@/i18n/request';
@@ -27,13 +29,19 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   let data: ProductListResponse | null = null;
   let error: string | null = null;
   try {
-    data = await apiGet<ProductListResponse>(`/api/v1/products?${qs.toString()}`);
+    data = await apiGet<ProductListResponse>(`/api/v1/products?${qs.toString()}`, { revalidate: 60 });
   } catch (e) {
     error = e instanceof ApiError ? e.message : t('failedToLoadProducts');
   }
 
   const allCats = await getCategories();
   const topCats = allCats.filter((c) => !c.parentId).slice(0, 8);
+
+  // Brands populate the filter panel. A failure here must not take the whole
+  // catalogue page down, so it degrades to an empty brand list.
+  const brands = await apiGet<FilterBrand[]>('/api/v1/brands', { revalidate: 300 }).catch(
+    () => [] as FilterBrand[],
+  );
 
   const page = parseInt((params.page as string) ?? '1', 10);
   const currentSort = (params.sort as string) ?? 'newest';
@@ -61,8 +69,11 @@ export default async function ProductsPage({ searchParams }: PageProps) {
           )}
         </div>
 
-        {/* ─── Sort ─── */}
-        <SortLinks current={currentSort} params={params} t={t} />
+        {/* ─── Filters + sort ─── */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <ProductFilters brands={brands} />
+          <ProductSort current={currentSort} />
+        </div>
       </div>
 
       {/* ─── Quick category chips ─── */}
@@ -135,49 +146,6 @@ function CategoryChip({ active, href, children }: { active: boolean; href: strin
     >
       {children}
     </Link>
-  );
-}
-
-function SortLinks({
-  current,
-  params,
-  t,
-}: {
-  current: string;
-  params: Record<string, string | string[] | undefined>;
-  t: Awaited<ReturnType<typeof getTranslations<'products'>>>;
-}) {
-  const options: Array<{ value: string; label: string }> = [
-    { value: 'newest', label: t('sortNewest') },
-    { value: 'popular', label: t('sortPopular') },
-    { value: 'price_asc', label: t('sortPriceAsc') },
-    { value: 'price_desc', label: t('sortPriceDesc') },
-    { value: 'rating', label: t('sortRating') },
-  ];
-  return (
-    <div className="flex gap-1.5 text-sm overflow-x-auto scrollbar-none max-w-full [&>*]:shrink-0">
-      {options.map((o) => {
-        const next = new URLSearchParams();
-        for (const [k, v] of Object.entries(params)) {
-          if (typeof v === 'string' && v) next.set(k, v);
-        }
-        next.set('sort', o.value);
-        next.delete('page');
-        return (
-          <Link
-            key={o.value}
-            href={`/products?${next.toString()}`}
-            className={`px-3 py-1.5 rounded-md ${
-              current === o.value
-                ? 'bg-[color:var(--bg-soft)] text-[color:var(--fg)]'
-                : 'text-[color:var(--fg-muted)] hover:text-[color:var(--fg)]'
-            }`}
-          >
-            {o.label}
-          </Link>
-        );
-      })}
-    </div>
   );
 }
 
