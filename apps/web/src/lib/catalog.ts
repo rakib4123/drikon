@@ -23,8 +23,8 @@ interface NavBrand {
 export const getCategories = cache(async (): Promise<NavCategory[]> => {
   try {
     const [cats, brands] = await Promise.all([
-      apiGet<NavCategory[]>('/api/v1/categories'),
-      apiGet<NavBrand[]>('/api/v1/brands').catch(() => []),
+      apiGet<NavCategory[]>('/api/v1/categories', { revalidate: 300 }),
+      apiGet<NavBrand[]>('/api/v1/brands', { revalidate: 300 }).catch(() => []),
     ]);
     
     const smart = cats.find(c => c.slug === 'smartphones');

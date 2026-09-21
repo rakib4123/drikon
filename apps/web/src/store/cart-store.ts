@@ -20,6 +20,12 @@ interface CartState {
   remove: (productId: string, variantId?: string) => void;
   updateQty: (productId: string, qty: number, variantId?: string) => void;
   setCoupon: (code: string | null) => void;
+  /**
+   * Overwrites stored unit prices with server-quoted ones. The cart keeps the
+   * price seen when an item was added, which goes stale when a flash sale ends
+   * or a price changes; the server quote is the truth.
+   */
+  syncPrices: (lines: { productId: string; variantId?: string | null; unitPrice: number }[]) => void;
   clear: () => void;
   subtotal: () => number;
 }
@@ -61,6 +67,20 @@ export const useCartStore = create<CartState>()(
             sameItem(i, { productId, variantId }) ? { ...i, quantity: Math.max(1, qty) } : i,
           ),
         }));
+      },
+
+      syncPrices(lines) {
+        set((state) => {
+          let changed = false;
+          const items = state.items.map((i) => {
+            const q = lines.find((l) => sameItem(i, { productId: l.productId, variantId: l.variantId ?? undefined }));
+            if (!q || q.unitPrice === i.unitPrice) return i;
+            changed = true;
+            return { ...i, unitPrice: q.unitPrice };
+          });
+          // Returning the same state object skips a re-render when nothing moved.
+          return changed ? { items } : state;
+        });
       },
 
       clear() { set({ items: [], couponCode: null }); },

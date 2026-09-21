@@ -10,7 +10,7 @@ export default function AdminProductNewPage() {
       <Link href="/admin/products" className="inline-flex items-center gap-1.5 text-sm text-[color:var(--fg-muted)] hover:text-[color:var(--fg)] mb-6">
         <ArrowLeft className="w-4 h-4" /> All products
       </Link>
-      <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
+      <div className="text-xs font-bold uppercase tracking-wide text-[color:var(--accent)] mb-2">
         New product
       </div>
       <h1 className="display text-4xl mb-8">Add a product</h1>

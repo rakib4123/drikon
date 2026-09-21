@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { useWishlistStore } from '@/store/wishlist-store';
 import { useAuthStore } from '@/store/auth-store';
 import { cn } from '@/lib/utils';
+import { IconTooltip } from '@/components/ui/tooltip';
 
 interface WishlistButtonProps {
   productId: string;
@@ -51,13 +52,18 @@ export function WishlistButton({
     }
   };
 
+  const label = wishlisted ? 'Remove from wishlist' : 'Add to wishlist';
+
   return (
+    // Tooltip supplements aria-label — it never replaces it, since touch
+    // devices never hover and would otherwise get no label at all.
+    <IconTooltip label={label}>
     <motion.button
       type="button"
       onClick={onClick}
       whileTap={{ scale: 0.85 }}
       aria-pressed={wishlisted}
-      aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+      aria-label={label}
       className={cn(
         'grid place-items-center transition-colors',
         variant === 'overlay'
@@ -75,5 +81,6 @@ export function WishlistButton({
         )}
       />
     </motion.button>
+    </IconTooltip>
   );
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { OrderStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../modules/prisma/prisma.service';
 
 @Injectable()
@@ -24,5 +24,19 @@ export class CouponModel {
 
   delete<T extends Prisma.CouponDeleteArgs>(args: Prisma.SelectSubset<T, Prisma.CouponDeleteArgs>) {
     return this.prisma.coupon.delete(args);
+  }
+
+  /**
+   * How many times `userId` has already redeemed `couponId`, backing perUserLimit.
+   * Cancelled orders don't count — the customer never got the benefit.
+   */
+  countRedemptionsByUser(couponId: string, userId: string) {
+    return this.prisma.order.count({
+      where: {
+        couponId,
+        userId,
+        status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REFUNDED] },
+      },
+    });
   }
 }

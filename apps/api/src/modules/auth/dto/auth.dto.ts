@@ -24,10 +24,21 @@ export const RegisterSchema = z.object({
 });
 export class RegisterDto extends createZodDto(RegisterSchema) {}
 
+/**
+ * A second factor: either a 6-digit TOTP code or one of the 10-character hex
+ * recovery codes issued when 2FA was enabled (randomBytes(5).toString('hex')).
+ * Accepting only 6 digits here made recovery codes unusable — they were
+ * rejected by validation before AuthService ever saw them.
+ */
+const secondFactorCode = z
+  .string()
+  .trim()
+  .regex(/^(\d{6}|[0-9a-fA-F]{10})$/, 'Enter a 6-digit code or a 10-character recovery code');
+
 export const LoginSchema = z.object({
   email: z.string().email().toLowerCase().trim(),
   password: z.string().min(1).max(128),
-  twoFactorCode: z.string().regex(/^\d{6}$/).optional(),
+  twoFactorCode: secondFactorCode.optional(),
 });
 export class LoginDto extends createZodDto(LoginSchema) {}
 
@@ -51,3 +62,15 @@ export const Enable2FASchema = z.object({
   code: z.string().regex(/^\d{6}$/),
 });
 export class Enable2FADto extends createZodDto(Enable2FASchema) {}
+
+/** Disabling 2FA accepts a recovery code too, so a lost authenticator isn't a dead end. */
+export const Disable2FASchema = z.object({
+  code: secondFactorCode,
+});
+export class Disable2FADto extends createZodDto(Disable2FASchema) {}
+
+/** Completes a pending sign-in: a TOTP code or a recovery code. */
+export const VerifyTwoFactorSchema = z.object({
+  code: secondFactorCode,
+});
+export class VerifyTwoFactorDto extends createZodDto(VerifyTwoFactorSchema) {}

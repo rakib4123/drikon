@@ -12,7 +12,7 @@ import { Role } from '@prisma/client';
 
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto/category.dto';
-import { Public, Roles } from '../../common/decorators';
+import { Audit, Public, Roles } from '../../common/decorators';
 
 @ApiTags('categories')
 @Controller({ path: 'categories', version: '1' })
@@ -26,6 +26,7 @@ export class CategoriesController {
     return this.categories.list();
   }
 
+  @Audit('category.create', 'Category')
   @Post()
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: '(Admin) Create a category' })
@@ -33,6 +34,7 @@ export class CategoriesController {
     return this.categories.create(dto);
   }
 
+  @Audit('category.update', 'Category')
   @Patch(':id')
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: '(Admin) Update a category' })
@@ -40,6 +42,7 @@ export class CategoriesController {
     return this.categories.update(id, dto);
   }
 
+  @Audit('category.delete', 'Category')
   @Delete(':id')
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: '(Admin) Delete a category' })

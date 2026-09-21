@@ -19,10 +19,19 @@ const productCard = {
     id: true,
     name: true,
     slug: true,
+    nameBn: true,
     price: true,
+    compareAtPrice: true,
     currency: true,
     stock: true,
+    isFeatured: true,
+    averageRating: true,
+    reviewCount: true,
     images: { orderBy: { position: 'asc' as const }, take: 1, select: { url: true, alt: true } },
+    // The storefront renders sale items with the standard product card, which
+    // needs the same brand/category/rating fields as a catalogue listing.
+    brand: { select: { id: true, name: true, slug: true } },
+    category: { select: { id: true, name: true, slug: true } },
   },
 } satisfies Prisma.ProductDefaultArgs;
 
@@ -56,7 +65,7 @@ export class FlashSalesService {
       endsAt: sale.endsAt,
       items: sale.products
         .filter((p) => p.product.stock > 0)
-        .map((p) => ({ salePrice: p.salePrice, soldCount: p.soldCount, product: p.product })),
+        .map((p) => ({ salePrice: p.salePrice, soldCount: p.soldCount, inventoryCap: p.inventoryCap, product: p.product })),
     };
   }
 

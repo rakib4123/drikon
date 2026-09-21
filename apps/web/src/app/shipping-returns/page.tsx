@@ -10,7 +10,7 @@ export default async function ShippingReturnsPage() {
   return (
     <section className="max-w-3xl mx-auto px-6 py-20">
       <div className="text-center mb-14">
-        <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--fg-muted)] mb-3">
+        <div className="text-xs font-bold uppercase tracking-wide text-[color:var(--fg-muted)] mb-3">
           {t('eyebrow')}
         </div>
         <h1 className="display text-4xl md:text-5xl">{t('heading')}</h1>

@@ -14,6 +14,7 @@ interface Coupon {
   value: string | number;
   minOrderAmount: string | number | null;
   maxRedemptions: number | null;
+  perUserLimit: number | null;
   redemptionCount: number;
   expiresAt: string | null;
   isActive: boolean;
@@ -29,13 +30,14 @@ type Draft = {
   value: string;
   minOrderAmount: string;
   maxRedemptions: string;
+  perUserLimit: string;
   expiresAt: string;
   isActive: boolean;
   freeShipping: boolean;
   isPublic: boolean;
   categoryId: string;
 };
-const EMPTY: Draft = { code: '', isPercentage: true, value: '', minOrderAmount: '', maxRedemptions: '', expiresAt: '', isActive: true, freeShipping: false, isPublic: false, categoryId: '' };
+const EMPTY: Draft = { code: '', isPercentage: true, value: '', minOrderAmount: '', maxRedemptions: '', perUserLimit: '', expiresAt: '', isActive: true, freeShipping: false, isPublic: false, categoryId: '' };
 
 export default function AdminCouponsPage() {
   const [items, setItems] = useState<Coupon[]>([]);
@@ -71,6 +73,7 @@ export default function AdminCouponsPage() {
       value: String(c.value),
       minOrderAmount: c.minOrderAmount != null ? String(c.minOrderAmount) : '',
       maxRedemptions: c.maxRedemptions != null ? String(c.maxRedemptions) : '',
+      perUserLimit: c.perUserLimit != null ? String(c.perUserLimit) : '',
       expiresAt: c.expiresAt ? c.expiresAt.slice(0, 10) : '',
       isActive: c.isActive,
       freeShipping: c.freeShipping,
@@ -103,6 +106,7 @@ export default function AdminCouponsPage() {
     };
     if (draft.minOrderAmount) body.minOrderAmount = Number(draft.minOrderAmount);
     if (draft.maxRedemptions) body.maxRedemptions = Number(draft.maxRedemptions);
+    if (draft.perUserLimit) body.perUserLimit = Number(draft.perUserLimit);
     if (draft.expiresAt) body.expiresAt = new Date(draft.expiresAt).toISOString();
     try {
       if (editingId) {
@@ -164,6 +168,7 @@ export default function AdminCouponsPage() {
           <input className="input" type="number" placeholder={draft.isPercentage ? 'Discount % (e.g. 20)' : 'Amount off (e.g. 500)'} value={draft.value} onChange={(e) => setDraft({ ...draft, value: e.target.value })} />
           <input className="input" type="number" placeholder="Min order amount (optional)" value={draft.minOrderAmount} onChange={(e) => setDraft({ ...draft, minOrderAmount: e.target.value })} />
           <input className="input" type="number" placeholder="Max redemptions (optional)" value={draft.maxRedemptions} onChange={(e) => setDraft({ ...draft, maxRedemptions: e.target.value })} />
+          <input className="input" type="number" min="1" placeholder="Uses per customer (optional)" title="How many times one customer may use this code. Blank = unlimited." value={draft.perUserLimit} onChange={(e) => setDraft({ ...draft, perUserLimit: e.target.value })} />
           <label className="block text-xs text-[color:var(--fg-muted)]">
             Restrict to category (optional)
             <select className="input mt-1" value={draft.categoryId} onChange={(e) => setDraft({ ...draft, categoryId: e.target.value })}>
@@ -217,6 +222,7 @@ export default function AdminCouponsPage() {
                       {Number(c.value) > 0 ? (c.isPercentage ? `${c.value}% off` : `৳${Number(c.value).toLocaleString()} off`) : 'free shipping'}
                       {c.minOrderAmount ? ` · min ${c.minOrderAmount}` : ''}
                       {' · '}{c.redemptionCount}{c.maxRedemptions ? `/${c.maxRedemptions}` : ''} used
+                      {c.perUserLimit ? ` · max ${c.perUserLimit}/customer` : ''}
                     </div>
                   </div>
                   <button onClick={() => startEdit(c)} className="p-2 rounded-lg hover:bg-[color:var(--bg)] text-[color:var(--fg-muted)] hover:text-[color:var(--accent)]" aria-label="Edit">

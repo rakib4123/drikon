@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { OrderStatus, PaymentMethod, Prisma } from '@prisma/client';
 import { PrismaService } from '../modules/prisma/prisma.service';
 
@@ -21,6 +21,8 @@ interface OrderLineInput {
   unitPrice: Prisma.Decimal;
   quantity: number;
   lineTotal: Prisma.Decimal;
+  /** Set when this line was priced from a live flash sale — drives soldCount/cap bookkeeping. */
+  flashSaleId?: string | null;
 }
 
 export type PaymentPersistInput =
@@ -41,6 +43,8 @@ export interface CreateOrderPersistArgs {
   notes?: string;
   lines: OrderLineInput[];
   payment: PaymentPersistInput;
+  /** Enforced inside the transaction so a coupon can't blow past maxRedemptions under load. */
+  couponMaxRedemptions?: number | null;
 }
 
 @Injectable()
@@ -84,15 +88,46 @@ export class OrderModel {
       });
 
       for (const l of args.lines) {
-        await tx.product.update({
-          where: { id: l.productId },
+        // Conditional decrement: the `stock: { gte }` guard makes the check and the
+        // write one atomic statement, so two concurrent checkouts for the last unit
+        // can't both succeed and drive stock negative. count === 0 means we lost the race.
+        const stockHit = await tx.product.updateMany({
+          where: { id: l.productId, stock: { gte: l.quantity } },
           data: { stock: { decrement: l.quantity }, salesCount: { increment: l.quantity } },
         });
+        if (stockHit.count === 0) {
+          throw new ConflictException(
+            `"${l.productName}" sold out while you were checking out — please adjust your cart`,
+          );
+        }
+
         if (l.variantId) {
-          await tx.productVariant.update({
-            where: { id: l.variantId },
+          const variantHit = await tx.productVariant.updateMany({
+            where: { id: l.variantId, stock: { gte: l.quantity } },
             data: { stock: { decrement: l.quantity } },
           });
+          if (variantHit.count === 0) {
+            throw new ConflictException(
+              `The selected option for "${l.productName}" sold out while you were checking out`,
+            );
+          }
+        }
+
+        // Flash-sale bookkeeping: bump soldCount and enforce inventoryCap in the same
+        // atomic guard, so a capped sale can't oversell either.
+        if (l.flashSaleId) {
+          const saleHit = await tx.$executeRaw`
+            UPDATE "FlashSaleProduct"
+               SET "soldCount" = "soldCount" + ${l.quantity}
+             WHERE "flashSaleId" = ${l.flashSaleId}
+               AND "productId" = ${l.productId}
+               AND ("inventoryCap" IS NULL OR "soldCount" + ${l.quantity} <= "inventoryCap")
+          `;
+          if (saleHit === 0) {
+            throw new ConflictException(
+              `The flash-sale allocation for "${l.productName}" just ran out — please reload your cart`,
+            );
+          }
         }
       }
 
@@ -109,14 +144,95 @@ export class OrderModel {
       });
 
       if (args.couponId) {
-        await tx.coupon.update({
-          where: { id: args.couponId },
-          data: { redemptionCount: { increment: 1 } },
-        });
+        // Same pattern as stock: increment only while still under the cap, in one
+        // statement, so the limit holds under concurrent redemptions.
+        const couponHit = await tx.$executeRaw`
+          UPDATE "Coupon"
+             SET "redemptionCount" = "redemptionCount" + 1
+           WHERE "id" = ${args.couponId}
+             AND ("maxRedemptions" IS NULL OR "redemptionCount" < "maxRedemptions")
+        `;
+        if (couponHit === 0) {
+          throw new ConflictException('This coupon has just been fully redeemed');
+        }
       }
 
       return created;
     });
+  }
+
+  /**
+   * Atomically reserves the next order number for `year`.
+   *
+   * Runs in its own statement (not the order transaction) on purpose: holding the
+   * counter row locked for the whole checkout would serialise every concurrent
+   * order. A number burned by a later failure just leaves a harmless gap.
+   */
+  async nextSequenceValue(year: number): Promise<number> {
+    const rows = await this.prisma.$queryRaw<{ lastValue: number }[]>`
+      INSERT INTO "OrderSequence" ("year", "lastValue", "updatedAt")
+      VALUES (${year}, 1, NOW())
+      ON CONFLICT ("year")
+      DO UPDATE SET "lastValue" = "OrderSequence"."lastValue" + 1, "updatedAt" = NOW()
+      RETURNING "lastValue"
+    `;
+    return rows[0].lastValue;
+  }
+
+  /**
+   * Returns stock to inventory for a cancelled/refunded order, exactly once.
+   *
+   * `stockRestoredAt IS NULL` is checked as part of the same UPDATE that sets it,
+   * so two concurrent cancels can't both restock. Returns false if it was a no-op.
+   */
+  async restoreStockTransaction(orderId: string): Promise<boolean> {
+    return this.prisma.$transaction(async (tx) => {
+      // Claim the restock. Losing this race means someone else already did it.
+      const claimed = await tx.order.updateMany({
+        where: { id: orderId, stockRestoredAt: null },
+        data: { stockRestoredAt: new Date() },
+      });
+      if (claimed.count === 0) return false;
+
+      const order = await tx.order.findUniqueOrThrow({
+        where: { id: orderId },
+        select: { couponId: true, items: { select: { productId: true, variantId: true, quantity: true } } },
+      });
+
+      for (const item of order.items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stock: { increment: item.quantity },
+            // salesCount is a "units actually sold" metric, so a cancelled order
+            // should not keep inflating it (or the best-seller list).
+            salesCount: { decrement: item.quantity },
+          },
+        });
+        if (item.variantId) {
+          await tx.productVariant.update({
+            where: { id: item.variantId },
+            data: { stock: { increment: item.quantity } },
+          });
+        }
+      }
+
+      // Give the coupon use back so a cancelled order doesn't consume an allocation.
+      if (order.couponId) {
+        await tx.$executeRaw`
+          UPDATE "Coupon"
+             SET "redemptionCount" = GREATEST("redemptionCount" - 1, 0)
+           WHERE "id" = ${order.couponId}
+        `;
+      }
+
+      return true;
+    });
+  }
+
+  /** Status histogram for the admin dashboard — aggregated in Postgres, not in Node. */
+  groupByStatus() {
+    return this.prisma.order.groupBy({ by: ['status'], _count: { _all: true } });
   }
 
   findManyAndCount<T extends Prisma.OrderFindManyArgs>(
@@ -155,10 +271,6 @@ export class OrderModel {
 
   aggregate<T extends Prisma.OrderAggregateArgs>(args: Prisma.SelectSubset<T, Prisma.OrderAggregateArgs>) {
     return this.prisma.order.aggregate(args);
-  }
-
-  countCreatedBetween(start: Date, end: Date) {
-    return this.prisma.order.count({ where: { createdAt: { gte: start, lt: end } } });
   }
 
   countItemsForProducts(productIds: string[]) {

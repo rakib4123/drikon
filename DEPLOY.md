@@ -41,11 +41,15 @@ the Render dashboard's `drikon-db` page — use the **External** connection
 string, not the internal one):
 
 ```bash
-DATABASE_URL="<external connection string from Render>" pnpm --filter @drikon/api db:seed
+DATABASE_URL="<external connection string from Render>" \
+SEED_ADMIN_PASSWORD="<a long password only you know>" \
+  pnpm --filter @drikon/api db:seed
 ```
 
-Default admin (change the password immediately after first login):
-`admin@drikon.com` / `Admin@drikon2026`
+The admin is `admin@drikon.com` with the password you set. Leave
+`SEED_ADMIN_PASSWORD` unset and the seed generates a random one and prints it
+once — copy it then. The seed has no built-in password on purpose: this
+repository is public, so any default written here is known to everyone.
 
 > Prefer a clean catalog with no demo products? Skip this and create your
 > admin directly in the database, then add real products via the admin panel.
