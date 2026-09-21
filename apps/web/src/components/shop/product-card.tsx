@@ -9,13 +9,14 @@ import { formatPrice, effectivePrice } from '@/lib/utils';
 import { useCartStore } from '@/store/cart-store';
 import { localize } from '@/lib/localize';
 import type { Locale } from '@/i18n/request';
+import { TiltCard } from '@/components/ui/tilt-card';
 import { WishlistButton } from './wishlist-button';
 import { CompareButton } from './compare-button';
 import { StarRating } from './star-rating';
 import { ProductThumb } from './product-thumb';
 
 /**
- * Megastore product tile: product on white, badges top-left, wishlist/compare
+ * Neon glass product tile with CSS 3D tilt: product on white, badges top-left, wishlist/compare
  * rail top-right, rating, price, and a full-width add-to-cart.
  *
  * The action rail is hidden until hover only on devices that CAN hover. It
@@ -48,7 +49,8 @@ export function ProductCard({ product }: { product: ProductSummary }) {
     '[@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 focus-visible:opacity-100 aria-[pressed=true]:opacity-100 transition-opacity';
 
   return (
-    <article className="group card card-hover !p-0 overflow-hidden flex flex-col h-full">
+    <TiltCard className="group h-full">
+      <article className="card card-hover !p-0 overflow-hidden flex flex-col">
       <div className="relative aspect-square [background:var(--image-well)] overflow-hidden">
         <Link href={`/products/${product.slug}`} className="absolute inset-0" tabIndex={-1} aria-hidden>
           <ProductThumb
@@ -118,5 +120,6 @@ export function ProductCard({ product }: { product: ProductSummary }) {
         </button>
       </div>
     </article>
+    </TiltCard>
   );
 }
