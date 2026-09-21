@@ -107,6 +107,9 @@
   --surface-solid: #ffffff;
   --image-well:    #ffffff;
   --border-strong: #d0d5dd;
+  --glow-edge:     color-mix(in srgb, var(--color-accent) 18%, transparent);
+  --radius-card:   10px;
+  --radius-ctl:    8px;
   --glass:         rgba(255, 255, 255, 0.92);
   --grid-line:     rgba(17, 24, 39, 0.05);
   --shadow:        rgba(16, 24, 40, 0.08);
@@ -418,6 +421,21 @@ html, body {
       linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 56px 56px,
       var(--bg);
   }
+
+  /* Admin (.theme-classic) keeps the pre-neon component look — spec §1. */
+  .theme-classic .btn-primary { color: #ffffff; box-shadow: 0 1px 2px var(--shadow); }
+  .theme-classic .btn-primary:hover {
+    background: color-mix(in srgb, var(--accent) 86%, #000);
+    border-color: color-mix(in srgb, var(--accent) 86%, #000);
+    box-shadow: 0 6px 16px -6px var(--glow);
+  }
+  .theme-classic .card { backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: 0 1px 2px var(--shadow); }
+  .theme-classic .card-hover:hover {
+    border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+    box-shadow: 0 12px 28px -14px rgba(16, 24, 40, 0.22);
+  }
+  .theme-classic .display,
+  .theme-classic .section-title { font-family: var(--font-sans); }
 }
 
 @media (prefers-reduced-motion: reduce) {
