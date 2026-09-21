@@ -23,11 +23,22 @@ export function classifyDevice(i: TierInputs): DeviceTier {
   return 'high';
 }
 
+// Every loader mount called hasWebGL(), and each call created a fresh WebGL
+// context that was never released — a real context leak under the browser's
+// (usually ~8-16) live-context limit. The probe result can't change within a
+// page's lifetime, so cache it once at module scope and immediately release
+// the probe context itself.
+let cachedWebGL: boolean | null = null;
+
 export function hasWebGL(): boolean {
+  if (cachedWebGL !== null) return cachedWebGL;
   try {
     const canvas = document.createElement('canvas');
-    return !!(canvas.getContext('webgl2') ?? canvas.getContext('webgl'));
+    const gl = canvas.getContext('webgl2') ?? canvas.getContext('webgl');
+    cachedWebGL = !!gl;
+    gl?.getExtension('WEBGL_lose_context')?.loseContext();
   } catch {
-    return false;
+    cachedWebGL = false;
   }
+  return cachedWebGL;
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, type ReactNode } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useReducedMotion } from 'motion/react';
 import type { Group } from 'three';
@@ -27,10 +27,10 @@ function Rings({ spin }: { spin: boolean }) {
   );
 }
 
-export default function CartOrb({ tier }: { tier: 'low' | 'high' }) {
+export default function CartOrb({ tier, fallback }: { tier: 'low' | 'high'; fallback: ReactNode }) {
   const spin = !useReducedMotion();
   return (
-    <SceneCanvas name="cart" tier={tier} fallback={null} className="h-full w-full" camera={{ position: [0, 0, 3.6], fov: 45 }}>
+    <SceneCanvas name="cart" tier={tier} fallback={fallback} className="h-full w-full" camera={{ position: [0, 0, 3.6], fov: 45 }}>
       <ambientLight intensity={0.4} />
       <Rings spin={spin} />
     </SceneCanvas>
