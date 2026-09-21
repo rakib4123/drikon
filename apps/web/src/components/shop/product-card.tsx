@@ -66,6 +66,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
           {onFlashSale && (
             <span className="badge-deal">{t('flashSaleBadge')}</span>
           )}
+          {/* .badge-sale's text is var(--bg) (dark) — on this --fg fill that's ~17:1, not the ~1.2:1 white-on-white it used to be. */}
           {soldOut && <span className="badge-sale !bg-[color:var(--fg)]">{t('soldOut')}</span>}
         </div>
 

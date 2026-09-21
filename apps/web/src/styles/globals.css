@@ -84,6 +84,9 @@
   --glass:         var(--surface);
   --grid-line:     rgba(120, 140, 255, 0.07);
   --shadow:        rgba(0, 0, 0, 0.45);
+  /* Skeleton shimmer highlight — dim on the storefront's dark surfaces, bright
+     on admin's light ones (see .theme-classic below). */
+  --skeleton-shine: rgba(255, 255, 255, 0.06);
   color-scheme: dark;
 }
 
@@ -107,6 +110,7 @@
   --surface-solid: #ffffff;
   --image-well:    #ffffff;
   --border-strong: #d0d5dd;
+  --skeleton-shine: rgba(255, 255, 255, 0.7);
   --glow-edge:     color-mix(in srgb, var(--color-accent) 18%, transparent);
   --radius-card:   10px;
   --radius-ctl:    8px;
@@ -119,6 +123,12 @@
 }
 
 * { border-color: var(--border); }
+/* Unlayered, like the rule above, so it actually beats it: `.input`'s own
+   border-color living inside `@layer components` (below) loses to this
+   universal selector regardless of specificity — CSS cascade layers rank an
+   unlayered author rule above every layered one. Same trick would apply to
+   any other component that needs a stronger border than the page default. */
+.input { border-color: var(--border-strong); }
 
 html, body {
   background: var(--bg);
@@ -296,13 +306,19 @@ html, body {
   }
 
   /* ─── Commerce ─── */
+  /* Dark text, not white: white on the storefront's magenta --color-sale is
+     ~3.5:1 and fails WCAG AA for text this size. `var(--bg)` resolves to the
+     near-black storefront background (#05060d → ~5.8:1 on the magenta fill)
+     and, inside .theme-classic, to admin's white background — so this keeps
+     admin's original white-on-red badge (#ffffff on #e0302f, ~4.5:1)
+     unchanged without a separate override. */
   .badge-sale {
     display: inline-flex;
     align-items: center;
     padding: 0.2rem 0.45rem;
     border-radius: 5px;
     background: var(--color-sale);
-    color: #ffffff;
+    color: var(--bg);
     font-size: 0.7rem;
     font-weight: 800;
     line-height: 1;
@@ -341,7 +357,7 @@ html, body {
     padding: 0.65rem 0.85rem;
     border-radius: var(--radius-ctl);
     background-color: var(--surface-solid);
-    border: 1px solid #d0d5dd;
+    border: 1px solid var(--border-strong);
     color: var(--fg);
     font-size: 0.9rem;
     transition: border-color 150ms, box-shadow 150ms;
@@ -386,7 +402,7 @@ html, body {
   .skeleton {
     position: relative;
     overflow: hidden;
-    background: #eef0f4;
+    background: var(--bg-soft);
     border-radius: var(--radius-ctl);
   }
   .skeleton::after {
@@ -394,9 +410,12 @@ html, body {
     position: absolute;
     inset: 0;
     transform: translateX(-100%);
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+    background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent);
     animation: shimmer 1.4s infinite;
   }
+  /* Admin keeps its original light skeleton (spec §1) — the dark tokens above
+     are for the storefront's neon surfaces. */
+  .theme-classic .skeleton { background: #eef0f4; }
 
   .text-glow { text-shadow: 0 2px 24px rgba(0, 0, 0, 0.25); }
 
