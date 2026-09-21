@@ -124,7 +124,7 @@ function SocialLink({ href, label, children }: { href: string; label: string; ch
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="w-9 h-9 rounded-full bg-white/10 hover:bg-[color:var(--accent)] text-[color:var(--accent-fg)] grid place-items-center transition-colors"
+      className="w-9 h-9 rounded-full bg-white/10 hover:bg-[color:var(--accent)] text-white hover:text-[color:var(--accent-fg)] grid place-items-center transition-colors"
     >
       {children}
     </a>
