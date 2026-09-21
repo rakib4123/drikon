@@ -1,13 +1,14 @@
 'use client';
 
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Float, Image as DreiImage } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import { useReducedMotion } from 'motion/react';
 import type { Group, Mesh } from 'three';
-import { SceneBoundary, SceneCanvas } from './scene-canvas';
+import { useSafeTexture } from '@/lib/three/use-safe-texture';
+import { SceneCanvas } from './scene-canvas';
 
 export type HeroProduct = { slug: string; name: string; image: string };
 
@@ -47,6 +48,7 @@ function Panel({ product, angle, radius }: { product: HeroProduct; angle: number
   const router = useRouter();
   const ref = useRef<Group>(null);
   const [hovered, setHovered] = useState(false);
+  const { texture } = useSafeTexture(product.image);
   useFrame((_, d) => {
     const g = ref.current;
     if (!g) return;
@@ -78,11 +80,7 @@ function Panel({ product, angle, radius }: { product: HeroProduct; angle: number
         router.push(`/products/${product.slug}`);
       }}
     >
-      <SceneBoundary fallback={<BlankPanel />}>
-        <Suspense fallback={<BlankPanel />}>
-          <DreiImage url={product.image} scale={[1.25, 1.25]} radius={0.12} transparent />
-        </Suspense>
-      </SceneBoundary>
+      {texture ? <DreiImage texture={texture} scale={[1.25, 1.25]} radius={0.12} transparent /> : <BlankPanel />}
     </group>
   );
 }
