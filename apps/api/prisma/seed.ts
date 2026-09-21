@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 /**
  * Drikon — seed data
  * Run: pnpm db:seed
@@ -31,9 +32,17 @@ async function main() {
   console.log('🌱 Seeding Drikon database...');
 
   // ─── Users ───
-  // NOTE: this is a DEMO password — rotate it immediately on any real deployment.
-  const adminHash = await argon2.hash(process.env.SEED_ADMIN_PASSWORD || 'Admin@drikon2026', argonOpts);
-  const userHash = await argon2.hash('User@drikon2026', argonOpts);
+  // No built-in passwords. These used to default to values published in this
+  // (public) repo and in DEPLOY.md — and DEPLOY.md has you seed production from
+  // your own machine, where NODE_ENV isn't "production", so the guard above
+  // never fired. Set the env vars, or take the random ones printed below.
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD || generatePassword();
+  const customerPassword = process.env.SEED_CUSTOMER_PASSWORD || generatePassword();
+  const adminHash = await argon2.hash(adminPassword, argonOpts);
+  const userHash = await argon2.hash(customerPassword, argonOpts);
+
+  const adminExisted = !!(await prisma.user.findUnique({ where: { email: 'admin@drikon.com' }, select: { id: true } }));
+  const customerExisted = !!(await prisma.user.findUnique({ where: { email: 'demo@drikon.com' }, select: { id: true } }));
 
   const admin = await prisma.user.upsert({
     where: { email: 'admin@drikon.com' },
@@ -58,6 +67,14 @@ async function main() {
       emailVerified: new Date(),
     },
   });
+
+  // Shown once. Existing accounts keep their password (upsert doesn't update it).
+  if (!adminExisted) {
+    console.log(`🔑 Admin created: admin@drikon.com / ${process.env.SEED_ADMIN_PASSWORD ? '(SEED_ADMIN_PASSWORD)' : adminPassword}`);
+  }
+  if (!customerExisted) {
+    console.log(`🔑 Demo customer created: demo@drikon.com / ${process.env.SEED_CUSTOMER_PASSWORD ? '(SEED_CUSTOMER_PASSWORD)' : customerPassword}`);
+  }
 
   console.log(`  ✓ users (admin: ${admin.email}, demo: ${customer.email})`);
 
@@ -909,10 +926,11 @@ async function main() {
   console.log(`  ✓ demo orders (${ordersCreated}) — click "Recompute" on the admin Recommendations page to generate rules`);
 
   console.log('\n✨ Seed complete.\n');
-  const adminPw = process.env.SEED_ADMIN_PASSWORD || 'Admin@drikon2026';
-  console.log(`Login as admin: admin@drikon.com / ${adminPw}`);
-  console.log('Login as demo:  demo@drikon.com  / User@drikon2026\n');
-  console.log('⚠️  These are DEMO credentials. Rotate the admin password before exposing this publicly.\n');
+  if (adminExisted && customerExisted) {
+    console.log('Accounts already existed — their passwords were left unchanged.\n');
+  } else {
+    console.log('Sign-in details for newly created accounts are printed above (🔑). They are not stored anywhere.\n');
+  }
 }
 
 main()
@@ -923,3 +941,9 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+
+/** 20 random characters with every class the password policy requires. */
+function generatePassword(): string {
+  const body = randomBytes(15).toString('base64url');
+  return `${body}Aa1!`;
+}
