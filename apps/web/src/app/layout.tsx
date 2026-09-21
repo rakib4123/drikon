@@ -12,6 +12,7 @@ import { SiteChrome } from '@/components/layout/site-chrome';
 import { getSettings, resolveContent } from '@/lib/settings';
 import { getCategories } from '@/lib/catalog';
 import { SITE_URL } from '@/lib/site';
+import { accentForeground } from '@/lib/contrast';
 
 // Self-hosted via next/font: no render-blocking stylesheet round-trip to Google,
 // automatic `font-display: swap`, and a size-adjusted fallback so swapping the
@@ -82,13 +83,22 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const content = resolveContent(s);
   const brand = { siteName: s.siteName, logoUrl: s.logoUrl ?? null, tagline: s.tagline ?? null };
 
-  // Runtime accent override from admin branding — applies across light + dark.
-  // Sets the --color-* theme tokens (not the aliases), so both the hand-written
-  // `var(--accent)` call sites AND the Tailwind-generated utilities that read
-  // --color-accent pick the brand colour up without a redeploy.
+  // Runtime accent override from admin branding — applies to both the
+  // storefront (:root) and the admin surface (.theme-classic), so admin
+  // previews the brand accent too instead of staying pinned to its hardcoded
+  // #0b57d0. Sets the --color-* theme tokens (not the aliases), so both the
+  // hand-written `var(--accent)` call sites AND the Tailwind-generated
+  // utilities that read --color-accent pick the brand colour up without a
+  // redeploy. --color-accent-fg is recomputed from the accent's WCAG relative
+  // luminance too — an arbitrary admin-picked accent can be light or dark, and
+  // the fixed #03121a default only reads well against light ones.
   const accentCss =
     s.accentColor || s.accentColor2
-      ? `:root,.dark{${s.accentColor ? `--color-accent:${s.accentColor};--color-ring:${s.accentColor};` : ''}${s.accentColor2 ? `--color-accent-2:${s.accentColor2};` : ''}}`
+      ? `:root,.theme-classic{${
+          s.accentColor
+            ? `--color-accent:${s.accentColor};--color-ring:${s.accentColor};--color-accent-fg:${accentForeground(s.accentColor)};`
+            : ''
+        }${s.accentColor2 ? `--color-accent-2:${s.accentColor2};` : ''}}`
       : null;
 
   return (
