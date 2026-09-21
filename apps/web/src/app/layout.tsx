@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Plus_Jakarta_Sans, Hind_Siliguri, JetBrains_Mono, Space_Grotesk } from 'next/font/google';
+import { Plus_Jakarta_Sans, Hind_Siliguri, JetBrains_Mono, Fraunces } from 'next/font/google';
 import '../styles/globals.css';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
@@ -41,11 +41,11 @@ const jetbrainsMono = JetBrains_Mono({
   display: 'swap',
 });
 
-// Display face for the neon-cyber headings; body copy stays Plus Jakarta.
-const grotesk = Space_Grotesk({
+// Serif display face for the warm editorial headings; body copy stays Plus Jakarta.
+const fraunces = Fraunces({
   subsets: ['latin'],
-  weight: ['500', '600', '700'],
-  variable: '--font-grotesk',
+  weight: ['500', '600'],
+  variable: '--font-fraunces',
   display: 'swap',
 });
 
@@ -72,7 +72,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export const viewport: Viewport = {
   // Matches the dark storefront background.
-  themeColor: '#05060d',
+  themeColor: '#f5f1ea',
   width: 'device-width',
   initialScale: 1,
 };
@@ -105,7 +105,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html
       lang={locale}
       suppressHydrationWarning
-      className={`${jakarta.variable} ${bangla.variable} ${jetbrainsMono.variable} ${grotesk.variable}`}
+      className={`${jakarta.variable} ${bangla.variable} ${jetbrainsMono.variable} ${fraunces.variable}`}
     >
       <body>
         {accentCss && <style dangerouslySetInnerHTML={{ __html: accentCss }} />}
