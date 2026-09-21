@@ -7,6 +7,7 @@ import {
 import { Prisma } from '@prisma/client';
 import { OrderModel } from '../../models/order.model';
 import { ProductModel } from '../../models/product.model';
+import { FlashSaleModel } from '../../models/flash-sale.model';
 import { CouponsService } from '../coupons/coupons.service';
 import { SettingsService } from '../settings/settings.service';
 import type { CreateOrderDto, OrderQueryDto } from './dto/order.dto';
@@ -21,6 +22,7 @@ export class OrdersService {
   constructor(
     private readonly orders: OrderModel,
     private readonly products: ProductModel,
+    private readonly flashSales: FlashSaleModel,
     private readonly coupons: CouponsService,
     private readonly settingsService: SettingsService,
   ) {}
@@ -47,6 +49,12 @@ export class OrdersService {
     });
     const byId = new Map(products.map((p) => [p.id, p]));
 
+    // Authoritative sale pricing. The client sends product IDs and quantities but
+    // never prices — what a line costs is decided here, from the same live flash
+    // sale the storefront renders, so an advertised discount is actually charged.
+    const saleEntries = await this.flashSales.findActiveEntriesForProducts(productIds);
+    const saleByProduct = new Map(saleEntries.map((e) => [e.productId, e]));
+
     const lines = dto.items.map((item) => {
       const product = byId.get(item.productId);
       if (!product) {
@@ -67,7 +75,11 @@ export class OrdersService {
         );
       }
 
-      const unitPrice = variant?.price ?? product.price;
+      // A flash sale prices the product itself, so it only applies to a line with no
+      // variant override — a variant carries its own price and isn't part of the sale.
+      const sale = variant ? undefined : saleByProduct.get(product.id);
+      const basePrice = variant?.price ?? product.price;
+      const unitPrice = sale && sale.salePrice.lessThan(basePrice) ? sale.salePrice : basePrice;
       const lineTotal = unitPrice.mul(item.quantity);
 
       return {
@@ -79,6 +91,7 @@ export class OrdersService {
         quantity: item.quantity,
         lineTotal,
         currency: product.currency,
+        flashSaleId: unitPrice.equals(basePrice) ? null : (sale?.flashSaleId ?? null),
       };
     });
 
@@ -98,6 +111,7 @@ export class OrdersService {
         dto.couponCode,
         subtotal.toNumber(),
         lines.map((l) => ({ productId: l.productId, quantity: l.quantity, unitPrice: l.unitPrice.toNumber() })),
+        userId,
       );
       discount = resolved.discount;
       couponId = resolved.couponId;
@@ -181,13 +195,16 @@ export class OrdersService {
   // Helpers
   // ─────────────────────────────────────────────────────────────────
 
+  /**
+   * Reserves the next order number from the OrderSequence table.
+   *
+   * The previous count()+1 scheme handed the same number to two concurrent
+   * checkouts, and one of them died on the unique constraint as a 500.
+   */
   private async nextOrderNumber(): Promise<string> {
     const year = new Date().getFullYear();
-    const start = new Date(year, 0, 1);
-    const end = new Date(year + 1, 0, 1);
-    const countThisYear = await this.orders.countCreatedBetween(start, end);
-    const seq = String(countThisYear + 1).padStart(6, '0');
-    return `DRK-${year}-${seq}`;
+    const next = await this.orders.nextSequenceValue(year);
+    return `DRK-${year}-${String(next).padStart(6, '0')}`;
   }
 
   private async attachSlugs<T extends { items: { productId: string }[] }>(

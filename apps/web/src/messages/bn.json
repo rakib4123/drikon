@@ -84,7 +84,18 @@
     "sortPopular": "সবচেয়ে জনপ্রিয়",
     "sortPriceAsc": "দাম ↑",
     "sortPriceDesc": "দাম ↓",
-    "sortRating": "সেরা রেটিং"
+    "sortRating": "সেরা রেটিং",
+    "sortLabel": "সাজান",
+    "filters": "ফিল্টার",
+    "brand": "ব্র্যান্ড",
+    "priceRange": "দামের পরিসর",
+    "min": "সর্বনিম্ন",
+    "max": "সর্বোচ্চ",
+    "minPrice": "সর্বনিম্ন দাম",
+    "maxPrice": "সর্বোচ্চ দাম",
+    "inStockOnly": "শুধু স্টকে আছে",
+    "clear": "মুছুন",
+    "apply": "প্রয়োগ করুন"
   },
   "pdp": {
     "shop": "শপ",
@@ -97,7 +108,8 @@
     "specifications": "স্পেসিফিকেশন",
     "frequentlyBoughtTogether": "একসাথে যা কেনা হয়",
     "youMightAlsoLike": "আপনার আরও পছন্দ হতে পারে",
-    "offBadge": "−{discount}% ছাড়"
+    "offBadge": "−{discount}% ছাড়",
+    "flashSale": "ফ্ল্যাশ সেল"
   },
   "about": {
     "eyebrow": "{brand} সম্পর্কে",

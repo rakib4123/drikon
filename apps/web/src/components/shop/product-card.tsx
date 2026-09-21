@@ -7,7 +7,7 @@ import { ShoppingBag, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLocale, useTranslations } from 'next-intl';
 import type { ProductSummary } from '@drikon/shared-types';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, effectivePrice } from '@/lib/utils';
 import { useCartStore } from '@/store/cart-store';
 import { localize } from '@/lib/localize';
 import type { Locale } from '@/i18n/request';
@@ -19,14 +19,21 @@ export function ProductCard({ product }: { product: ProductSummary }) {
   const locale = useLocale() as Locale;
   const add = useCartStore((s) => s.add);
   const name = localize(product.name, product.nameBn, locale);
-  const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
+  // A live flash sale beats the catalogue price, and it's what checkout will charge.
+  const { price, listPrice, onSale: onFlashSale, discountPercent } = effectivePrice(product);
   const compareAt = product.compareAtPrice
     ? typeof product.compareAtPrice === 'string'
       ? parseFloat(product.compareAtPrice)
       : product.compareAtPrice
     : null;
-  const onSale = compareAt && compareAt > price;
-  const discount = onSale && compareAt ? Math.round(((compareAt - price) / compareAt) * 100) : 0;
+  // Strike through the flash-sale list price when there is one, otherwise the RRP.
+  const struckPrice = onFlashSale ? listPrice : compareAt && compareAt > price ? compareAt : null;
+  const onSale = struckPrice !== null;
+  const discount = onFlashSale
+    ? discountPercent
+    : struckPrice
+      ? Math.round(((struckPrice - price) / struckPrice) * 100)
+      : 0;
 
   return (
     <article className="group card !p-0 overflow-hidden flex flex-col">
@@ -90,9 +97,9 @@ export function ProductCard({ product }: { product: ProductSummary }) {
         <div className="mt-auto pt-4 flex items-end justify-between gap-2">
           <div>
             <div className="font-semibold">{formatPrice(price, product.currency)}</div>
-            {onSale && compareAt && (
+            {struckPrice !== null && (
               <div className="text-xs text-[color:var(--fg-muted)] line-through">
-                {formatPrice(compareAt, product.currency)}
+                {formatPrice(struckPrice, product.currency)}
               </div>
             )}
           </div>

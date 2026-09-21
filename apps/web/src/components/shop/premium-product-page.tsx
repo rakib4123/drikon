@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion, useScroll, useTransform, AnimatePresence, useReducedMotion } from 'motion/react';
 import { ArrowLeft, ChevronDown, ShieldCheck, Truck, Headphones } from 'lucide-react';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, effectivePrice } from '@/lib/utils';
 import { AddToCart } from '@/components/shop/add-to-cart';
 import type { ProductSummary } from '@drikon/shared-types';
 
@@ -48,7 +48,8 @@ export function PremiumProductPage({ product }: PremiumProductPageProps) {
     offset: ['start start', 'end end'],
   });
 
-  const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
+  // Same rule as the standard template: a live flash sale is the price we charge.
+  const { price } = effectivePrice(product);
 
   const headerOpacity = useTransform(scrollYProgress, [0, 0.05], [0, 1]);
   const heroY = useTransform(scrollYProgress, [0, 0.2], [0, reduce ? 0 : 100]);

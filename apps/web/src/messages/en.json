@@ -84,7 +84,18 @@
     "sortPopular": "Most popular",
     "sortPriceAsc": "Price ↑",
     "sortPriceDesc": "Price ↓",
-    "sortRating": "Top rated"
+    "sortRating": "Top rated",
+    "sortLabel": "Sort",
+    "filters": "Filters",
+    "brand": "Brand",
+    "priceRange": "Price range",
+    "min": "Min",
+    "max": "Max",
+    "minPrice": "Minimum price",
+    "maxPrice": "Maximum price",
+    "inStockOnly": "In stock only",
+    "clear": "Clear",
+    "apply": "Apply"
   },
   "pdp": {
     "shop": "Shop",
@@ -97,7 +108,8 @@
     "specifications": "Specifications",
     "frequentlyBoughtTogether": "Frequently bought together",
     "youMightAlsoLike": "You might also like",
-    "offBadge": "−{discount}% OFF"
+    "offBadge": "−{discount}% OFF",
+    "flashSale": "Flash sale"
   },
   "about": {
     "eyebrow": "About {brand}",

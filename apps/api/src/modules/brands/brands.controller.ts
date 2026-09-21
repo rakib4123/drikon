@@ -12,7 +12,7 @@ import { Role } from '@prisma/client';
 
 import { BrandsService } from './brands.service';
 import { CreateBrandDto, UpdateBrandDto } from './dto/brand.dto';
-import { Public, Roles } from '../../common/decorators';
+import { Audit, Public, Roles } from '../../common/decorators';
 
 @ApiTags('brands')
 @Controller({ path: 'brands', version: '1' })
@@ -26,6 +26,7 @@ export class BrandsController {
     return this.brands.list();
   }
 
+  @Audit('brand.create', 'Brand')
   @Post()
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: '(Admin) Create a brand' })
@@ -33,6 +34,7 @@ export class BrandsController {
     return this.brands.create(dto);
   }
 
+  @Audit('brand.update', 'Brand')
   @Patch(':id')
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: '(Admin) Update a brand' })
@@ -40,6 +42,7 @@ export class BrandsController {
     return this.brands.update(id, dto);
   }
 
+  @Audit('brand.delete', 'Brand')
   @Delete(':id')
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: '(Admin) Delete a brand' })

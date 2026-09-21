@@ -12,7 +12,7 @@ import { Role } from '@prisma/client';
 
 import { BannersService } from './banners.service';
 import { CreateBannerDto, UpdateBannerDto } from './dto/banner.dto';
-import { Public, Roles } from '../../common/decorators';
+import { Audit, Public, Roles } from '../../common/decorators';
 
 @ApiTags('banners')
 @Controller({ path: 'banners', version: '1' })
@@ -34,6 +34,7 @@ export class BannersController {
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Audit('banner.create', 'Banner')
   @Post()
   @ApiOperation({ summary: '(Admin) Create a banner' })
   create(@Body() dto: CreateBannerDto) {
@@ -41,6 +42,7 @@ export class BannersController {
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Audit('banner.update', 'Banner')
   @Patch(':id')
   @ApiOperation({ summary: '(Admin) Update a banner' })
   update(@Param('id') id: string, @Body() dto: UpdateBannerDto) {
@@ -48,6 +50,7 @@ export class BannersController {
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Audit('banner.delete', 'Banner')
   @Delete(':id')
   @ApiOperation({ summary: '(Admin) Delete a banner' })
   remove(@Param('id') id: string) {

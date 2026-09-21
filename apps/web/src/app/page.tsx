@@ -23,7 +23,7 @@ import type { ProductListResponse } from '@drikon/shared-types';
 interface BrandLite { id: string; name: string; slug: string; logoUrl?: string | null }
 async function getBrands(): Promise<BrandLite[]> {
   try {
-    return await apiGet<BrandLite[]>('/api/v1/brands');
+    return await apiGet<BrandLite[]>('/api/v1/brands', { revalidate: 300 });
   } catch {
     return [];
   }
@@ -32,7 +32,7 @@ async function getBrands(): Promise<BrandLite[]> {
 // Fetch on the server — RSC means no API key/token leaks to client.
 async function getFeatured(): Promise<ProductListResponse | null> {
   try {
-    return await apiGet<ProductListResponse>('/api/v1/products?featured=true&limit=4');
+    return await apiGet<ProductListResponse>('/api/v1/products?featured=true&limit=4', { revalidate: 60 });
   } catch {
     return null;
   }

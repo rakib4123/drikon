@@ -43,3 +43,20 @@ export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
  */
 export const ROLES_KEY = 'roles';
 export const Roles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);
+
+/**
+ * Marks a handler as auditable — AuditInterceptor writes an AdminLog row after
+ * the handler succeeds.
+ *
+ * Usage:
+ *   @Audit('order.status', 'Order')
+ *   @Patch('orders/:id/status')
+ */
+export interface AuditMetadata {
+  action: string;
+  targetType?: string;
+}
+
+export const AUDIT_KEY = 'audit';
+export const Audit = (action: string, targetType?: string) =>
+  SetMetadata(AUDIT_KEY, { action, targetType } satisfies AuditMetadata);

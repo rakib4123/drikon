@@ -14,6 +14,7 @@ import {
   Zap,
   Sparkles,
   GalleryHorizontalEnd,
+  ScrollText,
   Settings as SettingsIcon,
 } from 'lucide-react';
 
@@ -37,6 +38,7 @@ const NAV: NavItem[] = [
   { href: '/admin/coupons', label: 'Coupons', icon: Ticket },
   { href: '/admin/flash-sales', label: 'Flash sales', icon: Zap },
   { href: '/admin/recommendations', label: 'Recommendations', icon: Sparkles },
+  { href: '/admin/audit-log', label: 'Audit log', icon: ScrollText },
   { href: '/admin/settings', label: 'Settings', icon: SettingsIcon },
 ];
 

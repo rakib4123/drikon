@@ -30,7 +30,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
  */
 export const getSettings = cache(async (): Promise<SiteSettings> => {
   try {
-    return await apiGet<SiteSettings>('/api/v1/settings');
+    return await apiGet<SiteSettings>('/api/v1/settings', { revalidate: 60 });
   } catch {
     return DEFAULT_SETTINGS;
   }

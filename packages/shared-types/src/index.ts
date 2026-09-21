@@ -113,6 +113,13 @@ export interface ProductSummary {
   shortDescriptionBn?: string | null;
   price: string | number;
   compareAtPrice?: string | number | null;
+  /**
+   * Live flash-sale price, set by the API when the product is in a running sale.
+   * This is the price the shopper is actually charged — always prefer it over
+   * `price` when it is non-null, so the storefront and checkout agree.
+   */
+  salePrice?: string | number | null;
+  saleEndsAt?: string | Date | null;
   currency: string;
   stock: number;
   averageRating: number;

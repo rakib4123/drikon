@@ -17,7 +17,7 @@ import {
   UpdateProductDto,
   ProductQueryDto,
 } from './dto/product.dto';
-import { Public, Roles } from '../../common/decorators';
+import { Audit, Public, Roles } from '../../common/decorators';
 
 @ApiTags('products')
 @Controller({ path: 'products', version: '1' })
@@ -54,6 +54,7 @@ export class ProductsController {
   }
 
   // ─── Admin-only mutations ───
+  @Audit('product.create', 'Product')
   @Post()
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: '(Admin) Create a product' })
@@ -61,6 +62,7 @@ export class ProductsController {
     return this.products.create(dto);
   }
 
+  @Audit('product.update', 'Product')
   @Patch(':id')
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: '(Admin) Update a product' })
@@ -68,6 +70,7 @@ export class ProductsController {
     return this.products.update(id, dto);
   }
 
+  @Audit('product.delete', 'Product')
   @Delete(':id')
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: '(Admin) Soft-delete a product' })

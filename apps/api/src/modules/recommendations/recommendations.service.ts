@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { OrderStatus } from '@prisma/client';
 import { OrderModel } from '../../models/order.model';
 import { ProductModel } from '../../models/product.model';
+import { FlashSaleModel } from '../../models/flash-sale.model';
 import { ProductAssociationRuleModel } from '../../models/product-association-rule.model';
 import { RecommendationRunModel } from '../../models/recommendation-run.model';
 import { AprioriService } from './apriori.service';
@@ -20,6 +21,7 @@ export class RecommendationsService {
   constructor(
     private readonly orders: OrderModel,
     private readonly products: ProductModel,
+    private readonly flashSales: FlashSaleModel,
     private readonly rules: ProductAssociationRuleModel,
     private readonly runs: RecommendationRunModel,
     private readonly apriori: AprioriService,
@@ -100,10 +102,25 @@ export class RecommendationsService {
       },
     });
     const byId = new Map(productRows.map((p) => [p.id, p]));
-    return rankedIds
+    const ranked = rankedIds
       .map((id) => byId.get(id))
       .filter((p): p is NonNullable<typeof p> => !!p)
       .slice(0, limit);
+
+    // Recommendation carousels render the same ProductCard as the catalogue, so
+    // they need the sale price too — otherwise a product shows its list price
+    // here and its sale price on its own page.
+    const entries = await this.flashSales.findActiveEntriesForProducts(ranked.map((p) => p.id));
+    const saleByProduct = new Map(entries.map((e) => [e.productId, e]));
+    return ranked.map((p) => {
+      const sale = saleByProduct.get(p.id);
+      const applies = sale && sale.salePrice.lessThan(p.price);
+      return {
+        ...p,
+        salePrice: applies ? sale.salePrice : null,
+        saleEndsAt: applies ? sale.flashSale.endsAt : null,
+      };
+    });
   }
 
   async getStatus() {

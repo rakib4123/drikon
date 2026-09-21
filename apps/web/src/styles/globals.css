@@ -1,20 +1,64 @@
 @import 'tailwindcss';
 
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
-
 /* ─── Design tokens — premium light minimal ───
-   Off-white + near-black + restraint-as-premium. No hue accent by default —
-   --accent / --accent-2 stay overridable at runtime by the brand settings
-   for stores that want color. */
+   Off-white + near-black + restraint-as-premium.
+
+   Declared in @theme so Tailwind v4 generates matching utilities (bg-bg,
+   text-fg-muted, border-border, font-sans, …). Tailwind emits each of these as a
+   real CSS custom property on :root, so the admin brand settings can still
+   override --color-accent at runtime and every utility follows — which a JS
+   config or a hard-coded palette could not do.
+
+   The unprefixed aliases below (--accent, --fg-muted, …) keep the existing
+   `var(--accent)` call sites working; both names resolve to one value. */
+@theme {
+  --color-bg:        #faf9f6;
+  --color-bg-soft:   #f2f0ea;
+  --color-fg:        #151515;
+  --color-fg-muted:  #6b6b6b;
+  --color-border:    #e5e2da;
+  --color-accent:    #151515;
+  --color-accent-2:  #2a2a2a;
+  --color-ring:      #151515;
+
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+
+  /* Radix primitives animate off their own data-state rather than Motion —
+     AnimatePresence can't drive an exit for content Radix unmounts itself.
+     Timings match the Motion defaults used elsewhere (fast, ease-out). */
+  --animate-dk-fade-in:  dk-fade-in 150ms ease-out;
+  --animate-dk-fade-out: dk-fade-out 120ms ease-in;
+  --animate-dk-zoom-in:  dk-zoom-in 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-dk-zoom-out: dk-zoom-out 130ms ease-in;
+  --animate-dk-slide-in-left:  dk-slide-in-left 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-dk-slide-out-left: dk-slide-out-left 180ms ease-in;
+  --animate-dk-pop-in:  dk-pop-in 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-dk-pop-out: dk-pop-out 110ms ease-in;
+}
+
+@keyframes dk-fade-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes dk-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes dk-zoom-in  { from { opacity: 0; transform: translateX(-50%) translateY(-12px) scale(0.98); } to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } }
+@keyframes dk-zoom-out { from { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } to { opacity: 0; transform: translateX(-50%) translateY(-8px) scale(0.98); } }
+@keyframes dk-slide-in-left  { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@keyframes dk-slide-out-left { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+@keyframes dk-pop-in  { from { opacity: 0; transform: translateY(-4px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes dk-pop-out { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(-2px) scale(0.98); } }
+
 :root {
-  --bg:        #faf9f6;
-  --bg-soft:   #f2f0ea;
-  --fg:        #151515;
-  --fg-muted:  #6b6b6b;
-  --border:    #e5e2da;
-  --accent:    #151515;
-  --accent-2:  #2a2a2a;
-  --ring:      #151515;
+  /* Aliases → the @theme tokens. Overriding --color-accent at runtime (see the
+     admin accent override in layout.tsx) flows through to both names. */
+  --bg:        var(--color-bg);
+  --bg-soft:   var(--color-bg-soft);
+  --fg:        var(--color-fg);
+  --fg-muted:  var(--color-fg-muted);
+  --border:    var(--color-border);
+  --accent:    var(--color-accent);
+  --accent-2:  var(--color-accent-2);
+  --ring:      var(--color-ring);
+
+  /* Not colour-scale tokens — no utility would be generated, so they stay here. */
   --glow:      rgba(20,20,20,0.10);
   --glass:     rgba(255,255,255,0.72);
   --grid-line: rgba(0,0,0,0.04);
@@ -26,7 +70,7 @@
 html, body {
   background: var(--bg);
   color: var(--fg);
-  font-family: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -52,12 +96,12 @@ html, body {
 
 /* ─── Headings: clean, confident sans ─── */
 .display {
-  font-family: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
   font-weight: 700;
   letter-spacing: -0.025em;
   line-height: 1.08;
 }
-.font-display { font-family: 'Geist', ui-sans-serif, system-ui, sans-serif; }
+.font-display { font-family: var(--font-sans); }
 
 /* Hide scrollbar (used by horizontally-scrolling nav strips) */
 .scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
@@ -287,6 +331,19 @@ select.input {
 @media (prefers-reduced-motion: reduce) {
   .aurora::before, .aurora::after, .animate-float, .animate-glow-pulse, .skeleton::after { animation: none; }
   .btn-primary::after { transition: none; }
+
+  /* Radix overlays: keep a short fade so open/close is still perceivable,
+     but drop every transform. Mirrors what useReducedMotion() does for Motion. */
+  [data-radix-popper-content-wrapper] *,
+  [data-state][class*="animate-dk-"] {
+    animation-duration: 1ms !important;
+  }
+  @keyframes dk-zoom-in  { from { opacity: 0; transform: translateX(-50%); } to { opacity: 1; transform: translateX(-50%); } }
+  @keyframes dk-zoom-out { from { opacity: 1; transform: translateX(-50%); } to { opacity: 0; transform: translateX(-50%); } }
+  @keyframes dk-slide-in-left  { from { opacity: 0; transform: none; } to { opacity: 1; transform: none; } }
+  @keyframes dk-slide-out-left { from { opacity: 1; transform: none; } to { opacity: 0; transform: none; } }
+  @keyframes dk-pop-in  { from { opacity: 0; transform: none; } to { opacity: 1; transform: none; } }
+  @keyframes dk-pop-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: none; } }
 }
 
 /* ─── Print (receipts) ───
