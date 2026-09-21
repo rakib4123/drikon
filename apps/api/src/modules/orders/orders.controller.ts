@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Query,
@@ -10,14 +12,24 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 
 import { OrdersService } from './orders.service';
-import { CreateOrderDto, OrderQueryDto } from './dto/order.dto';
-import { CurrentUser } from '../../common/decorators';
+import { CreateOrderDto, OrderQueryDto, QuoteDto } from './dto/order.dto';
+import { CurrentUser, Public } from '../../common/decorators';
 
-// All routes auth-protected by the global JwtAuthGuard.
+// Auth-protected by the global JwtAuthGuard, except the public price quote.
 @ApiTags('orders')
 @Controller({ path: 'orders', version: '1' })
 export class OrdersController {
   constructor(private readonly orders: OrdersService) {}
+
+  // Public: guests price their cart too. It reads prices and writes nothing.
+  @Public()
+  @Post('quote')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ short: { limit: 60, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Price a cart exactly as order creation would' })
+  quote(@Body() dto: QuoteDto) {
+    return this.orders.quote(dto);
+  }
 
   @Post()
   @Throttle({ short: { limit: 12, ttl: 60_000 } }) // cap order placement / inventory abuse
