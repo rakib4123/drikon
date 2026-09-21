@@ -7,7 +7,7 @@ describe('canOptimize — which images go through the Next optimizer', () => {
     ({ canOptimize } = await import('@/components/ui/smart-image'));
   });
 
-  it('optimises local paths', () => expect(canOptimize('/hero.png')).toBe(true));
+  it('optimises local paths', () => expect(canOptimize('/logo.svg')).toBe(true));
   it('optimises an allow-listed host', () => expect(canOptimize('https://res.cloudinary.com/x/a.jpg')).toBe(true));
   it('matches subdomains for a leading-dot entry', () => {
     expect(canOptimize('https://cdn.example.net/a.jpg')).toBe(true);
