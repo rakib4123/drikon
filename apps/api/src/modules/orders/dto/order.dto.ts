@@ -39,6 +39,13 @@ export const CreateOrderSchema = z.object({
 });
 export class CreateOrderDto extends createZodDto(CreateOrderSchema) {}
 
+/** A cart to price. Empty is allowed — the cart page quotes an emptied cart too. */
+export const QuoteSchema = z.object({
+  items: z.array(CheckoutItemSchema).max(50),
+  couponCode: z.string().max(40).trim().optional().or(z.literal('')),
+});
+export class QuoteDto extends createZodDto(QuoteSchema) {}
+
 export const OrderQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(50).default(10),

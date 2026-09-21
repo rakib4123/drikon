@@ -43,7 +43,7 @@ describe('OrdersService', () => {
   };
   let products: jest.Mocked<Pick<ProductModel, 'findMany'>>;
   let flashSales: jest.Mocked<Pick<FlashSaleModel, 'findActiveEntriesForProducts'>>;
-  let coupons: jest.Mocked<Pick<CouponsService, 'resolveForOrder'>>;
+  let coupons: jest.Mocked<Pick<CouponsService, 'resolveForOrder' | 'validate'>>;
   let settings: jest.Mocked<Pick<SettingsService, 'get'>>;
 
   beforeEach(async () => {
@@ -56,7 +56,7 @@ describe('OrdersService', () => {
     } as never;
     products = { findMany: jest.fn().mockResolvedValue([product()]) } as never;
     flashSales = { findActiveEntriesForProducts: jest.fn().mockResolvedValue([]) } as never;
-    coupons = { resolveForOrder: jest.fn() } as never;
+    coupons = { resolveForOrder: jest.fn(), validate: jest.fn() } as never;
     settings = { get: jest.fn().mockResolvedValue({ bkashEnabled: true, codEnabled: true }) } as never;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -185,6 +185,89 @@ describe('OrdersService', () => {
           payment: { method: 'BKASH_MANUAL', providerPaymentId: 'T1', payerReference: '017' },
         }) as never),
       ).rejects.toBeInstanceOf(BadRequestException);
+    });
+  });
+
+  describe('quote', () => {
+    const sale = (salePrice: number) => [
+      { flashSaleId: 'fs1', productId: 'p1', salePrice: dec(salePrice), inventoryCap: null, soldCount: 0,
+        flashSale: { endsAt: new Date() } },
+    ];
+
+    it('prices the cart with the live flash-sale price and shipping, in plain numbers', async () => {
+      flashSales.findActiveEntriesForProducts.mockResolvedValue(sale(750) as never);
+
+      const q = await service.quote({ items: [{ productId: 'p1', quantity: 2 }] } as never);
+
+      expect(q.lines[0]).toMatchObject({ unitPrice: 750, listPrice: 1000, onSale: true, lineTotal: 1500 });
+      expect(q.subtotal).toBe(1500);
+      expect(q.shipping).toBe(60); // under the 3000 free-shipping threshold
+      expect(q.total).toBe(1560);
+      expect(q.issues).toEqual([]);
+    });
+
+    it('charges exactly what the quote showed — the guarantee this endpoint exists for', async () => {
+      flashSales.findActiveEntriesForProducts.mockResolvedValue(sale(750) as never);
+      const cart = { items: [{ productId: 'p1', quantity: 3 }] };
+
+      const q = await service.quote(cart as never);
+      await service.create('u1', baseDto(cart) as never);
+      const charged = orders.createOrderTransaction.mock.calls[0][0];
+
+      expect(charged.total.toNumber()).toBe(q.total);
+      expect(charged.subtotal.toNumber()).toBe(q.subtotal);
+      expect(charged.shipping.toNumber()).toBe(q.shipping);
+    });
+
+    it('reports an unavailable product instead of throwing, and leaves it out of the totals', async () => {
+      products.findMany.mockResolvedValue([product()] as never);
+
+      const q = await service.quote({
+        items: [{ productId: 'p1', quantity: 1 }, { productId: 'gone', quantity: 1 }],
+      } as never);
+
+      expect(q.lines.map((l) => l.productId)).toEqual(['p1']);
+      expect(q.issues).toEqual([expect.objectContaining({ productId: 'gone', reason: 'unavailable' })]);
+      expect(q.subtotal).toBe(1000);
+    });
+
+    it('flags a quantity above stock but still prices it, so the cart can ask the shopper to reduce it', async () => {
+      products.findMany.mockResolvedValue([product({ stock: 2 })] as never);
+
+      const q = await service.quote({ items: [{ productId: 'p1', quantity: 5 }] } as never);
+
+      expect(q.lines[0].quantity).toBe(5);
+      expect(q.issues).toEqual([expect.objectContaining({ reason: 'insufficient_stock', available: 2 })]);
+    });
+
+    it('applies a valid coupon, including free shipping', async () => {
+      coupons.validate.mockResolvedValue({
+        valid: true, message: 'ok', discount: dec(100), freeShipping: true, couponId: 'c1', code: 'SAVE',
+      } as never);
+
+      const q = await service.quote({ items: [{ productId: 'p1', quantity: 1 }], couponCode: 'save' } as never);
+
+      expect(q.discount).toBe(100);
+      expect(q.shipping).toBe(0);
+      expect(q.total).toBe(900);
+      expect(q.coupon).toMatchObject({ code: 'SAVE', valid: true, freeShipping: true });
+    });
+
+    it('reports an invalid coupon without discounting', async () => {
+      coupons.validate.mockResolvedValue({
+        valid: false, message: 'This coupon has expired', discount: dec(0), freeShipping: false,
+      } as never);
+
+      const q = await service.quote({ items: [{ productId: 'p1', quantity: 1 }], couponCode: 'OLD' } as never);
+
+      expect(q.discount).toBe(0);
+      expect(q.coupon).toMatchObject({ valid: false, message: 'This coupon has expired' });
+    });
+
+    it('quotes an empty cart as zero, with no shipping', async () => {
+      products.findMany.mockResolvedValue([] as never);
+      const q = await service.quote({ items: [] } as never);
+      expect(q).toMatchObject({ subtotal: 0, shipping: 0, discount: 0, total: 0, lines: [] });
     });
   });
 });

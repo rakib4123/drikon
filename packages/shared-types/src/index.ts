@@ -103,6 +103,9 @@ export interface PublicUser {
   name: string;
   role: Role;
   avatarUrl?: string | null;
+  emailVerified?: string | Date | null;
+  twoFactorEnabled?: boolean;
+  authProvider?: 'LOCAL' | 'GOOGLE';
 }
 
 export interface ProductSummary {
