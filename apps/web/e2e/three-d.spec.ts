@@ -87,6 +87,18 @@ test.describe('3D storefront (WebGL on)', () => {
     });
   });
 
+  // Positive control for the test below: without emulation, a desktop fine
+  // pointer should reach data-tilt="on" after hydration — otherwise "off"
+  // could just mean the pointer/hover media query never resolved at all.
+  test('card tilt turns on for a fine pointer with no reduced motion', async () => {
+    await withPage(WEBGL_ON_ARGS, async (page) => {
+      await page.goto('/products');
+      const card = page.locator('[data-tilt]').first();
+      test.skip((await card.count()) === 0, 'no products in this environment');
+      await expect(card).toHaveAttribute('data-tilt', 'on');
+    });
+  });
+
   test('reduced motion disables card tilt', async () => {
     await withPage(WEBGL_ON_ARGS, async (page) => {
       await page.emulateMedia({ reducedMotion: 'reduce' });
