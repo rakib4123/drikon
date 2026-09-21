@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Float, Image as DreiImage } from '@react-three/drei';
@@ -133,10 +133,18 @@ function Composition({ products, spin }: { products: HeroProduct[]; spin: boolea
   );
 }
 
-export default function HeroScene({ products, tier }: { products: HeroProduct[]; tier: 'low' | 'high' }) {
+export default function HeroScene({
+  products,
+  tier,
+  fallback,
+}: {
+  products: HeroProduct[];
+  tier: 'low' | 'high';
+  fallback: ReactNode;
+}) {
   const spin = !useReducedMotion();
   return (
-    <SceneCanvas name="hero" tier={tier} fallback={null} className="h-full w-full" camera={{ position: [0, 1.2, 7], fov: 42 }}>
+    <SceneCanvas name="hero" tier={tier} fallback={fallback} className="h-full w-full" camera={{ position: [0, 1.2, 7], fov: 42 }}>
       <ambientLight intensity={0.5} />
       <pointLight position={[4, 4, 4]} intensity={40} color="#22e5ff" />
       <pointLight position={[-4, -2, 2]} intensity={30} color="#8b5cf6" />

@@ -28,33 +28,45 @@ export function TiltCard({ className, children }: { className?: string; children
     return () => mq.removeEventListener('change', sync);
   }, []);
 
-  if (reduced || !canHover) {
-    return <div data-tilt="off" className={className}>{children}</div>;
-  }
+  // Always the same element (motion.div) so toggling `enabled` — canHover
+  // resolving after mount, or reduced-motion changing — never remounts the
+  // card's subtree. Only the transform-driving bits (spring style, pointer
+  // handlers, glare) are conditional; `data-tilt` keeps its on/off semantics.
+  const enabled = !reduced && canHover;
 
   return (
     <motion.div
-      data-tilt="on"
+      data-tilt={enabled ? 'on' : 'off'}
       className={cn('relative [transform-style:preserve-3d]', className)}
-      style={{ rotateX, rotateY, transformPerspective: 900 }}
-      onPointerMove={(e) => {
-        const t = tiltFromPointer(e.clientX, e.clientY, e.currentTarget.getBoundingClientRect());
-        rx.set(t.rotateX);
-        ry.set(t.rotateY);
-        glare.current?.style.setProperty('--gx', `${t.glareX}%`);
-        glare.current?.style.setProperty('--gy', `${t.glareY}%`);
-      }}
-      onPointerLeave={() => {
-        rx.set(0);
-        ry.set(0);
-      }}
+      style={enabled ? { rotateX, rotateY, transformPerspective: 900 } : undefined}
+      onPointerMove={
+        enabled
+          ? (e) => {
+              const t = tiltFromPointer(e.clientX, e.clientY, e.currentTarget.getBoundingClientRect());
+              rx.set(t.rotateX);
+              ry.set(t.rotateY);
+              glare.current?.style.setProperty('--gx', `${t.glareX}%`);
+              glare.current?.style.setProperty('--gy', `${t.glareY}%`);
+            }
+          : undefined
+      }
+      onPointerLeave={
+        enabled
+          ? () => {
+              rx.set(0);
+              ry.set(0);
+            }
+          : undefined
+      }
     >
       {children}
-      <div
-        ref={glare}
-        aria-hidden
-        className="pointer-events-none absolute inset-0 rounded-[var(--radius-card)] opacity-0 transition-opacity duration-300 [.group:hover_&]:opacity-100 [background:radial-gradient(circle_at_var(--gx,50%)_var(--gy,50%),rgba(34,229,255,0.18),transparent_55%)]"
-      />
+      {enabled && (
+        <div
+          ref={glare}
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-[var(--radius-card)] opacity-0 transition-opacity duration-300 [.group:hover_&]:opacity-100 [background:radial-gradient(circle_at_var(--gx,50%)_var(--gy,50%),rgba(34,229,255,0.18),transparent_55%)]"
+        />
+      )}
     </motion.div>
   );
 }
