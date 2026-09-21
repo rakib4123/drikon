@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 import type { ProductSummary } from '@drikon/shared-types';
 import { ProductCard } from './product-card';
 
-const DEFAULT_GRID = 'grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6';
+const DEFAULT_GRID = 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4';
 
 /**
  * A product grid whose cards stagger-reveal as they scroll into view.
@@ -26,6 +26,9 @@ export function ProductGrid({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-40px' }}
           transition={{ duration: 0.4, ease: 'easeOut', delay: Math.min(i * 0.05, 0.3) }}
+          // h-full so every card in a row stretches to the tallest, which keeps
+          // the add-to-cart buttons on one line.
+          className="h-full"
         >
           <ProductCard product={p} />
         </motion.div>

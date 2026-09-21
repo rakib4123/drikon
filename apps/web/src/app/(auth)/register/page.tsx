@@ -4,151 +4,99 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslations } from 'next-intl';
+import { ArrowRight, Loader2, MailCheck } from 'lucide-react';
 import { RegisterSchema, type RegisterInput } from '@drikon/shared-types';
 import { useAuthStore } from '@/store/auth-store';
 import { ApiError } from '@/lib/api-client';
 import { useBrand } from '@/components/layout/settings-context';
-import { ArrowRight, Check, Loader2 } from 'lucide-react';
+import { AuthShell, AuthField, FormAlert } from '@/components/auth/auth-shell';
+import { PasswordRules } from '@/components/auth/password-rules';
 
 export default function RegisterPage() {
-  const register = useAuthStore((s) => s.register);
+  const t = useTranslations('auth');
+  const signUp = useAuthStore((s) => s.register);
   const { siteName } = useBrand();
   const [serverError, setServerError] = useState<string | null>(null);
-  const [done, setDone] = useState<string | null>(null);
+  const [sentTo, setSentTo] = useState<string | null>(null);
 
   const {
-    register: rhfRegister,
+    register,
     handleSubmit,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterInput>({
-    resolver: zodResolver(RegisterSchema),
-  });
+  } = useForm<RegisterInput>({ resolver: zodResolver(RegisterSchema) });
 
   const password = watch('password') ?? '';
-
-  const rules = [
-    { label: '10+ characters', ok: password.length >= 10 },
-    { label: 'Lowercase letter', ok: /[a-z]/.test(password) },
-    { label: 'Uppercase letter', ok: /[A-Z]/.test(password) },
-    { label: 'A digit', ok: /\d/.test(password) },
-    { label: 'A symbol', ok: /[^A-Za-z0-9]/.test(password) },
-  ];
 
   async function onSubmit(values: RegisterInput) {
     setServerError(null);
     try {
-      const res = await register(values);
-      setDone(res.message);
+      await signUp(values);
+      setSentTo(values.email);
     } catch (err) {
-      setServerError(err instanceof ApiError ? err.message : 'Something went wrong');
+      setServerError(err instanceof ApiError ? err.message : t('genericError'));
     }
   }
 
-  if (done) {
+  if (sentTo) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] grid place-items-center px-6 py-16">
-        <div className="card max-w-md text-center">
-          <div className="w-12 h-12 mx-auto rounded-full bg-[color:var(--accent)]/15 grid place-items-center text-[color:var(--accent)] mb-4">
-            <Check className="w-6 h-6" />
+      <AuthShell title={t('checkEmailTitle')}>
+        <div className="text-center">
+          <div className="w-14 h-14 mx-auto rounded-full bg-[color:var(--accent)]/10 text-[color:var(--accent)] grid place-items-center mb-4">
+            <MailCheck aria-hidden className="w-7 h-7" />
           </div>
-          <h2 className="display text-2xl mb-2">Check your email</h2>
-          <p className="text-[color:var(--fg-muted)] text-sm">{done}</p>
-          <Link href="/login" className="btn-ghost mt-6 inline-flex">
-            Back to sign in
+          {/* The API answers identically whether or not the address was new, so it
+              can't be used to discover who has an account — mirror that here. */}
+          <p className="text-[color:var(--fg-muted)]">{t('checkEmailBody', { email: sentTo })}</p>
+          <Link href="/login" className="btn-primary mt-6">
+            {t('backToSignIn')}
           </Link>
         </div>
-      </div>
+      </AuthShell>
     );
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] grid lg:grid-cols-2">
-      <div className="flex items-center justify-center px-6 py-16">
-        <div className="w-full max-w-sm">
-          <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
-            Create an account
-          </div>
-          <h1 className="display text-3xl md:text-4xl mb-8">Welcome to {siteName}</h1>
+    <AuthShell title={t('registerTitle', { site: siteName })} subtitle={t('registerSubtitle')}>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+        {serverError && <FormAlert>{serverError}</FormAlert>}
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-            <Field label="Full name" error={errors.name?.message}>
-              <input
-                type="text"
-                autoComplete="name"
-                {...rhfRegister('name')}
-                className="w-full px-4 py-3 rounded-xl bg-[color:var(--bg-soft)] border border-[color:var(--border)] focus:border-[color:var(--accent)] outline-none transition-colors"
-              />
-            </Field>
-            <Field label="Email" error={errors.email?.message}>
-              <input
-                type="email"
-                autoComplete="email"
-                {...rhfRegister('email')}
-                className="w-full px-4 py-3 rounded-xl bg-[color:var(--bg-soft)] border border-[color:var(--border)] focus:border-[color:var(--accent)] outline-none transition-colors"
-              />
-            </Field>
-            <Field label="Password" error={errors.password?.message}>
-              <input
-                type="password"
-                autoComplete="new-password"
-                {...rhfRegister('password')}
-                className="w-full px-4 py-3 rounded-xl bg-[color:var(--bg-soft)] border border-[color:var(--border)] focus:border-[color:var(--accent)] outline-none transition-colors"
-              />
-              <ul className="mt-2 grid grid-cols-2 gap-1 text-xs">
-                {rules.map((r) => (
-                  <li key={r.label} className={`flex items-center gap-1 ${r.ok ? 'text-emerald-600' : 'text-[color:var(--fg-muted)]'}`}>
-                    <Check className={`w-3 h-3 ${r.ok ? 'opacity-100' : 'opacity-30'}`} />
-                    {r.label}
-                  </li>
-                ))}
-              </ul>
-            </Field>
+        <AuthField id="name" label={t('fullName')} error={errors.name?.message}>
+          <input id="name" autoComplete="name" aria-invalid={!!errors.name} className="input h-12" {...register('name')} />
+        </AuthField>
+        <AuthField id="email" label={t('email')} error={errors.email?.message}>
+          <input id="email" type="email" autoComplete="email" aria-invalid={!!errors.email} className="input h-12" {...register('email')} />
+        </AuthField>
+        <AuthField id="password" label={t('password')} error={errors.password?.message}>
+          <input
+            id="password"
+            type="password"
+            autoComplete="new-password"
+            aria-invalid={!!errors.password}
+            className="input h-12"
+            {...register('password')}
+          />
+          <PasswordRules password={password} />
+        </AuthField>
 
-            {serverError && (
-              <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-sm text-red-600">
-                {serverError}
-              </div>
-            )}
+        <button type="submit" disabled={isSubmitting} className="btn-primary w-full h-12">
+          {isSubmitting ? (
+            <Loader2 aria-label={t('creating')} className="w-4 h-4 animate-spin" />
+          ) : (
+            <>
+              {t('createAccount')} <ArrowRight aria-hidden className="w-4 h-4" />
+            </>
+          )}
+        </button>
 
-            <button type="submit" disabled={isSubmitting} className="btn-primary w-full">
-              {isSubmitting ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <>Create account <ArrowRight className="w-4 h-4" /></>
-              )}
-            </button>
-
-            <p className="text-center text-sm text-[color:var(--fg-muted)] mt-6">
-              Already have an account?{' '}
-              <Link href="/login" className="text-[color:var(--accent)] font-medium hover:underline">
-                Sign in
-              </Link>
-            </p>
-          </form>
-        </div>
-      </div>
-
-      <div className="hidden lg:block relative bg-drikon-gradient grain">
-        <div className="absolute inset-0 grid place-items-center p-16">
-          <div className="max-w-md text-white">
-            <div className="display text-5xl leading-tight">A marketplace<br />for the curious.</div>
-            <p className="mt-6 text-white/80">
-              Free to join. No spam, ever. Your data lives in encrypted-at-rest cookies — never in localStorage.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
-  return (
-    <label className="block">
-      <span className="block text-sm font-medium mb-1.5">{label}</span>
-      {children}
-      {error && <span className="block text-xs text-red-600 mt-1">{error}</span>}
-    </label>
+        <p className="text-center text-sm text-[color:var(--fg-muted)]">
+          {t('haveAccount')}{' '}
+          <Link href="/login" className="text-[color:var(--accent)] font-bold hover:underline underline-offset-4">
+            {t('signIn')}
+          </Link>
+        </p>
+      </form>
+    </AuthShell>
   );
 }

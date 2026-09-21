@@ -4,7 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { useLocale } from 'next-intl';
-import { ChevronDown, ChevronRight, ArrowRight, LayoutGrid } from 'lucide-react';
+import { ChevronDown, ChevronRight, ArrowRight, Menu } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { CategoryIcon } from '@/components/shop/category-icon';
 import type { NavCategory } from '@/lib/catalog';
 import { localize } from '@/lib/localize';
 import type { Locale } from '@/i18n/request';
@@ -25,6 +27,7 @@ import type { Locale } from '@/i18n/request';
  */
 export function MegaMenu({ categories = [] }: { categories?: NavCategory[] }) {
   const locale = useLocale() as Locale;
+  const t = useTranslations('nav');
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const list = categories ?? [];
@@ -43,22 +46,25 @@ export function MegaMenu({ categories = [] }: { categories?: NavCategory[] }) {
       onValueChange={(v) => {
         if (!v) setActiveId(null);
       }}
-      className="relative"
+      className="relative flex"
     >
-      <NavigationMenu.List className="flex list-none m-0 p-0">
-        <NavigationMenu.Item>
-          <NavigationMenu.Trigger className="group inline-flex items-center gap-1 hover:text-[color:var(--accent)] transition-colors outline-none">
-            Shop
-            <ChevronDown className="w-3.5 h-3.5 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+      <NavigationMenu.List className="flex h-full list-none m-0 p-0">
+        <NavigationMenu.Item className="flex">
+          {/* The megastore "All categories" block: navy, full bar height, a fixed
+              width that lines up with the homepage category sidebar below it. */}
+          <NavigationMenu.Trigger className="group flex w-[260px] items-center gap-3 bg-[color:var(--color-ink)] px-4 text-[13.5px] font-bold text-white outline-none hover:bg-[color:var(--color-ink-soft)] data-[state=open]:bg-[color:var(--color-ink-soft)] transition-colors">
+            <Menu aria-hidden className="w-[18px] h-[18px]" />
+            <span className="flex-1 text-left">{t('allCategories')}</span>
+            <ChevronDown aria-hidden className="w-4 h-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
           </NavigationMenu.Trigger>
 
           <NavigationMenu.Content
-            className="absolute left-0 top-full pt-3 z-50
+            className="absolute left-0 top-full z-50 text-[color:var(--fg)]
                        data-[motion=from-start]:animate-dk-fade-in data-[motion=from-end]:animate-dk-fade-in
                        data-[state=open]:animate-dk-fade-in data-[state=closed]:animate-dk-fade-out"
           >
             {topLevel.length === 0 ? (
-              <div className="rounded-2xl glass border border-[color:var(--border)] shadow-2xl p-5">
+              <div className="w-[260px] rounded-b-[var(--radius-card)] bg-white border border-[color:var(--border)] shadow-2xl p-5">
                 <NavigationMenu.Link asChild>
                   <Link href="/products" className="text-sm text-[color:var(--accent)]">
                     Browse all products →
@@ -66,9 +72,9 @@ export function MegaMenu({ categories = [] }: { categories?: NavCategory[] }) {
                 </NavigationMenu.Link>
               </div>
             ) : (
-              <div className="w-[min(94vw,780px)] rounded-2xl glass border border-[color:var(--border)] shadow-2xl overflow-hidden grid grid-cols-[230px_1fr]">
+              <div className="w-[min(94vw,860px)] rounded-b-[var(--radius-card)] bg-white border border-t-0 border-[color:var(--border)] shadow-[0_24px_48px_-20px_rgba(16,24,40,0.35)] overflow-hidden grid grid-cols-[260px_1fr]">
                 {/* Left: category list */}
-                <ul className="max-h-[62vh] overflow-y-auto border-r border-[color:var(--border)] p-2 list-none m-0">
+                <ul className="max-h-[62vh] overflow-y-auto border-r border-[color:var(--border)] py-2 list-none m-0 bg-[color:var(--bg-soft)]/60">
                   {topLevel.map((cat) => {
                     const isActive = active?.id === cat.id;
                     return (
@@ -80,14 +86,15 @@ export function MegaMenu({ categories = [] }: { categories?: NavCategory[] }) {
                             // the same right-pane change a mouse user gets.
                             onMouseEnter={() => setActiveId(cat.id)}
                             onFocus={() => setActiveId(cat.id)}
-                            className={`flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
+                            className={`flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors ${
                               isActive
-                                ? 'bg-[color:var(--accent)]/12 text-[color:var(--accent)] font-medium'
-                                : 'text-[color:var(--fg-muted)] hover:text-[color:var(--fg)]'
+                                ? 'bg-white text-[color:var(--accent)] shadow-[inset_3px_0_0_var(--accent)]'
+                                : 'text-[color:var(--fg)] hover:text-[color:var(--accent)]'
                             }`}
                           >
-                            <span className="truncate">{localize(cat.name, cat.nameBn, locale)}</span>
-                            <ChevronRight className="w-3.5 h-3.5 shrink-0" />
+                            <CategoryIcon slug={cat.slug} className="w-[18px] h-[18px] shrink-0 opacity-80" />
+                            <span className="flex-1 truncate">{localize(cat.name, cat.nameBn, locale)}</span>
+                            <ChevronRight aria-hidden className="w-3.5 h-3.5 shrink-0 opacity-50" />
                           </Link>
                         </NavigationMenu.Link>
                       </li>
@@ -96,17 +103,15 @@ export function MegaMenu({ categories = [] }: { categories?: NavCategory[] }) {
                 </ul>
 
                 {/* Right: subcategories of the active category */}
-                <div className="p-5 max-h-[62vh] overflow-y-auto">
+                <div className="p-6 max-h-[62vh] overflow-y-auto">
                   <div className="flex items-center justify-between mb-4">
                     <NavigationMenu.Link asChild>
                       <Link
                         href={`/products?category=${active?.slug}`}
                         className="inline-flex items-center gap-2 text-sm font-semibold hover:text-[color:var(--accent)]"
                       >
-                        <span className="w-6 h-6 rounded-md bg-[color:var(--accent)]/10 grid place-items-center text-[color:var(--accent)]">
-                          <LayoutGrid className="w-3.5 h-3.5" />
-                        </span>
-                        {activeName}
+                        {active && <CategoryIcon slug={active.slug} className="w-5 h-5 text-[color:var(--accent)]" />}
+                        <span className="text-base font-extrabold">{activeName}</span>
                       </Link>
                     </NavigationMenu.Link>
                     <NavigationMenu.Link asChild>
@@ -125,7 +130,7 @@ export function MegaMenu({ categories = [] }: { categories?: NavCategory[] }) {
                         <NavigationMenu.Link asChild key={k.id}>
                           <Link
                             href={`/products?category=${k.slug}`}
-                            className="text-sm text-[color:var(--fg-muted)] hover:text-[color:var(--accent)] transition-colors border-b border-[color:var(--border)] py-1.5"
+                            className="text-sm text-[color:var(--fg-muted)] hover:text-[color:var(--accent)] transition-colors py-1.5"
                           >
                             {localize(k.name, k.nameBn, locale)}
                           </Link>

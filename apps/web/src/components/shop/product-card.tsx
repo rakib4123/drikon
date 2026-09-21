@@ -1,9 +1,7 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'motion/react';
-import { ShoppingBag, Star } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLocale, useTranslations } from 'next-intl';
 import type { ProductSummary } from '@drikon/shared-types';
@@ -13,13 +11,24 @@ import { localize } from '@/lib/localize';
 import type { Locale } from '@/i18n/request';
 import { WishlistButton } from './wishlist-button';
 import { CompareButton } from './compare-button';
+import { StarRating } from './star-rating';
+import { ProductThumb } from './product-thumb';
 
+/**
+ * Megastore product tile: product on white, badges top-left, wishlist/compare
+ * rail top-right, rating, price, and a full-width add-to-cart.
+ *
+ * The action rail is hidden until hover only on devices that CAN hover. It
+ * used to be `opacity-0` everywhere, which left wishlist and compare
+ * permanently invisible on phones — touch screens never fire hover.
+ */
 export function ProductCard({ product }: { product: ProductSummary }) {
   const t = useTranslations('product');
   const locale = useLocale() as Locale;
   const add = useCartStore((s) => s.add);
   const name = localize(product.name, product.nameBn, locale);
-  // A live flash sale beats the catalogue price, and it's what checkout will charge.
+
+  // A live flash sale beats the catalogue price, and it's what checkout charges.
   const { price, listPrice, onSale: onFlashSale, discountPercent } = effectivePrice(product);
   const compareAt = product.compareAtPrice
     ? typeof product.compareAtPrice === 'string'
@@ -28,105 +37,85 @@ export function ProductCard({ product }: { product: ProductSummary }) {
     : null;
   // Strike through the flash-sale list price when there is one, otherwise the RRP.
   const struckPrice = onFlashSale ? listPrice : compareAt && compareAt > price ? compareAt : null;
-  const onSale = struckPrice !== null;
   const discount = onFlashSale
     ? discountPercent
     : struckPrice
       ? Math.round(((struckPrice - price) / struckPrice) * 100)
       : 0;
+  const soldOut = product.stock === 0;
+
+  const hoverRail =
+    '[@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 focus-visible:opacity-100 aria-[pressed=true]:opacity-100 transition-opacity';
 
   return (
-    <article className="group card !p-0 overflow-hidden flex flex-col">
-      <div className="relative aspect-[4/5] bg-[color:var(--bg)] overflow-hidden">
-        <Link href={`/products/${product.slug}`} className="absolute inset-0">
-          {product.images?.[0]?.url ? (
-            <Image
-              src={product.images[0].url}
-              alt={product.images[0].alt ?? name}
-              fill
-              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-          ) : (
-            <div className="w-full h-full bg-drikon-mesh" />
-          )}
+    <article className="group card card-hover !p-0 overflow-hidden flex flex-col h-full">
+      <div className="relative aspect-square bg-white overflow-hidden">
+        <Link href={`/products/${product.slug}`} className="absolute inset-0" tabIndex={-1} aria-hidden>
+          <ProductThumb
+            src={product.images?.[0]?.url}
+            sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+            className="transition-transform duration-500 group-hover:scale-105"
+            dimmed={soldOut}
+          />
         </Link>
-        {/* Depth gradient on hover */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        {onSale && (
-          <span className="absolute top-3 left-3 px-2 py-1 text-[10px] font-bold rounded-md bg-[color:var(--accent)] text-white">
-            −{discount}%
-          </span>
-        )}
-        {product.stock === 0 && (
-          <span className="absolute bottom-3 left-3 px-2 py-1 text-[10px] font-bold rounded-md bg-black/70 text-white">
-            {t('soldOut')}
-          </span>
-        )}
-        <WishlistButton
-          productId={product.id}
-          productName={name}
-          variant="overlay"
-          className="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 aria-[pressed=true]:opacity-100 transition-opacity"
-        />
-        <CompareButton
-          product={product}
-          variant="overlay"
-          className="absolute top-[3.4rem] right-2.5 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 aria-[pressed=true]:opacity-100 transition-opacity"
-        />
+
+        <div className="absolute top-2.5 left-2.5 flex flex-col items-start gap-1.5 pointer-events-none">
+          {discount > 0 && <span className="badge-sale">−{discount}%</span>}
+          {onFlashSale && (
+            <span className="badge-deal">{t('flashSaleBadge')}</span>
+          )}
+          {soldOut && <span className="badge-sale !bg-[color:var(--fg)]">{t('soldOut')}</span>}
+        </div>
+
+        <div className="absolute top-2 right-2 flex flex-col gap-1.5">
+          <WishlistButton productId={product.id} productName={name} variant="overlay" className={hoverRail} />
+          <CompareButton product={product} variant="overlay" className={hoverRail} />
+        </div>
       </div>
 
-      <div className="p-4 flex-1 flex flex-col">
-        <div className="text-[11px] font-mono uppercase tracking-wider text-[color:var(--fg-muted)] mb-1">
+      <div className="px-3.5 pb-3.5 pt-3 flex-1 flex flex-col border-t border-[color:var(--border)]">
+        <div className="text-[11px] font-semibold uppercase tracking-wide text-[color:var(--fg-muted)] mb-1 truncate">
           {product.brand?.name ?? product.category.name}
         </div>
         <Link href={`/products/${product.slug}`}>
-          <h3 className="text-[15px] font-semibold leading-snug line-clamp-2 hover:text-[color:var(--accent)] transition-colors">
+          <h3 className="text-[14px] font-semibold leading-snug line-clamp-2 min-h-[2.6em] hover:text-[color:var(--accent)] transition-colors">
             {name}
           </h3>
         </Link>
 
-        {product.averageRating > 0 && (
-          <div className="flex items-center gap-1 mt-1.5 text-xs text-[color:var(--fg-muted)]">
-            <Star className="w-3.5 h-3.5 fill-[color:var(--accent-2)] text-[color:var(--accent-2)]" />
-            <span>{product.averageRating.toFixed(1)}</span>
-            <span>({product.reviewCount})</span>
-          </div>
-        )}
-
-        <div className="mt-auto pt-4 flex items-end justify-between gap-2">
-          <div>
-            <div className="font-semibold">{formatPrice(price, product.currency)}</div>
-            {struckPrice !== null && (
-              <div className="text-xs text-[color:var(--fg-muted)] line-through">
-                {formatPrice(struckPrice, product.currency)}
-              </div>
-            )}
-          </div>
-          <motion.button
-            type="button"
-            disabled={product.stock === 0}
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.85 }}
-            transition={{ type: 'spring', stiffness: 500, damping: 18 }}
-            onClick={(e) => {
-              e.preventDefault();
-              add({
-                productId: product.id,
-                name,
-                slug: product.slug,
-                image: product.images?.[0]?.url,
-                unitPrice: price,
-                currency: product.currency,
-              });
-              toast.success(t('addedToCartToastTitle'), { description: name });
-            }}
-            className="p-2.5 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] hover:bg-[color:var(--accent)] hover:text-white hover:border-[color:var(--accent)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            aria-label={t('addToCartAria')}
-          >
-            <ShoppingBag className="w-4 h-4" />
-          </motion.button>
+        <div className="mt-1.5 min-h-[18px]">
+          {product.reviewCount > 0 && <StarRating value={product.averageRating} count={product.reviewCount} />}
         </div>
+
+        <div className="mt-2 flex items-baseline flex-wrap gap-x-2">
+          <span className={`price-now text-[17px] ${struckPrice ? 'is-sale' : ''}`}>{formatPrice(price, product.currency)}</span>
+          {struckPrice !== null && <span className="price-was text-[13px]">{formatPrice(struckPrice, product.currency)}</span>}
+        </div>
+
+        <button
+          type="button"
+          disabled={soldOut}
+          onClick={(e) => {
+            e.preventDefault();
+            add({
+              productId: product.id,
+              name,
+              slug: product.slug,
+              image: product.images?.[0]?.url,
+              unitPrice: price,
+              currency: product.currency,
+            });
+            toast.success(t('addedToCartToastTitle'), { description: name });
+          }}
+          className="mt-3 w-full inline-flex items-center justify-center gap-2 h-10 rounded-[var(--radius-ctl)] text-[13px] font-bold
+                     border border-[color:var(--accent)] text-[color:var(--accent)] bg-white
+                     enabled:hover:bg-[color:var(--accent)] enabled:hover:text-white enabled:group-hover:bg-[color:var(--accent)] enabled:group-hover:text-white
+                     transition-colors disabled:border-[color:var(--border)] disabled:text-[color:var(--fg-muted)]
+                     disabled:bg-[color:var(--bg-soft)] disabled:cursor-not-allowed"
+        >
+          <ShoppingCart aria-hidden className="w-4 h-4" />
+          {soldOut ? t('soldOutButton') : t('addToCart')}
+        </button>
       </div>
     </article>
   );

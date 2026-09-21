@@ -4,7 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import * as Accordion from '@radix-ui/react-accordion';
 import { useLocale } from 'next-intl';
-import { Menu, X, ChevronDown, ChevronRight, Heart, ShoppingBag, LayoutDashboard, Sparkles, Package } from 'lucide-react';
+import { Menu, X, ChevronDown, ChevronRight, Heart, ShoppingBag, LayoutDashboard, Sparkles, Package, GitCompare, PackageSearch } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { LanguageSwitcher } from '@/components/layout/language-switcher';
 import { useAuthStore, useIsAdmin } from '@/store/auth-store';
 import { useWishlistStore } from '@/store/wishlist-store';
 import { BrandMark } from '@/components/layout/brand-mark';
@@ -27,6 +29,7 @@ import type { Locale } from '@/i18n/request';
  */
 export function MobileMenu({ brand, categories }: { brand: BrandInfo; categories: NavCategory[] }) {
   const locale = useLocale() as Locale;
+  const t = useTranslations('nav');
   const [open, setOpen] = useState(false);
   const user = useAuthStore((s) => s.user);
   const isAdmin = useIsAdmin();
@@ -73,7 +76,7 @@ export function MobileMenu({ brand, categories }: { brand: BrandInfo; categories
 
           {topLevel.length > 0 && (
             <div className="mt-4 pt-4 border-t border-[color:var(--border)]">
-              <div className="px-3 text-[11px] font-mono uppercase tracking-[0.2em] text-[color:var(--fg-muted)] mb-2">
+              <div className="px-3 text-[11px] font-bold uppercase tracking-wide text-[color:var(--fg-muted)] mb-2">
                 Categories
               </div>
 
@@ -137,9 +140,15 @@ export function MobileMenu({ brand, categories }: { brand: BrandInfo; categories
 
         <div className="border-t border-[color:var(--border)] px-3 py-3 space-y-1 shrink-0">
           <NavLink href="/wishlist" icon={<Heart className="w-4 h-4" />} onClick={close}>
-            Wishlist{wishlistCount > 0 ? ` (${wishlistCount})` : ''}
+            {t('wishlist')}{wishlistCount > 0 ? ` (${wishlistCount})` : ''}
           </NavLink>
-          <NavLink href="/cart" icon={<ShoppingBag className="w-4 h-4" />} onClick={close}>Cart</NavLink>
+          <NavLink href="/compare" icon={<GitCompare className="w-4 h-4" />} onClick={close}>{t('compare')}</NavLink>
+          <NavLink href="/cart" icon={<ShoppingBag className="w-4 h-4" />} onClick={close}>{t('cart')}</NavLink>
+          <NavLink href="/orders" icon={<PackageSearch className="w-4 h-4" />} onClick={close}>{t('trackOrder')}</NavLink>
+          {/* The navy utility bar (and its language switch) is hidden on phones. */}
+          <div className="px-1.5 pt-1">
+            <LanguageSwitcher />
+          </div>
           {user ? (
             <Link href="/dashboard" onClick={close} className="btn-ghost w-full mt-2">My account</Link>
           ) : (

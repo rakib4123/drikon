@@ -54,7 +54,7 @@ export default function AdminProductsPage() {
     <div className="px-4 sm:px-8 py-8 sm:py-12">
       <div className="flex items-end justify-between mb-8 max-w-6xl gap-4">
         <div>
-          <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
+          <div className="text-xs font-bold uppercase tracking-wide text-[color:var(--accent)] mb-2">
             Catalog
           </div>
           <h1 className="display text-3xl">Products</h1>

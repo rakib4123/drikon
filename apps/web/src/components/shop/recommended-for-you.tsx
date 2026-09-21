@@ -1,14 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import type { ProductSummary } from '@drikon/shared-types';
 import { apiGet } from '@/lib/api-client';
 import { useAuthStore } from '@/store/auth-store';
-import { ProductGrid } from './product-grid';
+import { ProductCarousel } from './product-carousel';
+import { SectionHeader } from '@/components/home/section-header';
 
 export function RecommendedForYou() {
+  const t = useTranslations('home');
   const { user, initialized, fetchMe } = useAuthStore();
   const [products, setProducts] = useState<ProductSummary[]>([]);
 
@@ -35,19 +36,9 @@ export function RecommendedForYou() {
   if (!user || products.length === 0) return null;
 
   return (
-    <section className="max-w-7xl mx-auto px-6 py-20">
-      <div className="flex items-end justify-between mb-10 gap-6">
-        <div>
-          <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
-            For you
-          </div>
-          <h2 className="display text-3xl md:text-4xl">Recommended for you</h2>
-        </div>
-        <Link href="/products" className="text-sm font-medium hover:text-[color:var(--accent)] transition-colors inline-flex items-center gap-1">
-          Shop all <ArrowRight className="w-4 h-4" />
-        </Link>
-      </div>
-      <ProductGrid products={products} />
+    <section className="shell py-8" aria-labelledby="recommended-for-you">
+      <SectionHeader id="recommended-for-you" title={t('recommendedForYou')} href="/products" linkLabel={t('viewAll')} />
+      <ProductCarousel products={products} label={t('recommendedForYou')} />
     </section>
   );
 }
