@@ -1,8 +1,6 @@
-'use client';
-
 import Link from 'next/link';
-import { motion } from 'motion/react';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
+import { SectionHeader } from '@/components/home/section-header';
 
 interface Brand {
   id: string;
@@ -11,44 +9,38 @@ interface Brand {
   logoUrl?: string | null;
 }
 
-/** "Trusted brands" row — links each brand to its filtered catalog. */
-export function BrandStrip({ brands }: { brands: Brand[] }) {
-  const t = useTranslations('home');
+/** "Shop by brand" — a logo grid, each tile linking to that brand's filtered catalogue. */
+export async function BrandStrip({ brands }: { brands: Brand[] }) {
+  const t = await getTranslations('home');
   if (!brands || brands.length === 0) return null;
 
   return (
-    <section className="max-w-7xl mx-auto px-6 py-14">
-      <div className="text-center mb-8">
-        <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
-          {t('trustedBrands')}
-        </div>
-        <h2 className="display text-2xl md:text-3xl">{t('premiumBrandsYouLove')}</h2>
-      </div>
-      <div className="flex flex-wrap items-center justify-center gap-3">
-        {brands.map((b, i) => (
-          <motion.div
-            key={b.id}
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.4, ease: 'easeOut', delay: Math.min(i * 0.05, 0.3) }}
-          >
+    <section className="shell py-8" aria-labelledby="shop-by-brand">
+      <SectionHeader id="shop-by-brand" title={t('shopByBrand')} />
+      <ul className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+        {brands.slice(0, 16).map((b) => (
+          <li key={b.id}>
             <Link
               href={`/products?brand=${b.slug}`}
-              className="group flex items-center gap-2 px-5 py-3 rounded-xl border border-[color:var(--border)] glass hover:border-[color:var(--accent)] hover:-translate-y-0.5 transition-all"
+              className="group h-20 flex items-center justify-center rounded-[var(--radius-card)] border border-[color:var(--border)] bg-white px-4
+                         hover:border-[color:var(--accent)] hover:shadow-[0_10px_24px_-14px_rgba(16,24,40,0.3)] transition"
             >
               {b.logoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={b.logoUrl} alt={b.name} className="h-6 w-auto object-contain" />
+                <img
+                  src={b.logoUrl}
+                  alt={b.name}
+                  className="max-h-9 w-auto object-contain grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition"
+                />
               ) : (
-                <span className="font-semibold text-sm group-hover:text-[color:var(--accent)] transition-colors">
+                <span className="text-base font-extrabold tracking-tight text-[color:var(--fg-muted)] group-hover:text-[color:var(--accent)] transition-colors">
                   {b.name}
                 </span>
               )}
             </Link>
-          </motion.div>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }

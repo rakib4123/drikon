@@ -18,7 +18,7 @@ import {
   ValidateCouponDto,
   BestCouponDto,
 } from './dto/coupon.dto';
-import { Public, Roles } from '../../common/decorators';
+import { Audit, Public, Roles } from '../../common/decorators';
 
 @ApiTags('coupons')
 @Controller({ path: 'coupons', version: '1' })
@@ -58,6 +58,7 @@ export class CouponsController {
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Audit('coupon.create', 'Coupon')
   @Post()
   @ApiOperation({ summary: '(Admin) Create a coupon' })
   create(@Body() dto: CreateCouponDto) {
@@ -65,6 +66,7 @@ export class CouponsController {
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Audit('coupon.update', 'Coupon')
   @Patch(':id')
   @ApiOperation({ summary: '(Admin) Update a coupon' })
   update(@Param('id') id: string, @Body() dto: UpdateCouponDto) {
@@ -72,6 +74,7 @@ export class CouponsController {
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Audit('coupon.delete', 'Coupon')
   @Delete(':id')
   @ApiOperation({ summary: '(Admin) Delete a coupon' })
   remove(@Param('id') id: string) {

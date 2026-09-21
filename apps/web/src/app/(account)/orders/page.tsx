@@ -1,9 +1,10 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
+import Image from '@/components/ui/smart-image';
 import { Package, ArrowRight, ChevronRight } from 'lucide-react';
 import type { OrderListResponse, OrderSummary } from '@drikon/shared-types';
 import { apiGet } from '@/lib/api-client';
@@ -18,6 +19,7 @@ const dateFmt = new Intl.DateTimeFormat('en-US', {
 });
 
 export default function OrdersPage() {
+  const t = useTranslations('account');
   const router = useRouter();
   const { user, initialized, fetchMe } = useAuthStore();
   const [orders, setOrders] = useState<OrderSummary[]>([]);
@@ -51,23 +53,20 @@ export default function OrdersPage() {
 
   if (!user) {
     return (
-      <div className="max-w-7xl mx-auto px-6 py-24 text-center text-[color:var(--fg-muted)]">
-        Loading…
+      <div className="py-24 text-center text-[color:var(--fg-muted)]">
+        {t('loading')}
       </div>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-14">
-      <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
-        Your account
-      </div>
-      <h1 className="display text-4xl md:text-5xl mb-10">Orders</h1>
+    <div>
+      <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight mb-6">{t('orders')}</h1>
 
       {loading ? (
         <div className="space-y-3">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="card h-24 animate-pulse bg-[color:var(--bg-soft)]" />
+            <div key={i} className="skeleton h-24" />
           ))}
         </div>
       ) : orders.length === 0 ? (
@@ -75,10 +74,10 @@ export default function OrdersPage() {
           <div className="w-14 h-14 rounded-2xl bg-[color:var(--bg)] grid place-items-center mx-auto mb-5 text-[color:var(--fg-muted)]">
             <Package className="w-6 h-6" />
           </div>
-          <h2 className="display text-2xl mb-2">No orders yet</h2>
-          <p className="text-[color:var(--fg-muted)] mb-6">When you place an order it&apos;ll appear here.</p>
+          <h2 className="text-xl font-extrabold mb-2">{t('noOrders')}</h2>
+          <p className="text-[color:var(--fg-muted)] mb-6">{t('noOrdersBody')}</p>
           <Link href="/products" className="btn-primary">
-            Start shopping <ArrowRight className="w-4 h-4" />
+            {t('startShopping')} <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       ) : (
@@ -87,7 +86,7 @@ export default function OrdersPage() {
             <li key={o.id}>
               <Link
                 href={`/orders/${o.orderNumber}`}
-                className="card flex items-center gap-4 group"
+                className="card card-hover flex items-center gap-4 group"
               >
                 {/* Item thumbnails */}
                 <div className="flex -space-x-3 shrink-0">
@@ -110,7 +109,7 @@ export default function OrdersPage() {
                   </div>
                   <div className="text-xs text-[color:var(--fg-muted)]">
                     {dateFmt.format(new Date(o.createdAt))} ·{' '}
-                    {o.items.reduce((n, it) => n + it.quantity, 0)} item(s)
+                    {t('itemCount', { count: o.items.reduce((n, it) => n + it.quantity, 0) })}
                   </div>
                 </div>
 

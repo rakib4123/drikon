@@ -85,7 +85,12 @@ export class CouponsService {
   }
 
   /** Public-facing validation used by cart + checkout. Never throws. */
-  async validate(code: string, subtotal: number, items?: CartLine[]): Promise<CouponValidation> {
+  async validate(
+    code: string,
+    subtotal: number,
+    items?: CartLine[],
+    userId?: string,
+  ): Promise<CouponValidation> {
     const zero = new Prisma.Decimal(0);
     const invalid = (message: string): CouponValidation => ({ valid: false, message, discount: zero, freeShipping: false });
 
@@ -97,6 +102,18 @@ export class CouponsService {
     if (coupon.expiresAt && coupon.expiresAt < now) return invalid('This coupon has expired');
     if (coupon.maxRedemptions && coupon.redemptionCount >= coupon.maxRedemptions) {
       return invalid('This coupon has been fully redeemed');
+    }
+    // Per-user cap. Only checkable for a signed-in shopper; the authoritative
+    // enforcement is in resolveForOrder, which always has a userId.
+    if (coupon.perUserLimit && userId) {
+      const used = await this.coupons.countRedemptionsByUser(coupon.id, userId);
+      if (used >= coupon.perUserLimit) {
+        return invalid(
+          coupon.perUserLimit === 1
+            ? 'You have already used this code'
+            : `You have already used this code ${coupon.perUserLimit} times`,
+        );
+      }
     }
     const sub = new Prisma.Decimal(subtotal);
     if (coupon.minOrderAmount && sub.lessThan(coupon.minOrderAmount)) {
@@ -167,8 +184,8 @@ export class CouponsService {
   }
 
   /** Used inside order creation — throws if the code can't be applied. */
-  async resolveForOrder(code: string, subtotal: number, items?: CartLine[]) {
-    const result = await this.validate(code, subtotal, items);
+  async resolveForOrder(code: string, subtotal: number, items: CartLine[] | undefined, userId: string) {
+    const result = await this.validate(code, subtotal, items, userId);
     if (!result.valid || !result.couponId) throw new BadRequestException(result.message);
     return { couponId: result.couponId, discount: result.discount, freeShipping: result.freeShipping };
   }

@@ -32,3 +32,11 @@ export const UpdateUserRoleSchema = z.object({
   role: z.nativeEnum(Role),
 });
 export class UpdateUserRoleDto extends createZodDto(UpdateUserRoleSchema) {}
+
+export const AuditLogQuerySchema = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(100).default(50),
+  action: z.string().max(60).optional(),
+  adminId: z.string().max(40).optional(),
+});
+export class AuditLogQueryDto extends createZodDto(AuditLogQuerySchema) {}

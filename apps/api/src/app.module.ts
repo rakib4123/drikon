@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggerModule } from 'nestjs-pino';
 
 import { validateEnv } from './config/env.validation';
+import { AuditInterceptor } from './common/interceptors/audit.interceptor';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { ModelsModule } from './models/models.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -89,6 +90,8 @@ import { MailModule } from './modules/mail/mail.module';
   providers: [
     // Apply throttler globally
     { provide: APP_GUARD, useClass: ThrottlerGuard },
+    // Writes an AdminLog row for any handler tagged with @Audit(...); inert elsewhere.
+    { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
   ],
 })
 export class AppModule {}

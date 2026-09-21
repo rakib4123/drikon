@@ -12,6 +12,7 @@ import { SettingsModel } from './settings.model';
 import { UserModel } from './user.model';
 import { ProductAssociationRuleModel } from './product-association-rule.model';
 import { RecommendationRunModel } from './recommendation-run.model';
+import { AdminLogModel } from './admin-log.model';
 
 const models = [
   ProductModel,
@@ -27,6 +28,7 @@ const models = [
   UserModel,
   ProductAssociationRuleModel,
   RecommendationRunModel,
+  AdminLogModel,
 ];
 
 @Global()

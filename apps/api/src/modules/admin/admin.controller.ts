@@ -16,8 +16,10 @@ import {
   AdminUserQueryDto,
   UpdateUserRoleDto,
   VerifyPaymentDto,
+  AuditLogQueryDto,
 } from './dto/admin.dto';
-import { CurrentUser, Roles } from '../../common/decorators';
+import { Audit, CurrentUser, Roles } from '../../common/decorators';
+import type { AuthenticatedUser } from '../../common/decorators';
 
 // Class-level role gate — every route here requires an admin.
 @ApiTags('admin')
@@ -40,15 +42,24 @@ export class AdminController {
   }
 
   @Patch('orders/:id/status')
+  @Audit('order.status', 'Order')
   @ApiOperation({ summary: 'Update an order status' })
   updateOrderStatus(@Param('id') id: string, @Body() dto: UpdateOrderStatusDto) {
     return this.admin.updateOrderStatus(id, dto.status);
   }
 
   @Patch('orders/:id/payment')
+  @Audit('order.payment_verify', 'Order')
   @ApiOperation({ summary: 'Verify a manual payment (mark paid or failed)' })
   verifyPayment(@Param('id') id: string, @Body() dto: VerifyPaymentDto) {
     return this.admin.verifyPayment(id, dto.status, dto.adminNote);
+  }
+
+  // ─── Audit trail ───
+  @Get('audit-logs')
+  @ApiOperation({ summary: 'Admin action audit trail' })
+  listAuditLogs(@Query() query: AuditLogQueryDto) {
+    return this.admin.listAuditLogs(query);
   }
 
   // ─── Users ───
@@ -59,12 +70,13 @@ export class AdminController {
   }
 
   @Patch('users/:id/role')
+  @Audit('user.role_change', 'User')
   @ApiOperation({ summary: 'Change a user role' })
   updateUserRole(
-    @CurrentUser('id') actingUserId: string,
+    @CurrentUser() actor: AuthenticatedUser,
     @Param('id') id: string,
     @Body() dto: UpdateUserRoleDto,
   ) {
-    return this.admin.updateUserRole(actingUserId, id, dto.role);
+    return this.admin.updateUserRole(actor, id, dto.role);
   }
 }

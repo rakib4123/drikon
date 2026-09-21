@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import Image from '@/components/ui/smart-image';
 import { AnimatePresence, motion } from 'motion/react';
 import { GitCompare, X, ArrowRight } from 'lucide-react';
 import { useCompareStore } from '@/store/compare-store';

@@ -3,7 +3,7 @@
 import { use, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
+import Image from '@/components/ui/smart-image';
 import { motion } from 'motion/react';
 import { CheckCircle2, ArrowLeft, Loader2, Package, Printer } from 'lucide-react';
 import type { OrderSummary } from '@drikon/shared-types';
@@ -77,7 +77,7 @@ export default function OrderDetailPage({
 
   if (!user || loading) {
     return (
-      <div className="max-w-3xl mx-auto px-6 py-24 text-center text-[color:var(--fg-muted)]">
+      <div className="py-24 text-center text-[color:var(--fg-muted)]">
         <Loader2 className="w-5 h-5 animate-spin mx-auto" />
       </div>
     );
@@ -85,7 +85,7 @@ export default function OrderDetailPage({
 
   if (notFound || !order) {
     return (
-      <div className="max-w-3xl mx-auto px-6 py-24 text-center">
+      <div className="card py-16 text-center">
         <div className="w-14 h-14 rounded-2xl bg-[color:var(--bg-soft)] grid place-items-center mx-auto mb-5 text-[color:var(--fg-muted)]">
           <Package className="w-6 h-6" />
         </div>
@@ -103,7 +103,7 @@ export default function OrderDetailPage({
   const addr = order.shippingAddress;
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-14">
+    <div>
       <div className="flex items-center justify-between mb-8">
         <Link
           href="/orders"
@@ -151,7 +151,7 @@ export default function OrderDetailPage({
 
       <div className="flex items-center justify-between flex-wrap gap-3 mb-8">
         <div>
-          <h1 className="display text-3xl">{order.orderNumber}</h1>
+          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight font-mono">{order.orderNumber}</h1>
           <p className="text-sm text-[color:var(--fg-muted)] mt-1">
             Placed {dateFmt.format(new Date(order.createdAt))}
           </p>

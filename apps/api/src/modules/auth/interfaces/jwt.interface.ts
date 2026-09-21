@@ -15,6 +15,15 @@ export interface JwtRefreshPayload {
   jti: string;
 }
 
+/**
+ * Short-lived proof that the first factor passed but the second is still owed.
+ * Issued after Google sign-in for a 2FA account; exchanged at /auth/2fa/verify.
+ */
+export interface JwtTwoFactorPendingPayload {
+  sub: string;
+  type: '2fa_pending';
+}
+
 export interface TokenPair {
   accessToken: string;
   refreshToken: string;

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
+import Image from '@/components/ui/smart-image';
 import { motion } from 'motion/react';
 import { ShoppingBag, ArrowRight, Check, Star } from 'lucide-react';
 import { toast } from 'sonner';

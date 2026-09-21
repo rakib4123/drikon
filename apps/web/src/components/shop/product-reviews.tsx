@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import { Star, BadgeCheck, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import type { ReviewListResponse, CreateReviewInput } from '@drikon/shared-types';
 import { apiGet, apiPost } from '@/lib/api-client';
 import { useAuthStore } from '@/store/auth-store';
@@ -37,10 +38,14 @@ function Stars({ value, className }: { value: number; className?: string }) {
 export function ProductReviews({
   productId,
   productName,
+  hideHeading = false,
 }: {
+  /** Set when rendered inside a tab whose label already says "Reviews". */
+  hideHeading?: boolean;
   productId: string;
   productName: string;
 }) {
+  const t = useTranslations('pdp');
   const user = useAuthStore((s) => s.user);
   const [data, setData] = useState<ReviewListResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -106,8 +111,8 @@ export function ProductReviews({
   const total = data?.reviewCount ?? 0;
 
   return (
-    <section className="mb-16">
-      <h2 className="display text-2xl mb-6">Reviews</h2>
+    <section>
+      {!hideHeading && <h2 className="display text-2xl mb-6">{t('reviews')}</h2>}
 
       {loading ? (
         <div className="flex items-center gap-2 text-[color:var(--fg-muted)] text-sm">

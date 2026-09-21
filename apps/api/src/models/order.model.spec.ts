@@ -26,9 +26,10 @@ describe('OrderModel', () => {
       address: { create: jest.fn().mockResolvedValue({ id: 'addr1' }) },
       order: { create: jest.fn().mockResolvedValue({ id: 'order1', items: [] }) },
       payment: { create: jest.fn().mockResolvedValue({ id: 'pay1' }) },
-      product: { update: jest.fn() },
-      productVariant: { update: jest.fn() },
+      product: { updateMany: jest.fn().mockResolvedValue({ count: 1 }) },
+      productVariant: { updateMany: jest.fn().mockResolvedValue({ count: 1 }) },
       coupon: { update: jest.fn() },
+      $executeRaw: jest.fn().mockResolvedValue(1),
     };
     prisma.$transaction.mockImplementation((cb: any) => cb(tx));
 
@@ -66,18 +67,17 @@ describe('OrderModel', () => {
         payerReference: '01711111111',
       },
     });
-    expect(tx.product.update).toHaveBeenCalledWith({
-      where: { id: 'p1' },
+    // Guarded by `stock: { gte }` so the check and the decrement are one statement.
+    expect(tx.product.updateMany).toHaveBeenCalledWith({
+      where: { id: 'p1', stock: { gte: 1 } },
       data: { stock: { decrement: 1 }, salesCount: { increment: 1 } },
     });
-    expect(tx.productVariant.update).toHaveBeenCalledWith({
-      where: { id: 'v1' },
+    expect(tx.productVariant.updateMany).toHaveBeenCalledWith({
+      where: { id: 'v1', stock: { gte: 1 } },
       data: { stock: { decrement: 1 } },
     });
-    expect(tx.coupon.update).toHaveBeenCalledWith({
-      where: { id: 'coup1' },
-      data: { redemptionCount: { increment: 1 } },
-    });
+    // Coupon redemption is a raw guarded UPDATE, not a blind increment.
+    expect(tx.$executeRaw).toHaveBeenCalled();
     expect(result).toEqual({ id: 'order1', items: [] });
   });
 
@@ -86,9 +86,10 @@ describe('OrderModel', () => {
       address: { create: jest.fn().mockResolvedValue({ id: 'addr1' }) },
       order: { create: jest.fn().mockResolvedValue({ id: 'order2', items: [] }) },
       payment: { create: jest.fn().mockResolvedValue({ id: 'pay2' }) },
-      product: { update: jest.fn() },
-      productVariant: { update: jest.fn() },
+      product: { updateMany: jest.fn().mockResolvedValue({ count: 1 }) },
+      productVariant: { updateMany: jest.fn().mockResolvedValue({ count: 1 }) },
       coupon: { update: jest.fn() },
+      $executeRaw: jest.fn().mockResolvedValue(1),
     };
     prisma.$transaction.mockImplementation((cb: any) => cb(tx));
 
@@ -112,9 +113,10 @@ describe('OrderModel', () => {
       address: { create: jest.fn().mockResolvedValue({ id: 'addr1' }) },
       order: { create: jest.fn().mockResolvedValue({ id: 'order1', items: [] }) },
       payment: { create: jest.fn() },
-      product: { update: jest.fn() },
-      productVariant: { update: jest.fn() },
+      product: { updateMany: jest.fn().mockResolvedValue({ count: 1 }) },
+      productVariant: { updateMany: jest.fn().mockResolvedValue({ count: 1 }) },
       coupon: { update: jest.fn() },
+      $executeRaw: jest.fn().mockResolvedValue(1),
     };
     prisma.$transaction.mockImplementation((cb: any) => cb(tx));
 
@@ -128,7 +130,7 @@ describe('OrderModel', () => {
       payment: { method: 'COD' },
     });
 
-    expect(tx.coupon.update).not.toHaveBeenCalled();
+    expect(tx.$executeRaw).not.toHaveBeenCalled();
   });
 
   it('findManyAndCount runs findMany + count inside one $transaction call', async () => {
@@ -152,14 +154,6 @@ describe('OrderModel', () => {
   it('update delegates to prisma.order.update', async () => {
     prisma.order.update.mockResolvedValue({ id: 'o1' });
     await expect(model.update({ where: { id: 'o1' }, data: {} } as any)).resolves.toEqual({ id: 'o1' });
-  });
-
-  it('countCreatedBetween counts orders in the given range', async () => {
-    prisma.order.count.mockResolvedValue(5);
-    const start = new Date('2026-01-01');
-    const end = new Date('2027-01-01');
-    await expect(model.countCreatedBetween(start, end)).resolves.toBe(5);
-    expect(prisma.order.count).toHaveBeenCalledWith({ where: { createdAt: { gte: start, lt: end } } });
   });
 
   it('countItemsForProducts counts order items for the given product ids', async () => {

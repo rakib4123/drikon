@@ -82,6 +82,44 @@ jobs:
       - name: Test
         run: pnpm test
 
+  e2e:
+    name: E2E
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter @drikon/api db:generate
+
+      - name: Build web
+        run: pnpm --filter @drikon/web build
+
+      - name: Install Playwright browsers
+        run: pnpm --filter @drikon/web exec playwright install --with-deps chromium
+
+      # The storefront degrades to empty states when the API is unreachable, so
+      # the smoke suite is meaningful even without a backend in this job.
+      - name: E2E
+        run: pnpm --filter @drikon/web test:e2e
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report/
+          retention-days: 7
+
   build:
     name: Build
     runs-on: ubuntu-latest

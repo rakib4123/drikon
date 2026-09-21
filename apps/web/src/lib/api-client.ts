@@ -50,6 +50,15 @@ interface RequestOptions extends Omit<RequestInit, 'body'> {
   body?: unknown;
   /** Skip the auto-refresh-on-401 behaviour (used by /auth/refresh itself). */
   skipRefresh?: boolean;
+  /**
+   * Seconds to cache this response in Next's data cache (server-side only).
+   *
+   * Catalogue pages are `force-dynamic` because next-intl reads the locale
+   * cookie, so without this every page view hit the API on the critical path.
+   * Only ever set this for PUBLIC data — anything user-scoped must stay uncached
+   * or one shopper's response could be served to another.
+   */
+  revalidate?: number;
 }
 
 let refreshPromise: Promise<boolean> | null = null;
@@ -76,11 +85,19 @@ async function refreshTokens(): Promise<boolean> {
 }
 
 export async function api<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { body, skipRefresh, headers, ...rest } = options;
+  const { body, skipRefresh, headers, revalidate, ...rest } = options;
+
+  // Data-cache hints only mean anything on the server; in the browser the option
+  // is ignored, so guarding keeps client requests untouched.
+  const cacheOptions =
+    typeof window === 'undefined' && revalidate !== undefined
+      ? { next: { revalidate } }
+      : {};
 
   const doRequest = (): Promise<Response> =>
     fetch(`${API_BASE}${path.startsWith('/') ? path : `/${path}`}`, {
       ...rest,
+      ...cacheOptions,
       credentials: 'include',
       headers: {
         ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),

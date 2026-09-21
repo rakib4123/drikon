@@ -59,7 +59,7 @@ export default function WishlistPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-14">
-      <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
+      <div className="text-xs font-bold uppercase tracking-wide text-[color:var(--accent)] mb-2">
         Your account
       </div>
       <h1 className="display text-4xl md:text-5xl mb-2 flex items-center gap-3">

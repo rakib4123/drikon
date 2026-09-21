@@ -30,6 +30,33 @@ export class FlashSaleModel {
     return this.prisma.flashSale.delete(args);
   }
 
+  /**
+   * Flash-sale entries for the given products that are live right now.
+   *
+   * This is the authoritative source of sale pricing — the storefront reads it to
+   * display a sale price and checkout reads it to *charge* one, so both sides
+   * agree on what a product costs.
+   */
+  findActiveEntriesForProducts(productIds: string[], now: Date = new Date()) {
+    if (productIds.length === 0) return Promise.resolve([]);
+    return this.prisma.flashSaleProduct.findMany({
+      where: {
+        productId: { in: productIds },
+        flashSale: { isActive: true, startsAt: { lte: now }, endsAt: { gte: now } },
+      },
+      select: {
+        flashSaleId: true,
+        productId: true,
+        salePrice: true,
+        inventoryCap: true,
+        soldCount: true,
+        flashSale: { select: { endsAt: true } },
+      },
+      // Deterministic winner when a product somehow sits in two live sales: cheapest wins.
+      orderBy: { salePrice: 'asc' },
+    });
+  }
+
   upsertProduct<T extends Prisma.FlashSaleProductUpsertArgs>(args: Prisma.SelectSubset<T, Prisma.FlashSaleProductUpsertArgs>) {
     return this.prisma.flashSaleProduct.upsert(args);
   }

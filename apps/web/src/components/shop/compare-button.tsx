@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import type { ProductSummary } from '@drikon/shared-types';
 import { useCompareStore, MAX_COMPARE } from '@/store/compare-store';
 import { cn } from '@/lib/utils';
+import { IconTooltip } from '@/components/ui/tooltip';
 
 interface CompareButtonProps {
   product: ProductSummary;
@@ -30,14 +31,18 @@ export function CompareButton({ product, variant = 'overlay', className }: Compa
     }
   };
 
+  const label = active ? 'Remove from compare' : 'Add to compare';
+
   return (
+    // `title` is gone: it duplicated aria-label into a native tooltip that was
+    // slow, unstyleable, and invisible to keyboard users.
+    <IconTooltip label={label}>
     <motion.button
       type="button"
       onClick={onClick}
       whileTap={{ scale: 0.85 }}
       aria-pressed={active}
-      aria-label={active ? 'Remove from compare' : 'Add to compare'}
-      title="Compare"
+      aria-label={label}
       className={cn(
         'grid place-items-center transition-colors',
         variant === 'overlay'
@@ -48,5 +53,6 @@ export function CompareButton({ product, variant = 'overlay', className }: Compa
     >
       <GitCompare className={cn('w-[18px] h-[18px] transition-colors', active ? 'text-[color:var(--accent)]' : 'text-[color:var(--fg-muted)] hover:text-[color:var(--accent)]')} />
     </motion.button>
+    </IconTooltip>
   );
 }

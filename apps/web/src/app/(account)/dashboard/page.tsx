@@ -1,110 +1,137 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useAuthStore, useIsAdmin } from '@/store/auth-store';
-import { LogOut, ShoppingBag, LayoutDashboard, Heart, Package } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { Package, Heart, ShoppingCart, ShieldCheck, ArrowRight, ChevronRight } from 'lucide-react';
+import { useAuthStore } from '@/store/auth-store';
+import { useWishlistStore } from '@/store/wishlist-store';
+import { useCartStore } from '@/store/cart-store';
+import { apiGet } from '@/lib/api-client';
+import { formatPrice } from '@/lib/utils';
+import { OrderStatusBadge } from '@/components/shop/order-status-badge';
+import type { OrderStatus } from '@drikon/shared-types';
 
+interface RecentOrder {
+  id: string;
+  orderNumber: string;
+  status: OrderStatus;
+  total: string | number;
+  currency: string;
+  createdAt: string;
+  items: { id: string }[];
+}
+
+/** Account overview: counts, recent orders, and a nudge to enable 2FA. The layout owns the auth guard. */
 export default function DashboardPage() {
-  const router = useRouter();
-  const { user, initialized, fetchMe, logout } = useAuthStore();
-  const isAdmin = useIsAdmin();
+  const t = useTranslations('account');
+  const user = useAuthStore((s) => s.user);
+  const wishlistCount = useWishlistStore((s) => s.ids.length);
+  const cartCount = useCartStore((s) => s.items.reduce((n, i) => n + i.quantity, 0));
+  const [orders, setOrders] = useState<RecentOrder[] | null>(null);
+  const [orderTotal, setOrderTotal] = useState(0);
 
   useEffect(() => {
-    if (!initialized) fetchMe();
-  }, [initialized, fetchMe]);
+    apiGet<{ items: RecentOrder[]; pagination: { total: number } }>('/api/v1/orders?limit=5')
+      .then((d) => {
+        setOrders(d.items);
+        setOrderTotal(d.pagination.total);
+      })
+      .catch(() => setOrders([]));
+  }, []);
 
-  useEffect(() => {
-    if (initialized && !user) router.push('/login?next=/dashboard');
-  }, [initialized, user, router]);
-
-  if (!user) {
-    return (
-      <div className="max-w-7xl mx-auto px-6 py-24 text-center text-[color:var(--fg-muted)]">
-        Loading…
-      </div>
-    );
-  }
+  if (!user) return null;
+  const dateFmt = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-14">
-      <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
-        Your account
-      </div>
-      <h1 className="display text-4xl md:text-5xl mb-2">Hi, {user?.name?.split(' ')[0]}.</h1>
-      <p className="text-[color:var(--fg-muted)] mb-10">{user.email}</p>
-
-      {/* Profile summary card — always visible */}
-      <div className="card max-w-xl mb-6">
-        <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)] mb-2">
-          Profile
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-[color:var(--bg)] border border-[color:var(--border)] grid place-items-center font-bold text-lg">
-            {user?.name?.charAt(0)?.toUpperCase() ?? "?"}
-          </div>
-          <div className="min-w-0">
-            <div className="font-semibold truncate">{user.name}</div>
-            <div className="text-sm text-[color:var(--fg-muted)] truncate">{user.email}</div>
-            <div className="text-[10px] font-mono uppercase tracking-wider text-[color:var(--accent)] mt-1">
-              {user.role === 'SUPER_ADMIN' ? 'Super Admin' : user.role === 'ADMIN' ? 'Admin' : 'Customer'}
-            </div>
-          </div>
-        </div>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">{t('hello', { name: user.name.split(' ')[0] })}</h1>
+        <p className="text-[color:var(--fg-muted)] mt-1">{t('dashboardIntro')}</p>
       </div>
 
-      {/* Quick links */}
-      <div className="grid sm:grid-cols-2 gap-5 max-w-xl mb-10">
-        <DashCard icon={<ShoppingBag className="w-5 h-5" />} title="Continue shopping" href="/products">
-          Discover new arrivals and curated essentials.
-        </DashCard>
-        <DashCard icon={<Package className="w-5 h-5" />} title="Your orders" href="/orders">
-          Track and revisit everything you&apos;ve ordered.
-        </DashCard>
-        <DashCard icon={<Heart className="w-5 h-5" />} title="Wishlist" href="/wishlist">
-          The things you&apos;ve saved for later.
-        </DashCard>
-        {isAdmin && (
-          <DashCard icon={<LayoutDashboard className="w-5 h-5" />} title="Admin panel" href="/admin">
-            Manage products, orders, and users.
-          </DashCard>
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatTile href="/orders" icon={<Package className="w-5 h-5" />} label={t('orders')} value={orders ? orderTotal : '—'} />
+        <StatTile href="/wishlist" icon={<Heart className="w-5 h-5" />} label={t('wishlist')} value={wishlistCount} />
+        <StatTile href="/cart" icon={<ShoppingCart className="w-5 h-5" />} label={t('cartItems')} value={cartCount} />
+      </div>
+
+      {!user.twoFactorEnabled && (
+        <Link
+          href="/security"
+          className="flex items-center gap-4 rounded-[var(--radius-card)] border border-[color:var(--accent)]/30 bg-[color:var(--accent)]/5 p-4 hover:bg-[color:var(--accent)]/10 transition-colors"
+        >
+          <span className="w-10 h-10 rounded-full bg-[color:var(--accent)] text-white grid place-items-center shrink-0">
+            <ShieldCheck aria-hidden className="w-5 h-5" />
+          </span>
+          <span className="flex-1 min-w-0">
+            <span className="block font-bold">{t('secureTitle')}</span>
+            <span className="block text-sm text-[color:var(--fg-muted)]">{t('secureBody')}</span>
+          </span>
+          <ChevronRight aria-hidden className="w-5 h-5 text-[color:var(--accent)] shrink-0" />
+        </Link>
+      )}
+
+      <section className="card !p-0 overflow-hidden" aria-labelledby="recent-orders">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[color:var(--border)]">
+          <h2 id="recent-orders" className="font-extrabold">{t('recentOrders')}</h2>
+          {orderTotal > 0 && (
+            <Link href="/orders" className="text-sm font-bold text-[color:var(--accent)] hover:underline underline-offset-4 inline-flex items-center gap-1">
+              {t('viewAll')} <ArrowRight aria-hidden className="w-4 h-4" />
+            </Link>
+          )}
+        </div>
+        {orders === null ? (
+          <div className="p-5 space-y-3">
+            <div className="skeleton h-10" />
+            <div className="skeleton h-10" />
+          </div>
+        ) : orders.length === 0 ? (
+          <div className="p-8 text-center">
+            <p className="text-[color:var(--fg-muted)] mb-4">{t('noOrders')}</p>
+            <Link href="/products" className="btn-primary">{t('startShopping')}</Link>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="table-clean">
+              <thead>
+                <tr>
+                  <th>{t('order')}</th>
+                  <th>{t('date')}</th>
+                  <th>{t('status')}</th>
+                  <th className="text-right">{t('total')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map((o) => (
+                  <tr key={o.id}>
+                    <td>
+                      <Link href={`/orders/${o.orderNumber}`} className="font-mono font-bold text-[color:var(--accent)] hover:underline underline-offset-4">
+                        {o.orderNumber}
+                      </Link>
+                    </td>
+                    <td className="text-[color:var(--fg-muted)] whitespace-nowrap">{dateFmt.format(new Date(o.createdAt))}</td>
+                    <td><OrderStatusBadge status={o.status} /></td>
+                    <td className="text-right font-bold whitespace-nowrap">{formatPrice(Number(o.total), o.currency)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
-      </div>
-
-      <button
-        type="button"
-        onClick={async () => {
-          await logout();
-          router.push('/');
-          router.refresh();
-        }}
-        className="btn-ghost inline-flex"
-      >
-        <LogOut className="w-4 h-4" /> Sign out
-      </button>
+      </section>
     </div>
   );
 }
 
-function DashCard({
-  icon,
-  title,
-  href,
-  children,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  href: string;
-  children: React.ReactNode;
-}) {
+function StatTile({ href, icon, label, value }: { href: string; icon: React.ReactNode; label: string; value: number | string }) {
   return (
-    <Link href={href} className="card group">
-      <div className="w-10 h-10 rounded-lg bg-[color:var(--bg)] border border-[color:var(--border)] grid place-items-center text-[color:var(--accent)] mb-4 group-hover:bg-[color:var(--accent)] group-hover:text-white group-hover:border-[color:var(--accent)] transition-colors">
-        {icon}
-      </div>
-      <div className="font-semibold mb-1">{title}</div>
-      <div className="text-sm text-[color:var(--fg-muted)]">{children}</div>
+    <Link href={href} className="card card-hover flex items-center gap-4 !p-5">
+      <span className="w-12 h-12 rounded-full bg-[color:var(--accent)]/10 text-[color:var(--accent)] grid place-items-center shrink-0">{icon}</span>
+      <span>
+        <span className="block text-2xl font-extrabold tabular-nums">{value}</span>
+        <span className="block text-sm text-[color:var(--fg-muted)]">{label}</span>
+      </span>
     </Link>
   );
 }

@@ -7,12 +7,46 @@ import {
 import { Prisma } from '@prisma/client';
 import { OrderModel } from '../../models/order.model';
 import { ProductModel } from '../../models/product.model';
+import { FlashSaleModel } from '../../models/flash-sale.model';
 import { CouponsService } from '../coupons/coupons.service';
 import { SettingsService } from '../settings/settings.service';
-import type { CreateOrderDto, OrderQueryDto } from './dto/order.dto';
+import type { CreateOrderDto, OrderQueryDto, QuoteDto } from './dto/order.dto';
 
 const FREE_SHIPPING_THRESHOLD = new Prisma.Decimal(3000);
 const FLAT_SHIPPING_FEE = new Prisma.Decimal(60);
+
+type CheckoutItem = { productId: string; variantId?: string; quantity: number };
+
+interface PricedLine {
+  productId: string;
+  variantId: string | null;
+  productName: string;
+  productNameBn: string | null;
+  slug: string;
+  productImage: string | null;
+  unitPrice: Prisma.Decimal;
+  listPrice: Prisma.Decimal;
+  quantity: number;
+  lineTotal: Prisma.Decimal;
+  currency: string;
+  stock: number;
+  flashSaleId: string | null;
+}
+
+export interface LineIssue {
+  productId: string;
+  variantId: string | null;
+  reason: 'unavailable' | 'insufficient_stock';
+  /** Units actually available (0 when the product is gone). */
+  available: number;
+  message: string;
+}
+
+const sumLines = (lines: PricedLine[]) =>
+  lines.reduce((acc, l) => acc.add(l.lineTotal), new Prisma.Decimal(0));
+
+const shippingFor = (subtotal: Prisma.Decimal) =>
+  subtotal.greaterThanOrEqualTo(FREE_SHIPPING_THRESHOLD) ? new Prisma.Decimal(0) : FLAT_SHIPPING_FEE;
 
 @Injectable()
 export class OrdersService {
@@ -21,6 +55,7 @@ export class OrdersService {
   constructor(
     private readonly orders: OrderModel,
     private readonly products: ProductModel,
+    private readonly flashSales: FlashSaleModel,
     private readonly coupons: CouponsService,
     private readonly settingsService: SettingsService,
   ) {}
@@ -37,58 +72,12 @@ export class OrdersService {
       throw new BadRequestException('Cash on delivery is currently unavailable');
     }
 
-    const productIds = [...new Set(dto.items.map((i) => i.productId))];
-    const products = await this.products.findMany({
-      where: { id: { in: productIds }, isActive: true },
-      include: {
-        images: { orderBy: { position: 'asc' }, take: 1 },
-        variants: true,
-      },
-    });
-    const byId = new Map(products.map((p) => [p.id, p]));
+    const { lines, issues } = await this.priceItems(dto.items);
+    // Checkout refuses what the quote merely reports.
+    if (issues.length > 0) throw new BadRequestException(issues[0].message);
 
-    const lines = dto.items.map((item) => {
-      const product = byId.get(item.productId);
-      if (!product) {
-        throw new BadRequestException(`Product ${item.productId} is unavailable`);
-      }
-
-      const variant = item.variantId
-        ? product.variants.find((v) => v.id === item.variantId)
-        : undefined;
-      if (item.variantId && !variant) {
-        throw new BadRequestException(`Variant ${item.variantId} is unavailable`);
-      }
-
-      const availableStock = variant ? variant.stock : product.stock;
-      if (availableStock < item.quantity) {
-        throw new BadRequestException(
-          `Not enough stock for "${product.name}" (${availableStock} left)`,
-        );
-      }
-
-      const unitPrice = variant?.price ?? product.price;
-      const lineTotal = unitPrice.mul(item.quantity);
-
-      return {
-        productId: product.id,
-        variantId: variant?.id ?? null,
-        productName: product.name,
-        productImage: product.images[0]?.url ?? null,
-        unitPrice,
-        quantity: item.quantity,
-        lineTotal,
-        currency: product.currency,
-      };
-    });
-
-    const subtotal = lines.reduce(
-      (acc, l) => acc.add(l.lineTotal),
-      new Prisma.Decimal(0),
-    );
-    let shipping = subtotal.greaterThanOrEqualTo(FREE_SHIPPING_THRESHOLD)
-      ? new Prisma.Decimal(0)
-      : FLAT_SHIPPING_FEE;
+    const subtotal = sumLines(lines);
+    let shipping = shippingFor(subtotal);
     const tax = new Prisma.Decimal(0);
 
     let discount = new Prisma.Decimal(0);
@@ -98,6 +87,7 @@ export class OrdersService {
         dto.couponCode,
         subtotal.toNumber(),
         lines.map((l) => ({ productId: l.productId, quantity: l.quantity, unitPrice: l.unitPrice.toNumber() })),
+        userId,
       );
       discount = resolved.discount;
       couponId = resolved.couponId;
@@ -136,6 +126,139 @@ export class OrdersService {
       }
       throw err;
     }
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // QUOTE — what this cart costs right now, without creating anything
+  // ─────────────────────────────────────────────────────────────────
+  /**
+   * Prices a cart exactly as `create()` would, so the cart and checkout show
+   * the amount the order will actually be charged.
+   *
+   * The storefront used to total prices cached in the browser when each item
+   * was added. After a flash sale ended, checkout showed (and told bKash
+   * customers to send) the old sale price while the order charged full price.
+   *
+   * Unlike `create()` it never throws on a bad line: unavailable and short-stock
+   * items come back as `issues` so the cart can show them.
+   */
+  async quote(dto: QuoteDto) {
+    const { lines, issues } = await this.priceItems(dto.items);
+    const subtotal = sumLines(lines);
+    let shipping = lines.length > 0 ? shippingFor(subtotal) : new Prisma.Decimal(0);
+    let discount = new Prisma.Decimal(0);
+    let coupon: { code: string; valid: boolean; message: string; freeShipping: boolean } | null = null;
+
+    const code = dto.couponCode?.trim();
+    if (code && lines.length > 0) {
+      // Guests can quote too, so the per-user redemption cap is only checked
+      // when the order is placed and the buyer is known.
+      const v = await this.coupons.validate(
+        code,
+        subtotal.toNumber(),
+        lines.map((l) => ({ productId: l.productId, quantity: l.quantity, unitPrice: l.unitPrice.toNumber() })),
+      );
+      coupon = { code: v.code ?? code.toUpperCase(), valid: v.valid, message: v.message, freeShipping: v.freeShipping };
+      if (v.valid) {
+        discount = v.discount;
+        if (v.freeShipping) shipping = new Prisma.Decimal(0);
+      }
+    }
+
+    const total = Prisma.Decimal.max(0, subtotal.add(shipping).sub(discount));
+    return {
+      currency: lines[0]?.currency ?? 'BDT',
+      lines: lines.map((l) => ({
+        productId: l.productId,
+        variantId: l.variantId,
+        name: l.productName,
+        nameBn: l.productNameBn,
+        slug: l.slug,
+        image: l.productImage,
+        unitPrice: l.unitPrice.toNumber(),
+        listPrice: l.listPrice.toNumber(),
+        onSale: !l.unitPrice.equals(l.listPrice),
+        quantity: l.quantity,
+        lineTotal: l.lineTotal.toNumber(),
+        stock: l.stock,
+      })),
+      issues,
+      subtotal: subtotal.toNumber(),
+      shipping: shipping.toNumber(),
+      discount: discount.toNumber(),
+      total: total.toNumber(),
+      freeShippingThreshold: FREE_SHIPPING_THRESHOLD.toNumber(),
+      coupon,
+    };
+  }
+
+  /**
+   * The one place a cart line gets its price. Both `create()` and `quote()`
+   * call this, so what's shown and what's charged can't drift apart.
+   *
+   * The client sends product IDs and quantities but never prices. A live flash
+   * sale prices the product itself, so it applies only to lines without a
+   * variant — a variant carries its own price and isn't part of the sale.
+   */
+  private async priceItems(items: CheckoutItem[]) {
+    const productIds = [...new Set(items.map((i) => i.productId))];
+    const [products, saleEntries] = await Promise.all([
+      this.products.findMany({
+        where: { id: { in: productIds }, isActive: true },
+        include: {
+          images: { orderBy: { position: 'asc' }, take: 1 },
+          variants: true,
+        },
+      }),
+      this.flashSales.findActiveEntriesForProducts(productIds),
+    ]);
+    const byId = new Map(products.map((p) => [p.id, p]));
+    const saleByProduct = new Map(saleEntries.map((e) => [e.productId, e]));
+
+    const issues: LineIssue[] = [];
+    const lines: PricedLine[] = [];
+
+    for (const item of items) {
+      const product = byId.get(item.productId);
+      if (!product) {
+        issues.push({ productId: item.productId, variantId: item.variantId ?? null, reason: 'unavailable', available: 0,
+          message: `Product ${item.productId} is unavailable` });
+        continue;
+      }
+      const variant = item.variantId ? product.variants.find((v) => v.id === item.variantId) : undefined;
+      if (item.variantId && !variant) {
+        issues.push({ productId: product.id, variantId: item.variantId, reason: 'unavailable', available: 0,
+          message: `Variant ${item.variantId} is unavailable` });
+        continue;
+      }
+
+      const stock = variant ? variant.stock : product.stock;
+      if (stock < item.quantity) {
+        issues.push({ productId: product.id, variantId: variant?.id ?? null, reason: 'insufficient_stock', available: stock,
+          message: `Not enough stock for "${product.name}" (${stock} left)` });
+      }
+
+      const sale = variant ? undefined : saleByProduct.get(product.id);
+      const listPrice = variant?.price ?? product.price;
+      const unitPrice = sale && sale.salePrice.lessThan(listPrice) ? sale.salePrice : listPrice;
+
+      lines.push({
+        productId: product.id,
+        variantId: variant?.id ?? null,
+        productName: product.name,
+        productNameBn: product.nameBn,
+        slug: product.slug,
+        productImage: product.images[0]?.url ?? null,
+        unitPrice,
+        listPrice,
+        quantity: item.quantity,
+        lineTotal: unitPrice.mul(item.quantity),
+        currency: product.currency,
+        stock,
+        flashSaleId: unitPrice.equals(listPrice) ? null : (sale?.flashSaleId ?? null),
+      });
+    }
+    return { lines, issues };
   }
 
   // ─────────────────────────────────────────────────────────────────
@@ -181,13 +304,16 @@ export class OrdersService {
   // Helpers
   // ─────────────────────────────────────────────────────────────────
 
+  /**
+   * Reserves the next order number from the OrderSequence table.
+   *
+   * The previous count()+1 scheme handed the same number to two concurrent
+   * checkouts, and one of them died on the unique constraint as a 500.
+   */
   private async nextOrderNumber(): Promise<string> {
     const year = new Date().getFullYear();
-    const start = new Date(year, 0, 1);
-    const end = new Date(year + 1, 0, 1);
-    const countThisYear = await this.orders.countCreatedBetween(start, end);
-    const seq = String(countThisYear + 1).padStart(6, '0');
-    return `DRK-${year}-${seq}`;
+    const next = await this.orders.nextSequenceValue(year);
+    return `DRK-${year}-${String(next).padStart(6, '0')}`;
   }
 
   private async attachSlugs<T extends { items: { productId: string }[] }>(

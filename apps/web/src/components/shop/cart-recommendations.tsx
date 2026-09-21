@@ -4,9 +4,12 @@ import { useEffect, useMemo, useState } from 'react';
 import type { ProductSummary } from '@drikon/shared-types';
 import { apiPost } from '@/lib/api-client';
 import { useCartStore } from '@/store/cart-store';
-import { ProductGrid } from './product-grid';
+import { useTranslations } from 'next-intl';
+import { ProductCarousel } from './product-carousel';
+import { SectionHeader } from '@/components/home/section-header';
 
 export function CartRecommendations() {
+  const tc = useTranslations('cart');
   const items = useCartStore((s) => s.items);
   const [recommendations, setRecommendations] = useState<ProductSummary[]>([]);
   const productIds = useMemo(() => items.map((i) => i.productId), [items]);
@@ -36,9 +39,9 @@ export function CartRecommendations() {
   if (recommendations.length === 0) return null;
 
   return (
-    <section className="mt-14">
-      <h2 className="display text-2xl mb-6">Add these too</h2>
-      <ProductGrid products={recommendations} className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4" />
+    <section className="mt-10" aria-labelledby="cart-recommendations">
+      <SectionHeader id="cart-recommendations" title={tc('addTheseToo')} />
+      <ProductCarousel products={recommendations} label={tc('addTheseToo')} />
     </section>
   );
 }
