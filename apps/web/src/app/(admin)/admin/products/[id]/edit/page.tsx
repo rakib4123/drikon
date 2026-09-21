@@ -29,6 +29,7 @@ interface AdminProductDetail {
   categoryId: string;
   brandId?: string | null;
   videoUrl?: string | null;
+  modelUrl?: string | null;
   images?: { url: string; alt?: string | null }[];
 }
 
@@ -96,6 +97,7 @@ export default function AdminProductEditPage({ params }: PageProps) {
           categoryId: product.categoryId,
           brandId: product.brandId ?? '',
           videoUrl: product.videoUrl ?? '',
+          modelUrl: product.modelUrl ?? '',
           imageUrl: product.images?.[0]?.url ?? '',
           imageAlt: product.images?.[0]?.alt ?? '',
         }}
