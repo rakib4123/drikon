@@ -29,7 +29,7 @@ export async function CategoryGrid({ categories }: { categories: NavCategory[] }
             <li key={c.id}>
               <Link
                 href={`/products?category=${c.slug}`}
-                className="group flex flex-col items-center text-center gap-2.5 rounded-[var(--radius-card)] border border-[color:var(--border)] bg-white px-2 py-4
+                className="group flex flex-col items-center text-center gap-2.5 rounded-[var(--radius-card)] border border-[color:var(--border)] bg-[color:var(--surface)] neon-edge px-2 py-4
                            hover:border-[color:var(--accent)] hover:shadow-[0_10px_24px_-14px_rgba(16,24,40,0.3)] transition"
               >
                 <span className="relative w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-full bg-[color:var(--bg-soft)] grid place-items-center overflow-hidden

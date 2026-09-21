@@ -64,7 +64,7 @@ export function MegaMenu({ categories = [] }: { categories?: NavCategory[] }) {
                        data-[state=open]:animate-dk-fade-in data-[state=closed]:animate-dk-fade-out"
           >
             {topLevel.length === 0 ? (
-              <div className="w-[260px] rounded-b-[var(--radius-card)] bg-white border border-[color:var(--border)] shadow-2xl p-5">
+              <div className="w-[260px] rounded-b-[var(--radius-card)] bg-[color:var(--surface-solid)] border border-[color:var(--border)] shadow-2xl p-5">
                 <NavigationMenu.Link asChild>
                   <Link href="/products" className="text-sm text-[color:var(--accent)]">
                     Browse all products →
@@ -72,7 +72,7 @@ export function MegaMenu({ categories = [] }: { categories?: NavCategory[] }) {
                 </NavigationMenu.Link>
               </div>
             ) : (
-              <div className="w-[min(94vw,860px)] rounded-b-[var(--radius-card)] bg-white border border-t-0 border-[color:var(--border)] shadow-[0_24px_48px_-20px_rgba(16,24,40,0.35)] overflow-hidden grid grid-cols-[260px_1fr]">
+              <div className="w-[min(94vw,860px)] rounded-b-[var(--radius-card)] bg-[color:var(--surface-solid)] border border-t-0 border-[color:var(--border)] shadow-[0_24px_48px_-20px_rgba(16,24,40,0.35)] overflow-hidden grid grid-cols-[260px_1fr]">
                 {/* Left: category list */}
                 <ul className="max-h-[62vh] overflow-y-auto border-r border-[color:var(--border)] py-2 list-none m-0 bg-[color:var(--bg-soft)]/60">
                   {topLevel.map((cat) => {
@@ -88,7 +88,7 @@ export function MegaMenu({ categories = [] }: { categories?: NavCategory[] }) {
                             onFocus={() => setActiveId(cat.id)}
                             className={`flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors ${
                               isActive
-                                ? 'bg-white text-[color:var(--accent)] shadow-[inset_3px_0_0_var(--accent)]'
+                                ? 'bg-[color:var(--bg-soft)] text-[color:var(--accent)] shadow-[inset_3px_0_0_var(--accent)]'
                                 : 'text-[color:var(--fg)] hover:text-[color:var(--accent)]'
                             }`}
                           >

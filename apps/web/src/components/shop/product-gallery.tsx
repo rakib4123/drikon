@@ -38,7 +38,7 @@ export function ProductGallery({
                 onClick={() => setActive(i)}
                 aria-pressed={active === i}
                 aria-label={`${name} — ${i + 1} / ${images.length}`}
-                className={`relative block w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-[var(--radius-ctl)] overflow-hidden border-2 transition-colors bg-white ${
+                className={`relative block w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-[var(--radius-ctl)] overflow-hidden border-2 transition-colors [background:var(--image-well)] ${
                   active === i ? 'border-[color:var(--accent)]' : 'border-[color:var(--border)] hover:border-[color:var(--fg-muted)]'
                 }`}
               >
@@ -49,7 +49,7 @@ export function ProductGallery({
         </ul>
       )}
 
-      <div className="relative flex-1 aspect-square rounded-[var(--radius-card)] overflow-hidden border border-[color:var(--border)] bg-white">
+      <div className="relative flex-1 aspect-square rounded-[var(--radius-card)] overflow-hidden border border-[color:var(--border)] [background:var(--image-well)]">
         <ProductThumb
           // Keyed by URL so a failed image's fallback doesn't stick to the next one.
           key={current?.url}

@@ -61,7 +61,7 @@ export default function DashboardPage() {
           href="/security"
           className="flex items-center gap-4 rounded-[var(--radius-card)] border border-[color:var(--accent)]/30 bg-[color:var(--accent)]/5 p-4 hover:bg-[color:var(--accent)]/10 transition-colors"
         >
-          <span className="w-10 h-10 rounded-full bg-[color:var(--accent)] text-white grid place-items-center shrink-0">
+          <span className="w-10 h-10 rounded-full bg-[color:var(--accent)] text-[color:var(--accent-fg)] grid place-items-center shrink-0">
             <ShieldCheck aria-hidden className="w-5 h-5" />
           </span>
           <span className="flex-1 min-w-0">

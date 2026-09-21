@@ -79,7 +79,7 @@ export default function CartPage() {
                 <li key={`${item.productId}-${item.variantId ?? ''}`} className="p-4 md:px-5">
                   <div className="grid grid-cols-[72px_minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_120px_140px_120px_44px] gap-x-4 gap-y-3 items-center">
                     <div className="flex items-center gap-4 min-w-0 md:col-span-1 col-span-2">
-                      <Link href={`/products/${item.slug}`} className="relative w-[72px] h-[72px] shrink-0 rounded-[var(--radius-ctl)] overflow-hidden border border-[color:var(--border)] bg-white">
+                      <Link href={`/products/${item.slug}`} className="relative w-[72px] h-[72px] shrink-0 rounded-[var(--radius-ctl)] overflow-hidden border border-[color:var(--border)] [background:var(--image-well)]">
                         <ProductThumb src={q?.image ?? item.image} sizes="72px" />
                       </Link>
                       <div className="min-w-0">
@@ -96,7 +96,7 @@ export default function CartPage() {
                     </div>
 
                     <div className="col-start-2 md:col-start-auto flex items-center gap-3">
-                      <div className="inline-flex items-center h-10 border border-[#d0d5dd] rounded-[var(--radius-ctl)] overflow-hidden">
+                      <div className="inline-flex items-center h-10 border border-[color:var(--border-strong)] rounded-[var(--radius-ctl)] overflow-hidden">
                         <button
                           type="button"
                           onClick={() => updateQty(item.productId, item.quantity - 1, item.variantId)}
@@ -166,7 +166,7 @@ export default function CartPage() {
                   ? t('addForFreeShipping', { amount: formatPrice(toFreeShipping, currency) })
                   : t('freeShippingUnlocked')}
               </p>
-              <div className="mt-2.5 h-2 rounded-full bg-white overflow-hidden" aria-hidden>
+              <div className="mt-2.5 h-2 rounded-full bg-[color:var(--bg-soft)] overflow-hidden" aria-hidden>
                 <div className="h-full rounded-full bg-[color:var(--color-success)] transition-[width] duration-500" style={{ width: `${freeShipProgress}%` }} />
               </div>
             </div>

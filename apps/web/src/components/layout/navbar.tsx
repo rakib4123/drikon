@@ -54,7 +54,7 @@ export function Navbar({ brand, categories }: { brand: BrandInfo; categories: Na
   const firstName = user?.name?.split(' ')[0];
 
   return (
-    <header className="sticky top-0 z-40 bg-white shadow-[0_1px_0_var(--border)]">
+    <header className="sticky top-0 z-40 bg-[color:var(--surface-solid)]/90 backdrop-blur-md shadow-[0_1px_0_var(--border)]">
       {/* ─── Main row ─── */}
       <div className="shell h-16 md:h-[76px] flex items-center gap-3 md:gap-6">
         <div className="flex items-center gap-1 shrink-0">
@@ -90,7 +90,7 @@ export function Navbar({ brand, categories }: { brand: BrandInfo; categories: Na
 
           <HeaderIcon href="/compare" label={t('compare')} className="hidden md:inline-flex">
             <GitCompare className="w-[21px] h-[21px]" />
-            {mounted && <CountBadge count={compareCount} className="bg-[color:var(--fg)]" />}
+            {mounted && <CountBadge count={compareCount} className="bg-[color:var(--fg)] text-[color:var(--accent-fg)]" />}
           </HeaderIcon>
 
           <HeaderIcon href="/wishlist" label={t('wishlist')} className="hidden sm:inline-flex">
@@ -101,7 +101,7 @@ export function Navbar({ brand, categories }: { brand: BrandInfo; categories: Na
           <Link href="/cart" aria-label={t('cart')} className="flex items-center gap-2.5 pl-2 pr-1 py-1.5 rounded-lg hover:bg-[color:var(--bg-soft)] transition-colors">
             <span className="relative">
               <ShoppingCart className="w-6 h-6" />
-              {mounted && <CountBadge count={cartCount} className="bg-[color:var(--accent)]" />}
+              {mounted && <CountBadge count={cartCount} className="bg-[color:var(--accent)] text-[color:var(--accent-fg)]" />}
             </span>
             <span className="hidden xl:block leading-tight">
               <span className="block text-[11px] text-[color:var(--fg-muted)]">{t('cart')}</span>
@@ -119,7 +119,7 @@ export function Navbar({ brand, categories }: { brand: BrandInfo; categories: Na
       </div>
 
       {/* ─── Category bar ─── */}
-      <nav aria-label={t('mainNavigation')} className="hidden lg:block bg-[color:var(--accent)] text-white">
+      <nav aria-label={t('mainNavigation')} className="hidden lg:block bg-[color:var(--accent)] text-[color:var(--accent-fg)]">
         <div className="shell h-12 flex items-stretch gap-6">
           <MegaMenu categories={categories} />
           <ul className="flex items-center gap-1 text-[13.5px] font-semibold">
