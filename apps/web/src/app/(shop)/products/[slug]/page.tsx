@@ -14,7 +14,7 @@ import { CompareButton } from '@/components/shop/compare-button';
 import { ProductReviews } from '@/components/shop/product-reviews';
 import { VideoEmbed } from '@/components/shop/video-embed';
 import { PremiumProductPage } from '@/components/shop/premium-product-page';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, effectivePrice } from '@/lib/utils';
 import { getSettings, resolveContent } from '@/lib/settings';
 import { localize } from '@/lib/localize';
 import type { Locale } from '@/i18n/request';
@@ -44,7 +44,7 @@ interface ProductListResponse {
 // cache() dedupes the fetch shared by generateMetadata + the page render.
 const getProduct = cache(async (slug: string): Promise<ProductDetail | null> => {
   try {
-    return await apiGet<ProductDetail>(`/api/v1/products/slug/${slug}`);
+    return await apiGet<ProductDetail>(`/api/v1/products/slug/${slug}`, { revalidate: 60 });
   } catch (err) {
     if (err instanceof ApiError && err.status === 404) return null;
     throw err;
@@ -82,7 +82,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 async function getRelated(categorySlug: string, excludeId: string): Promise<ProductSummary[]> {
   try {
-    const data = await apiGet<ProductListResponse>(`/api/v1/products?category=${categorySlug}&limit=8`);
+    const data = await apiGet<ProductListResponse>(`/api/v1/products?category=${categorySlug}&limit=8`, { revalidate: 300 });
     return data.items.filter((p) => p.id !== excludeId).slice(0, 4);
   } catch {
     return [];
@@ -91,7 +91,7 @@ async function getRelated(categorySlug: string, excludeId: string): Promise<Prod
 
 async function getFrequentlyBoughtTogether(productId: string): Promise<ProductSummary[]> {
   try {
-    return await apiGet<ProductSummary[]>(`/api/v1/recommendations/product/${productId}`);
+    return await apiGet<ProductSummary[]>(`/api/v1/recommendations/product/${productId}`, { revalidate: 300 });
   } catch {
     return [];
   }
@@ -112,14 +112,21 @@ export default async function ProductDetailPage({ params }: PageProps) {
       ? frequentlyBoughtTogether
       : await getRelated(product.category.slug, product.id);
 
-  const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
+  // `price` is what checkout will charge: the live flash-sale price when one is
+  // running, otherwise the catalogue price.
+  const { price, listPrice, onSale: onFlashSale, discountPercent } = effectivePrice(product);
   const compareAt = product.compareAtPrice
     ? typeof product.compareAtPrice === 'string'
       ? parseFloat(product.compareAtPrice)
       : product.compareAtPrice
     : null;
-  const onSale = compareAt && compareAt > price;
-  const discount = onSale && compareAt ? Math.round(((compareAt - price) / compareAt) * 100) : 0;
+  const struckPrice = onFlashSale ? listPrice : compareAt && compareAt > price ? compareAt : null;
+  const onSale = struckPrice !== null;
+  const discount = onFlashSale
+    ? discountPercent
+    : struckPrice
+      ? Math.round(((struckPrice - price) / struckPrice) * 100)
+      : 0;
 
   const content = resolveContent(await getSettings());
 
@@ -228,9 +235,14 @@ export default async function ProductDetailPage({ params }: PageProps) {
           {/* Price */}
           <div className="flex items-baseline gap-3 mb-6">
             <span className="display text-3xl">{formatPrice(price, product.currency)}</span>
-            {onSale && compareAt && (
+            {struckPrice !== null && (
               <span className="text-[color:var(--fg-muted)] line-through text-lg">
-                {formatPrice(compareAt, product.currency)}
+                {formatPrice(struckPrice, product.currency)}
+              </span>
+            )}
+            {onFlashSale && (
+              <span className="px-2 py-1 text-[11px] font-bold rounded-md bg-[color:var(--accent)] text-white">
+                {t('flashSale')} −{discountPercent}%
               </span>
             )}
           </div>

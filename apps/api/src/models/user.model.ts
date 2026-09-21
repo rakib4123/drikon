@@ -125,6 +125,22 @@ export class UserModel {
     ]);
   }
 
+  /**
+   * Burns a single recovery code. The `has` filter makes the read and the write
+   * one statement, so the same code can't be redeemed twice concurrently.
+   */
+  async consumeRecoveryCode(userId: string, hashedCode: string): Promise<boolean> {
+    // array_remove drops just the one code. Prisma's scalar-list update can only
+    // `set` the whole array, which would burn every remaining code at once.
+    const affected = await this.prisma.$executeRaw`
+      UPDATE "TwoFactorSecret"
+         SET "recoveryCodes" = array_remove("recoveryCodes", ${hashedCode})
+       WHERE "userId" = ${userId}
+         AND ${hashedCode} = ANY("recoveryCodes")
+    `;
+    return affected > 0;
+  }
+
   /** Atomically flips twoFactorEnabled off and deletes the secret. */
   disableTwoFactorTransaction(userId: string) {
     return this.prisma.$transaction([

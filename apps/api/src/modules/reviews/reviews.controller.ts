@@ -14,7 +14,7 @@ import { Role } from '@prisma/client';
 
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/review.dto';
-import { Public, Roles, CurrentUser } from '../../common/decorators';
+import { Audit, CurrentUser, Public, Roles } from '../../common/decorators';
 
 @ApiTags('reviews')
 @Controller({ path: 'reviews', version: '1' })
@@ -57,6 +57,7 @@ export class ReviewsController {
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Audit('review.update', 'Review')
   @Patch(':id/visibility')
   @ApiOperation({ summary: '(Admin) Hide or unhide a review' })
   setHidden(@Param('id') id: string, @Body('isHidden') isHidden: boolean) {

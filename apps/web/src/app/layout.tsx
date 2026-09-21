@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Geist, JetBrains_Mono } from 'next/font/google';
 import '../styles/globals.css';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
@@ -11,6 +12,23 @@ import { CompareTray } from '@/components/shop/compare-tray';
 import { getSettings, resolveContent } from '@/lib/settings';
 import { getCategories } from '@/lib/catalog';
 import { SITE_URL } from '@/lib/site';
+
+// Self-hosted via next/font: no render-blocking stylesheet round-trip to Google,
+// automatic `font-display: swap`, and a size-adjusted fallback so swapping the
+// webfont in doesn't shift the layout.
+const geist = Geist({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  variable: '--font-geist',
+  display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  variable: '--font-jetbrains-mono',
+  display: 'swap',
+});
 
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();
@@ -49,17 +67,20 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const brand = { siteName: s.siteName, logoUrl: s.logoUrl ?? null, tagline: s.tagline ?? null };
 
   // Runtime accent override from admin branding — applies across light + dark.
+  // Sets the --color-* theme tokens (not the aliases), so both the hand-written
+  // `var(--accent)` call sites AND the Tailwind-generated utilities that read
+  // --color-accent pick the brand colour up without a redeploy.
   const accentCss =
     s.accentColor || s.accentColor2
-      ? `:root,.dark{${s.accentColor ? `--accent:${s.accentColor};--ring:${s.accentColor};` : ''}${s.accentColor2 ? `--accent-2:${s.accentColor2};` : ''}}`
+      ? `:root,.dark{${s.accentColor ? `--color-accent:${s.accentColor};--color-ring:${s.accentColor};` : ''}${s.accentColor2 ? `--color-accent-2:${s.accentColor2};` : ''}}`
       : null;
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      </head>
+    <html
+      lang={locale}
+      suppressHydrationWarning
+      className={`${geist.variable} ${jetbrainsMono.variable}`}
+    >
       <body>
         {accentCss && <style dangerouslySetInnerHTML={{ __html: accentCss }} />}
         <ParticleField />

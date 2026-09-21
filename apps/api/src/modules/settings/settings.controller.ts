@@ -4,7 +4,7 @@ import { Role } from '@prisma/client';
 
 import { SettingsService } from './settings.service';
 import { UpdateSettingsDto } from './dto/settings.dto';
-import { Public, Roles } from '../../common/decorators';
+import { Audit, Public, Roles } from '../../common/decorators';
 
 @ApiTags('settings')
 @Controller({ path: 'settings', version: '1' })
@@ -18,6 +18,7 @@ export class SettingsController {
     return this.settings.get();
   }
 
+  @Audit('settings.update', 'SiteSettings')
   @Patch()
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: '(Admin) Update site settings / branding' })

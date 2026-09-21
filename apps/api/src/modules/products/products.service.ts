@@ -7,6 +7,7 @@ import {
 import { Prisma } from '@prisma/client';
 import { ProductModel } from '../../models/product.model';
 import { OrderModel } from '../../models/order.model';
+import { FlashSaleModel } from '../../models/flash-sale.model';
 import type {
   CreateProductDto,
   UpdateProductDto,
@@ -41,7 +42,31 @@ export class ProductsService {
   constructor(
     private readonly products: ProductModel,
     private readonly orders: OrderModel,
+    private readonly flashSales: FlashSaleModel,
   ) {}
+
+  /**
+   * Stamps `salePrice` / `saleEndsAt` onto products that are in a live flash sale.
+   *
+   * The storefront used to render the catalogue price everywhere and only show a
+   * sale price on the homepage strip, while checkout charged full price. Both
+   * sides now read the same flash-sale entries, so what's shown is what's charged.
+   */
+  private async withSalePricing<T extends { id: string; price: Prisma.Decimal }>(
+    rows: T[],
+  ): Promise<(T & { salePrice: Prisma.Decimal | null; saleEndsAt: Date | null })[]> {
+    const entries = await this.flashSales.findActiveEntriesForProducts(rows.map((r) => r.id));
+    const byProduct = new Map(entries.map((e) => [e.productId, e]));
+    return rows.map((r) => {
+      const sale = byProduct.get(r.id);
+      const applies = sale && sale.salePrice.lessThan(r.price);
+      return {
+        ...r,
+        salePrice: applies ? sale.salePrice : null,
+        saleEndsAt: applies ? sale.flashSale.endsAt : null,
+      };
+    });
+  }
 
   // ─────────────────────────────────────────────────────────────────
   // LIST — filtering, sorting, pagination
@@ -97,7 +122,7 @@ export class ProductsService {
     );
 
     return {
-      items,
+      items: await this.withSalePricing(items),
       pagination: {
         page,
         limit,
@@ -133,7 +158,8 @@ export class ProductsService {
     if (!product || !product.isActive) {
       throw new NotFoundException('Product not found');
     }
-    return product;
+    const [withSale] = await this.withSalePricing([product]);
+    return withSale;
   }
 
   // ─────────────────────────────────────────────────────────────────

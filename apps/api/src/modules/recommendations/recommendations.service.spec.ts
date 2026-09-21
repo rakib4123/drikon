@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { OrderStatus } from '@prisma/client';
 import { OrderModel } from '../../models/order.model';
 import { ProductModel } from '../../models/product.model';
+import { FlashSaleModel } from '../../models/flash-sale.model';
 import { ProductAssociationRuleModel } from '../../models/product-association-rule.model';
 import { RecommendationRunModel } from '../../models/recommendation-run.model';
 import { AprioriService } from './apriori.service';
@@ -11,6 +12,7 @@ describe('RecommendationsService', () => {
   let service: RecommendationsService;
   let orders: jest.Mocked<Pick<OrderModel, 'findMany'>>;
   let products: jest.Mocked<Pick<ProductModel, 'findMany'>>;
+  let flashSales: jest.Mocked<Pick<FlashSaleModel, 'findActiveEntriesForProducts'>>;
   let rules: jest.Mocked<Pick<ProductAssociationRuleModel, 'findMany' | 'replaceAll'>>;
   let runs: jest.Mocked<Pick<RecommendationRunModel, 'create' | 'findLatest'>>;
   let apriori: jest.Mocked<Pick<AprioriService, 'computeRules'>>;
@@ -18,6 +20,8 @@ describe('RecommendationsService', () => {
   beforeEach(async () => {
     orders = { findMany: jest.fn() };
     products = { findMany: jest.fn() };
+    // No live sale by default — recommendations then carry salePrice: null.
+    flashSales = { findActiveEntriesForProducts: jest.fn().mockResolvedValue([]) };
     rules = { findMany: jest.fn(), replaceAll: jest.fn() };
     runs = { create: jest.fn(), findLatest: jest.fn() };
     apriori = { computeRules: jest.fn() };
@@ -27,6 +31,7 @@ describe('RecommendationsService', () => {
         RecommendationsService,
         { provide: OrderModel, useValue: orders },
         { provide: ProductModel, useValue: products },
+        { provide: FlashSaleModel, useValue: flashSales },
         { provide: ProductAssociationRuleModel, useValue: rules },
         { provide: RecommendationRunModel, useValue: runs },
         { provide: AprioriService, useValue: apriori },
@@ -123,7 +128,8 @@ describe('RecommendationsService', () => {
           brand: { select: { id: true, name: true, slug: true } },
         },
       });
-      expect(result).toEqual([{ id: 'c2', name: 'Product C2' }]);
+      // Sale fields are stamped on every recommendation; null when no sale is live.
+      expect(result).toEqual([{ id: 'c2', name: 'Product C2', salePrice: null, saleEndsAt: null }]);
     });
   });
 

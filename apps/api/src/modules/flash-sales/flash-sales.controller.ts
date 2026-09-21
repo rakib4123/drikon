@@ -16,7 +16,7 @@ import {
   UpdateFlashSaleDto,
   AddFlashSaleProductDto,
 } from './dto/flash-sale.dto';
-import { Public, Roles } from '../../common/decorators';
+import { Audit, Public, Roles } from '../../common/decorators';
 
 @ApiTags('flash-sales')
 @Controller({ path: 'flash-sales', version: '1' })
@@ -38,6 +38,7 @@ export class FlashSalesController {
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Audit('flashsale.create', 'FlashSale')
   @Post()
   @ApiOperation({ summary: '(Admin) Create a flash sale' })
   create(@Body() dto: CreateFlashSaleDto) {
@@ -45,6 +46,7 @@ export class FlashSalesController {
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Audit('flashsale.update', 'FlashSale')
   @Patch(':id')
   @ApiOperation({ summary: '(Admin) Update a flash sale' })
   update(@Param('id') id: string, @Body() dto: UpdateFlashSaleDto) {
@@ -52,6 +54,7 @@ export class FlashSalesController {
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Audit('flashsale.delete', 'FlashSale')
   @Delete(':id')
   @ApiOperation({ summary: '(Admin) Delete a flash sale' })
   remove(@Param('id') id: string) {
@@ -59,6 +62,7 @@ export class FlashSalesController {
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Audit('flashsale.create', 'FlashSale')
   @Post(':id/products')
   @ApiOperation({ summary: '(Admin) Add/update a product in a flash sale' })
   addProduct(@Param('id') id: string, @Body() dto: AddFlashSaleProductDto) {
@@ -66,6 +70,7 @@ export class FlashSalesController {
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Audit('flashsale.delete', 'FlashSale')
   @Delete(':id/products/:productId')
   @ApiOperation({ summary: '(Admin) Remove a product from a flash sale' })
   removeProduct(@Param('id') id: string, @Param('productId') productId: string) {

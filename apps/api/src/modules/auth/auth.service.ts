@@ -142,7 +142,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // 2FA check
+    // 2FA check — a TOTP code, or one of the single-use recovery codes issued at setup.
     if (user.twoFactorEnabled && user.twoFactorSecret) {
       if (!input.twoFactorCode) {
         return {
@@ -150,7 +150,11 @@ export class AuthService {
           requiresTwoFactor: true,
         };
       }
-      const valid = authenticator.check(input.twoFactorCode, user.twoFactorSecret.secret);
+      const valid = await this.verifySecondFactor(
+        user.id,
+        user.twoFactorSecret,
+        input.twoFactorCode,
+      );
       if (!valid) throw new UnauthorizedException('Invalid 2FA code');
     }
 
@@ -342,7 +346,7 @@ export class AuthService {
     }
     // Generate one-time recovery codes (10 × 10 chars). Store hashes.
     const recoveryCodes = Array.from({ length: 10 }, () => randomBytes(5).toString('hex'));
-    const hashedCodes = recoveryCodes.map((c) => this.hashToken(c));
+    const hashedCodes = recoveryCodes.map((c) => this.hashToken(c.toLowerCase()));
     await this.users.enableTwoFactorTransaction(userId, hashedCodes);
     return { recoveryCodes };
   }
@@ -350,11 +354,39 @@ export class AuthService {
   async disable2FA(userId: string, code: string): Promise<{ message: string }> {
     const row = await this.users.findTwoFactorSecret(userId);
     if (!row) throw new BadRequestException('2FA not enabled');
-    if (!authenticator.check(code, row.secret)) {
-      throw new BadRequestException('Invalid code');
-    }
+    const valid = await this.verifySecondFactor(userId, row, code);
+    if (!valid) throw new BadRequestException('Invalid code');
     await this.users.disableTwoFactorTransaction(userId);
     return { message: '2FA disabled' };
+  }
+
+  /**
+   * Accepts either a live TOTP code or an unused recovery code.
+   *
+   * Recovery codes were being generated, hashed and stored at setup but never
+   * checked anywhere, so losing the authenticator meant losing the account. A
+   * consumed code is deleted immediately — each one works exactly once.
+   */
+  private async verifySecondFactor(
+    userId: string,
+    row: { secret: string; recoveryCodes: string[] },
+    code: string,
+  ): Promise<boolean> {
+    const submitted = code.trim();
+    if (!submitted) return false;
+
+    if (authenticator.check(submitted, row.secret)) return true;
+
+    const submittedHash = this.hashToken(submitted.toLowerCase());
+    if (!row.recoveryCodes.includes(submittedHash)) return false;
+
+    // The DB write is the real check: it only succeeds if the code was still
+    // unused, so two parallel logins can't both spend the same one.
+    const consumed = await this.users.consumeRecoveryCode(userId, submittedHash);
+    if (!consumed) return false;
+
+    this.logger.warn({ msg: 'auth.recovery_code_used', userId });
+    return true;
   }
 
   // ───────────────────────────────────────────────────────────────────

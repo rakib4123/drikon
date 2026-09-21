@@ -17,7 +17,7 @@ export interface Banner {
 /** Active hero slides, cached per request. */
 export const getBanners = cache(async (): Promise<Banner[]> => {
   try {
-    return await apiGet<Banner[]>('/api/v1/banners/active');
+    return await apiGet<Banner[]>('/api/v1/banners/active', { revalidate: 60 });
   } catch {
     return [];
   }
