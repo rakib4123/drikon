@@ -162,7 +162,8 @@
     "viewAll": "সব দেখুন",
     "view3d": "থ্রিডি ভিউ",
     "viewPhotos": "ছবি",
-    "viewerHint": "ঘোরাতে টেনে ধরুন"
+    "viewerHint": "ঘোরাতে টেনে ধরুন",
+    "viewerTapHint": "ঘোরাতে ট্যাপ করুন"
   },
   "about": {
     "eyebrow": "{brand} সম্পর্কে",

@@ -195,7 +195,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
             images={product.images ?? []}
             name={name}
             modelUrl={product.modelUrl ?? null}
-            labels={{ view3d: t('view3d'), photos: t('viewPhotos'), hint: t('viewerHint') }}
+            labels={{ view3d: t('view3d'), photos: t('viewPhotos'), hint: t('viewerHint'), tapHint: t('viewerTapHint') }}
             badge={
               <>
                 {onSale && <span className="badge-sale !text-xs">{t('offBadge', { discount })}</span>}

@@ -30,7 +30,7 @@ export function ProductMedia({
   name: string;
   badge?: React.ReactNode;
   modelUrl: string | null;
-  labels: { view3d: string; photos: string; hint: string };
+  labels: { view3d: string; photos: string; hint: string; tapHint: string };
 }) {
   const tier = useDeviceTier();
   const [mode, setMode] = useState<Mode>('3d');
@@ -101,12 +101,16 @@ export function ProductMedia({
               </div>
             )}
             <div className="absolute inset-0">
-              <ProductViewer3D tier={viewerTier} modelUrl={modelUrl} imageUrl={current?.url ?? null} onFail={onFail} onReady={onReady} />
+              <ProductViewer3D
+                tier={viewerTier}
+                modelUrl={modelUrl}
+                imageUrl={current?.url ?? null}
+                labels={{ dragHint: labels.hint, tapHint: labels.tapHint }}
+                onFail={onFail}
+                onReady={onReady}
+              />
             </div>
             {badge && <div className="absolute top-3 left-3 flex flex-col items-start gap-1.5 pointer-events-none">{badge}</div>}
-            <p className="pointer-events-none absolute bottom-3 inset-x-0 text-center font-mono text-[11px] uppercase tracking-[0.2em] text-[color:var(--fg-muted)]">
-              {labels.hint}
-            </p>
           </div>
           {!modelUrl && images.length > 1 && (
             <ul className="flex gap-2 overflow-x-auto scrollbar-none">
