@@ -99,8 +99,9 @@ model User {
   passwordResetTokens PasswordResetToken[]
   adminLogs           AdminLog[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  loginFailures LoginFailure[]
 
   @@index([email])
   @@index([googleId])
@@ -121,6 +122,24 @@ model Session {
 
   @@index([userId])
   @@index([expiresAt])
+}
+
+/// Failed sign-ins per (account, IP). Lets a lockout target the source of the
+/// guessing instead of the account: five wrong passwords from one IP lock that
+/// account from that IP only, so a stranger who knows an email address can no
+/// longer keep its owner locked out. An account-wide lock still applies at a
+/// much higher threshold, to slow guessing spread across many IPs.
+model LoginFailure {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ipAddress   String
+  count       Int       @default(0)
+  windowStart DateTime  @default(now())
+  lockedUntil DateTime?
+
+  @@unique([userId, ipAddress])
+  @@index([userId, windowStart])
 }
 
 model TwoFactorSecret {

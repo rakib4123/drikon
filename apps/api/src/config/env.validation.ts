@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { booleanFromString } from '../common/utils/zod-boolean';
 
 /**
  * Centralized env-var validation.
@@ -18,7 +19,7 @@ const envSchema = z.object({
   JWT_REFRESH_TTL: z.coerce.number().int().positive().default(604800),
 
   COOKIE_DOMAIN: z.string().default('localhost'),
-  COOKIE_SECURE: z.coerce.boolean().default(false),
+  COOKIE_SECURE: booleanFromString.default(false),
 
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
@@ -38,6 +39,9 @@ const envSchema = z.object({
   RATE_LIMIT_LOGIN_WINDOW: z.coerce.number().int().positive().default(60),
   ACCOUNT_LOCK_THRESHOLD: z.coerce.number().int().positive().default(5),
   ACCOUNT_LOCK_DURATION: z.coerce.number().int().positive().default(1800),
+  // Failures within an hour, across all IPs, before the whole account locks.
+  // ACCOUNT_LOCK_THRESHOLD is now per (account, IP).
+  ACCOUNT_LOCK_GLOBAL_THRESHOLD: z.coerce.number().int().positive().default(50),
 
   LOG_LEVEL: z.enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal']).default('info'),
 });

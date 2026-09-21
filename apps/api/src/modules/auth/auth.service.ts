@@ -18,6 +18,7 @@ import type { GoogleUserPayload } from './strategies/google.strategy';
 import type {
   JwtAccessPayload,
   JwtRefreshPayload,
+  JwtTwoFactorPendingPayload,
   TokenPair,
 } from './interfaces/jwt.interface';
 
@@ -30,7 +31,21 @@ interface LoginResult {
   user: { id: string; email: string; name: string; role: string };
   tokens?: TokenPair;
   requiresTwoFactor?: boolean;
+  /** Set instead of `tokens` when a Google sign-in still owes a second factor. */
+  twoFactorPendingToken?: string;
 }
+
+/** Why a Google sign-in was refused — the controller maps these to a login-page message. */
+export class GoogleLoginRejected extends Error {
+  constructor(public readonly reason: 'unverified_email' | 'locked') {
+    super(reason);
+  }
+}
+
+const TWO_FACTOR_PENDING_TTL_SECONDS = 300;
+
+/** Failure records need an IP key even when the request's IP is unknown. */
+const ipKey = (ip: string | undefined) => ip || 'unknown';
 
 /**
  * The single source of truth for everything authentication.
@@ -129,16 +144,12 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Account lockout check
-    if (user.lockedUntil && user.lockedUntil > new Date()) {
-      throw new UnauthorizedException(
-        'Account temporarily locked due to too many failed attempts. Try again later.',
-      );
-    }
+    // Lockouts: account-wide (distributed guessing) or just from this IP.
+    await this.assertNotLocked(user, ctx.ipAddress);
 
     const ok = await argon2.verify(user.passwordHash, input.password);
     if (!ok) {
-      await this.handleFailedLogin(user);
+      await this.handleFailedLogin(user, ctx.ipAddress);
       throw new UnauthorizedException('Invalid credentials');
     }
 
@@ -155,13 +166,20 @@ export class AuthService {
         user.twoFactorSecret,
         input.twoFactorCode,
       );
-      if (!valid) throw new UnauthorizedException('Invalid 2FA code');
+      if (!valid) {
+        // A wrong second factor counts toward the account lockout. Otherwise
+        // anyone holding the password could guess 6-digit codes, bounded only
+        // by the per-IP rate limit.
+        await this.handleFailedLogin(user, ctx.ipAddress);
+        throw new UnauthorizedException('Invalid 2FA code');
+      }
     }
 
     // (Optional) email-verified gate. Comment out for friendlier dev experience.
     // if (!user.emailVerified) throw new ForbiddenException('Email not verified');
 
     // Successful login — clear failed counters, issue tokens
+    await this.users.clearLoginFailures(user.id, ipKey(ctx.ipAddress));
     await this.users.update({
       where: { id: user.id },
       data: {
@@ -179,20 +197,51 @@ export class AuthService {
     };
   }
 
-  private async handleFailedLogin(user: User): Promise<void> {
-    const threshold = this.config.get<number>('ACCOUNT_LOCK_THRESHOLD', 5);
+  private async assertNotLocked(user: User, ipAddress: string | undefined): Promise<void> {
+    const accountLocked = !!user.lockedUntil && user.lockedUntil > new Date();
+    if (accountLocked || (await this.users.isLoginLockedFromIp(user.id, ipKey(ipAddress)))) {
+      throw new UnauthorizedException(
+        'Account temporarily locked due to too many failed attempts. Try again later.',
+      );
+    }
+  }
+
+  /**
+   * Records a failed sign-in and decides what, if anything, to lock.
+   *
+   * It used to lock the whole account after five failures from anywhere, so
+   * anyone who knew an address — the admin's was public — could keep its owner
+   * locked out indefinitely. Now:
+   *  - ACCOUNT_LOCK_THRESHOLD failures from one IP lock the account from that
+   *    IP only; the owner elsewhere is unaffected.
+   *  - ACCOUNT_LOCK_GLOBAL_THRESHOLD failures within an hour across all IPs
+   *    still lock the whole account, to slow guessing spread over many IPs.
+   */
+  private async handleFailedLogin(user: User, ipAddress: string | undefined): Promise<void> {
+    const perIp = this.config.get<number>('ACCOUNT_LOCK_THRESHOLD', 5);
+    const global = this.config.get<number>('ACCOUNT_LOCK_GLOBAL_THRESHOLD', 50);
     const duration = this.config.get<number>('ACCOUNT_LOCK_DURATION', 1800);
-    const attempts = user.failedLoginAttempts + 1;
-    const shouldLock = attempts >= threshold;
+    const ip = ipKey(ipAddress);
+    const until = new Date(Date.now() + duration * 1000);
+
+    const fromThisIp = await this.users.recordLoginFailure(user.id, ip, duration);
+    if (fromThisIp >= perIp) {
+      await this.users.lockLoginFromIp(user.id, ip, until);
+      this.logger.warn({ msg: 'account.locked_for_ip', userId: user.id, ip, attempts: fromThisIp });
+    }
+
+    const recentTotal = await this.users.recentLoginFailures(user.id, 3600);
+    const lockAccount = recentTotal >= global;
     await this.users.update({
       where: { id: user.id },
       data: {
-        failedLoginAttempts: attempts,
-        lockedUntil: shouldLock ? new Date(Date.now() + duration * 1000) : null,
+        // Kept as a running tally for the admin users list.
+        failedLoginAttempts: user.failedLoginAttempts + 1,
+        ...(lockAccount ? { lockedUntil: until } : {}),
       },
     });
-    if (shouldLock) {
-      this.logger.warn({ msg: 'account.locked', userId: user.id, attempts });
+    if (lockAccount) {
+      this.logger.warn({ msg: 'account.locked', userId: user.id, recentTotal });
     }
   }
 
@@ -201,9 +250,15 @@ export class AuthService {
   // ───────────────────────────────────────────────────────────────────
 
   async loginWithGoogle(payload: GoogleUserPayload, ctx: LoginContext): Promise<LoginResult> {
+    // Matching on email (below) auto-links to an existing password account, so
+    // Google must vouch that the person owns that address — otherwise an
+    // unverified Google email is a takeover of whoever registered it here.
+    if (!payload.emailVerified) throw new GoogleLoginRejected('unverified_email');
+
     // Upsert by googleId, falling back to email match.
     let user = await this.users.findFirst({
       where: { OR: [{ googleId: payload.googleId }, { email: payload.email }] },
+      include: { twoFactorSecret: true },
     });
 
     if (!user) {
@@ -216,6 +271,7 @@ export class AuthService {
           authProvider: AuthProvider.GOOGLE,
           emailVerified: new Date(),
         },
+        include: { twoFactorSecret: true },
       });
     } else if (!user.googleId) {
       // Existing email account — link Google identity.
@@ -225,9 +281,65 @@ export class AuthService {
           googleId: payload.googleId,
           emailVerified: user.emailVerified ?? new Date(),
         },
+        include: { twoFactorSecret: true },
       });
     }
 
+    // Google is a first factor like a password: it can't skip a lockout...
+    if (user.lockedUntil && user.lockedUntil > new Date()) throw new GoogleLoginRejected('locked');
+
+    const summary = { id: user.id, email: user.email, name: user.name, role: user.role };
+
+    // ...or the second factor. It used to issue a full session here, so an
+    // account with 2FA on could be entered through Google with no code at all.
+    if (user.twoFactorEnabled && user.twoFactorSecret) {
+      const pending: JwtTwoFactorPendingPayload = { sub: user.id, type: '2fa_pending' };
+      const twoFactorPendingToken = await this.jwt.signAsync(pending, {
+        secret: this.config.getOrThrow<string>('JWT_ACCESS_SECRET'),
+        expiresIn: TWO_FACTOR_PENDING_TTL_SECONDS,
+      });
+      return { user: summary, requiresTwoFactor: true, twoFactorPendingToken };
+    }
+
+    const tokens = await this.issueTokenPair(user, ctx);
+    return { user: summary, tokens };
+  }
+
+  /**
+   * Completes a sign-in that is waiting on its second factor (currently: Google
+   * sign-in for a 2FA account). Wrong codes count toward the account lockout.
+   */
+  async verifyPendingTwoFactor(pendingToken: string, code: string, ctx: LoginContext): Promise<LoginResult> {
+    let payload: JwtTwoFactorPendingPayload;
+    try {
+      payload = await this.jwt.verifyAsync<JwtTwoFactorPendingPayload>(pendingToken, {
+        secret: this.config.getOrThrow<string>('JWT_ACCESS_SECRET'),
+      });
+    } catch {
+      throw new UnauthorizedException('Your sign-in expired — please sign in again');
+    }
+    if (payload.type !== '2fa_pending') throw new UnauthorizedException('Invalid sign-in state');
+
+    const user = await this.users.findUnique({
+      where: { id: payload.sub },
+      include: { twoFactorSecret: true },
+    });
+    if (!user || !user.twoFactorEnabled || !user.twoFactorSecret) {
+      throw new UnauthorizedException('Invalid sign-in state');
+    }
+    await this.assertNotLocked(user, ctx.ipAddress);
+
+    const valid = await this.verifySecondFactor(user.id, user.twoFactorSecret, code);
+    if (!valid) {
+      await this.handleFailedLogin(user, ctx.ipAddress);
+      throw new UnauthorizedException('Invalid 2FA code');
+    }
+    await this.users.clearLoginFailures(user.id, ipKey(ctx.ipAddress));
+
+    await this.users.update({
+      where: { id: user.id },
+      data: { failedLoginAttempts: 0, lockedUntil: null, lastLoginAt: new Date(), lastLoginIp: ctx.ipAddress },
+    });
     const tokens = await this.issueTokenPair(user, ctx);
     return { user: { id: user.id, email: user.email, name: user.name, role: user.role }, tokens };
   }
@@ -387,6 +499,31 @@ export class AuthService {
 
     this.logger.warn({ msg: 'auth.recovery_code_used', userId });
     return true;
+  }
+
+  // ───────────────────────────────────────────────────────────────────
+  // ME
+  // ───────────────────────────────────────────────────────────────────
+
+  /**
+   * The signed-in user's public profile. `/auth/me` used to return only the
+   * JWT-derived {id, email, role} — no name — so the dashboard greeted people
+   * as "Hi, ." and the header never showed their name.
+   */
+  async getMe(userId: string) {
+    return this.users.findUniqueOrThrow({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        avatarUrl: true,
+        emailVerified: true,
+        twoFactorEnabled: true,
+        authProvider: true,
+      },
+    });
   }
 
   // ───────────────────────────────────────────────────────────────────

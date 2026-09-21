@@ -22,6 +22,7 @@ describe('AuthController (HTTP)', () => {
     login: jest.fn().mockResolvedValue({ user: { id: 'u1' }, requiresTwoFactor: false }),
     disable2FA: jest.fn().mockResolvedValue({ message: '2FA disabled' }),
     enable2FA: jest.fn().mockResolvedValue({ recoveryCodes: [] }),
+    getMe: jest.fn().mockResolvedValue({ id: 'u1', email: 'a@b.com', name: 'Ada Lovelace', role: 'USER' }),
   };
 
   beforeAll(async () => {
@@ -95,5 +96,11 @@ describe('AuthController (HTTP)', () => {
       .send({ code: 'a1b2c3d4e5' })
       .expect(400);
     expect(auth.enable2FA).not.toHaveBeenCalled();
+  });
+
+  it('/auth/me returns the profile including the name, not just the JWT claims', async () => {
+    const res = await request(app.getHttpServer()).get('/api/v1/auth/me').expect(200);
+    expect(res.body.user).toMatchObject({ id: 'u1', name: 'Ada Lovelace' });
+    expect(auth.getMe).toHaveBeenCalledWith('u1');
   });
 });

@@ -68,3 +68,9 @@ export const Disable2FASchema = z.object({
   code: secondFactorCode,
 });
 export class Disable2FADto extends createZodDto(Disable2FASchema) {}
+
+/** Completes a pending sign-in: a TOTP code or a recovery code. */
+export const VerifyTwoFactorSchema = z.object({
+  code: secondFactorCode,
+});
+export class VerifyTwoFactorDto extends createZodDto(VerifyTwoFactorSchema) {}

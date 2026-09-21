@@ -107,6 +107,55 @@ export class UserModel {
     return this.prisma.session.deleteMany({ where: { refreshTokenHash: tokenHash } });
   }
 
+  // ─── Login failures (per account + IP) ───
+
+  /**
+   * Counts one failed sign-in for this account from this IP, restarting the
+   * count once the window has passed. One statement, so parallel guesses can't
+   * race past the threshold. Returns the count inside the current window.
+   */
+  async recordLoginFailure(userId: string, ipAddress: string, windowSeconds: number): Promise<number> {
+    const rows = await this.prisma.$queryRaw<{ count: number }[]>`
+      INSERT INTO "LoginFailure" ("id", "userId", "ipAddress", "count", "windowStart")
+      VALUES (gen_random_uuid()::text, ${userId}, ${ipAddress}, 1, NOW())
+      ON CONFLICT ("userId", "ipAddress") DO UPDATE SET
+        "count" = CASE WHEN "LoginFailure"."windowStart" < NOW() - make_interval(secs => ${windowSeconds})
+                       THEN 1 ELSE "LoginFailure"."count" + 1 END,
+        "windowStart" = CASE WHEN "LoginFailure"."windowStart" < NOW() - make_interval(secs => ${windowSeconds})
+                             THEN NOW() ELSE "LoginFailure"."windowStart" END
+      RETURNING "count"
+    `;
+    return rows[0].count;
+  }
+
+  lockLoginFromIp(userId: string, ipAddress: string, until: Date) {
+    return this.prisma.loginFailure.update({
+      where: { userId_ipAddress: { userId, ipAddress } },
+      data: { lockedUntil: until },
+    });
+  }
+
+  async isLoginLockedFromIp(userId: string, ipAddress: string): Promise<boolean> {
+    const row = await this.prisma.loginFailure.findUnique({
+      where: { userId_ipAddress: { userId, ipAddress } },
+      select: { lockedUntil: true },
+    });
+    return !!row?.lockedUntil && row.lockedUntil > new Date();
+  }
+
+  /** Failures against this account from every IP within the window — the account-wide signal. */
+  async recentLoginFailures(userId: string, windowSeconds: number): Promise<number> {
+    const agg = await this.prisma.loginFailure.aggregate({
+      where: { userId, windowStart: { gt: new Date(Date.now() - windowSeconds * 1000) } },
+      _sum: { count: true },
+    });
+    return agg._sum.count ?? 0;
+  }
+
+  clearLoginFailures(userId: string, ipAddress: string) {
+    return this.prisma.loginFailure.deleteMany({ where: { userId, ipAddress } });
+  }
+
   // ─── Two-factor (TOTP) ───
 
   upsertTwoFactorSecret<T extends Prisma.TwoFactorSecretUpsertArgs>(args: Prisma.SelectSubset<T, Prisma.TwoFactorSecretUpsertArgs>) {

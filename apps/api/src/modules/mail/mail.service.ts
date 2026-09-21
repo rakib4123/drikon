@@ -54,6 +54,10 @@ export class MailService {
         msg: 'mail.dev.skipped',
         to: args.to,
         subject: args.subject,
+        // Development only: without an email provider there was no way to follow
+        // a verify/reset link locally. Never in production — these are
+        // credentials, and a reset link in a log is an account takeover.
+        ...(process.env.NODE_ENV !== 'production' && { link: args.html.match(/href="([^"]+token=[^"]+)"/)?.[1] }),
       });
       return;
     }
@@ -80,22 +84,23 @@ export class MailService {
     return `
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#0f1118;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#e6e8ee">
+<body style="margin:0;padding:0;background:#f3f5f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#111827">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-    <tr><td align="center" style="padding:40px 20px">
-      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;background:#16192a;border-radius:16px;overflow:hidden;border:1px solid #232842">
-        <tr><td style="padding:32px 32px 0">
-          <div style="font-size:22px;font-weight:700;letter-spacing:-0.02em">Drikon</div>
-          <div style="color:#8590a8;font-size:13px;margin-top:4px">Vision, engineered.</div>
+    <tr><td align="center" style="padding:40px 16px">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:10px;overflow:hidden;border:1px solid #e4e7ec">
+        <tr><td style="padding:22px 32px;background:#0b1424">
+          <div style="font-size:22px;font-weight:800;letter-spacing:-0.02em;color:#ffffff">Drikon</div>
         </td></tr>
-        <tr><td style="padding:24px 32px 8px">
-          <h1 style="margin:0 0 16px;font-size:24px;font-weight:600;letter-spacing:-0.01em">${args.title}</h1>
-          <p style="margin:0 0 8px;color:#c0c7d8">Hi ${this.escape(args.name)},</p>
-          <p style="margin:0 0 24px;color:#a8b1c5;line-height:1.6">${this.escape(args.body)}</p>
-          <a href="${args.ctaUrl}" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#6366f1,#06b6d4);color:#fff;border-radius:10px;font-weight:600;text-decoration:none">${this.escape(args.ctaText)}</a>
-          ${args.footnote ? `<p style="margin:24px 0 0;color:#6c7591;font-size:12px">${this.escape(args.footnote)}</p>` : ''}
+        <tr><td style="padding:32px 32px 8px">
+          <h1 style="margin:0 0 16px;font-size:22px;font-weight:800;letter-spacing:-0.01em;color:#111827">${args.title}</h1>
+          <p style="margin:0 0 8px;color:#111827">Hi ${this.escape(args.name)},</p>
+          <p style="margin:0 0 24px;color:#475467;line-height:1.6">${this.escape(args.body)}</p>
+          <!-- Solid colour, not a gradient: Outlook ignores CSS gradients and would render the button with no background. -->
+          <a href="${args.ctaUrl}" style="display:inline-block;padding:13px 26px;background:#0b57d0;color:#ffffff;border-radius:8px;font-weight:700;text-decoration:none">${this.escape(args.ctaText)}</a>
+          ${args.footnote ? `<p style="margin:24px 0 0;color:#667085;font-size:12px">${this.escape(args.footnote)}</p>` : ''}
+          <p style="margin:20px 0 0;color:#667085;font-size:12px;line-height:1.5">If the button doesn't work, paste this link into your browser:<br><span style="color:#0b57d0;word-break:break-all">${this.escape(args.ctaUrl)}</span></p>
         </td></tr>
-        <tr><td style="padding:24px 32px 32px;border-top:1px solid #232842;color:#6c7591;font-size:12px">
+        <tr><td style="padding:22px 32px 28px;border-top:1px solid #e4e7ec;color:#667085;font-size:12px">
           © ${new Date().getFullYear()} Drikon. All rights reserved.
         </td></tr>
       </table>

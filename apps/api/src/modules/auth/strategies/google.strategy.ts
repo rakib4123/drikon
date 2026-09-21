@@ -8,6 +8,8 @@ export interface GoogleUserPayload {
   email: string;
   name: string;
   avatarUrl?: string;
+  /** Whether Google has verified the account owns this email. */
+  emailVerified: boolean;
 }
 
 @Injectable()
@@ -30,13 +32,19 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     profile: Profile,
     done: VerifyCallback,
   ): void {
-    const email = profile.emails?.[0]?.value;
+    const primary = profile.emails?.[0];
+    const email = primary?.value;
     if (!email) return done(new Error('Google account has no email'), undefined);
+    // passport-google-oauth20 exposes this in two places depending on version.
+    const raw = (primary as { verified?: boolean | string } | undefined)?.verified
+      ?? (profile as { _json?: { email_verified?: boolean | string } })._json?.email_verified;
+    const emailVerified = raw === true || raw === 'true';
     const payload: GoogleUserPayload = {
       googleId: profile.id,
       email: email.toLowerCase(),
       name: profile.displayName,
       avatarUrl: profile.photos?.[0]?.value,
+      emailVerified,
     };
     done(null, payload);
   }

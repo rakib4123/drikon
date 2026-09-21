@@ -1,5 +1,6 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+import { booleanFromString } from '../../../common/utils/zod-boolean';
 
 export const CreateProductSchema = z.object({
   name: z.string().min(2).max(200),
@@ -51,8 +52,8 @@ export const ProductQuerySchema = z.object({
   minPrice: z.coerce.number().nonnegative().optional(),
   maxPrice: z.coerce.number().positive().optional(),
   minRating: z.coerce.number().min(0).max(5).optional(),
-  inStock: z.coerce.boolean().optional(),
-  featured: z.coerce.boolean().optional(),
+  inStock: booleanFromString.optional(),
+  featured: booleanFromString.optional(),
   sort: z
     .enum(['newest', 'oldest', 'price_asc', 'price_desc', 'popular', 'rating'])
     .default('newest'),

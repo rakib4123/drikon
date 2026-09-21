@@ -20,6 +20,7 @@ describe('AuthService', () => {
   let service: AuthService;
   let users: Record<string, jest.Mock>;
   let passwordHash: string;
+  let jwt: { signAsync: jest.Mock; verifyAsync: jest.Mock };
 
   beforeAll(async () => {
     passwordHash = await argon2.hash('correct-horse', {
@@ -28,6 +29,7 @@ describe('AuthService', () => {
   });
 
   beforeEach(async () => {
+    jwt = { signAsync: jest.fn().mockResolvedValue('tok'), verifyAsync: jest.fn() };
     users = {
       findUnique: jest.fn(),
       update: jest.fn().mockResolvedValue({}),
@@ -35,13 +37,20 @@ describe('AuthService', () => {
       findTwoFactorSecret: jest.fn(),
       consumeRecoveryCode: jest.fn().mockResolvedValue(true),
       disableTwoFactorTransaction: jest.fn().mockResolvedValue({}),
+      findFirst: jest.fn(),
+      create: jest.fn(),
+      recordLoginFailure: jest.fn().mockResolvedValue(1),
+      lockLoginFromIp: jest.fn().mockResolvedValue({}),
+      isLoginLockedFromIp: jest.fn().mockResolvedValue(false),
+      recentLoginFailures: jest.fn().mockResolvedValue(1),
+      clearLoginFailures: jest.fn().mockResolvedValue({}),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
         { provide: UserModel, useValue: users },
-        { provide: JwtService, useValue: { signAsync: jest.fn().mockResolvedValue('tok') } },
+        { provide: JwtService, useValue: jwt },
         {
           provide: ConfigService,
           useValue: {
@@ -195,6 +204,138 @@ describe('AuthService', () => {
       });
 
       await expect(service.disable2FA('u1', '000000')).rejects.toBeInstanceOf(BadRequestException);
+    });
+  });
+
+  describe('login — failed second factor counts toward lockout', () => {
+    it('increments failedLoginAttempts on a wrong 2FA code', async () => {
+      users.findUnique.mockResolvedValue({ ...userWith2FA(authenticator.generateSecret()), failedLoginAttempts: 2 });
+
+      await expect(
+        service.login({ email: 'a@b.com', password: 'correct-horse', twoFactorCode: '000000' }, {}),
+      ).rejects.toBeInstanceOf(UnauthorizedException);
+      expect(users.update).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ failedLoginAttempts: 3 }) }),
+      );
+    });
+  });
+
+  describe('loginWithGoogle', () => {
+    const google = (over: Record<string, unknown> = {}) => ({
+      googleId: 'g1', email: 'a@b.com', name: 'A', emailVerified: true, ...over,
+    });
+
+    it('refuses an email Google has not verified — it would auto-link to an existing account', async () => {
+      await expect(service.loginWithGoogle(google({ emailVerified: false }) as never, {})).rejects.toMatchObject({
+        reason: 'unverified_email',
+      });
+      expect(users.findFirst).not.toHaveBeenCalled();
+    });
+
+    it('refuses a locked account', async () => {
+      users.findFirst.mockResolvedValue({
+        id: 'u1', email: 'a@b.com', name: 'A', role: Role.USER, googleId: 'g1',
+        lockedUntil: new Date(Date.now() + 60_000), twoFactorEnabled: false, twoFactorSecret: null,
+      });
+      await expect(service.loginWithGoogle(google() as never, {})).rejects.toMatchObject({ reason: 'locked' });
+    });
+
+    it('does not hand out a session to a 2FA account — it asks for the code instead', async () => {
+      users.findFirst.mockResolvedValue({
+        ...userWith2FA(authenticator.generateSecret()), googleId: 'g1',
+      });
+
+      const result = await service.loginWithGoogle(google() as never, {});
+
+      expect(result.tokens).toBeUndefined();
+      expect(result.requiresTwoFactor).toBe(true);
+      expect(result.twoFactorPendingToken).toBe('tok');
+      expect(users.createSession).not.toHaveBeenCalled();
+    });
+
+    it('issues a session straight away when 2FA is off', async () => {
+      users.findFirst.mockResolvedValue({
+        id: 'u1', email: 'a@b.com', name: 'A', role: Role.USER, googleId: 'g1',
+        lockedUntil: null, twoFactorEnabled: false, twoFactorSecret: null,
+      });
+      const result = await service.loginWithGoogle(google() as never, {});
+      expect(result.tokens).toBeDefined();
+    });
+  });
+
+  describe('verifyPendingTwoFactor', () => {
+    it('completes the sign-in with a valid code', async () => {
+      const secret = authenticator.generateSecret();
+      jwt.verifyAsync.mockResolvedValue({ sub: 'u1', type: '2fa_pending' });
+      users.findUnique.mockResolvedValue(userWith2FA(secret));
+
+      const result = await service.verifyPendingTwoFactor('pending', authenticator.generate(secret), {});
+      expect(result.tokens).toBeDefined();
+    });
+
+    it('rejects a wrong code and counts it toward lockout', async () => {
+      jwt.verifyAsync.mockResolvedValue({ sub: 'u1', type: '2fa_pending' });
+      users.findUnique.mockResolvedValue(userWith2FA(authenticator.generateSecret()));
+
+      await expect(service.verifyPendingTwoFactor('pending', '000000', {})).rejects.toBeInstanceOf(UnauthorizedException);
+      expect(users.update).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ failedLoginAttempts: 1 }) }),
+      );
+    });
+
+    it('rejects an access token passed off as a pending token', async () => {
+      jwt.verifyAsync.mockResolvedValue({ sub: 'u1', type: 'access' });
+      await expect(service.verifyPendingTwoFactor('x', '123456', {})).rejects.toBeInstanceOf(UnauthorizedException);
+      expect(users.findUnique).not.toHaveBeenCalled();
+    });
+
+    it('rejects an expired pending token', async () => {
+      jwt.verifyAsync.mockRejectedValue(new Error('jwt expired'));
+      await expect(service.verifyPendingTwoFactor('x', '123456', {})).rejects.toThrow(/expired/i);
+    });
+  });
+
+  describe('lockout — per IP, not per account', () => {
+    const plainUser = (over: Record<string, unknown> = {}) => ({
+      id: 'u1', email: 'a@b.com', name: 'A', role: Role.USER,
+      passwordHash, failedLoginAttempts: 0, lockedUntil: null, twoFactorEnabled: false, ...over,
+    });
+
+    it('locks the account from the guessing IP only, once that IP hits the threshold', async () => {
+      users.findUnique.mockResolvedValue(plainUser());
+      users.recordLoginFailure.mockResolvedValue(5); // 5th failure from this IP
+      users.recentLoginFailures.mockResolvedValue(5); // far below the account-wide 50
+
+      await expect(service.login({ email: 'a@b.com', password: 'nope' }, { ipAddress: '1.2.3.4' })).rejects.toThrow();
+
+      expect(users.lockLoginFromIp).toHaveBeenCalledWith('u1', '1.2.3.4', expect.any(Date));
+      // The account itself stays usable for its owner elsewhere.
+      const data = users.update.mock.calls.at(-1)[0].data;
+      expect(data.lockedUntil).toBeUndefined();
+    });
+
+    it('lets the owner in from another IP while one IP is locked out', async () => {
+      users.findUnique.mockResolvedValue(plainUser());
+      users.isLoginLockedFromIp.mockImplementation(async (_u: string, ip: string) => ip === '6.6.6.6');
+
+      await expect(service.login({ email: 'a@b.com', password: 'correct-horse' }, { ipAddress: '6.6.6.6' })).rejects.toThrow(/locked/i);
+      const ok = await service.login({ email: 'a@b.com', password: 'correct-horse' }, { ipAddress: '9.9.9.9' });
+      expect(ok.tokens).toBeDefined();
+    });
+
+    it('still locks the whole account when failures pile up across many IPs', async () => {
+      users.findUnique.mockResolvedValue(plainUser());
+      users.recordLoginFailure.mockResolvedValue(1);
+      users.recentLoginFailures.mockResolvedValue(50);
+
+      await expect(service.login({ email: 'a@b.com', password: 'nope' }, { ipAddress: '5.5.5.5' })).rejects.toThrow();
+      expect(users.update.mock.calls.at(-1)[0].data.lockedUntil).toBeInstanceOf(Date);
+    });
+
+    it('clears this IP\'s failure record on a successful sign-in', async () => {
+      users.findUnique.mockResolvedValue(plainUser());
+      await service.login({ email: 'a@b.com', password: 'correct-horse' }, { ipAddress: '1.2.3.4' });
+      expect(users.clearLoginFailures).toHaveBeenCalledWith('u1', '1.2.3.4');
     });
   });
 });
