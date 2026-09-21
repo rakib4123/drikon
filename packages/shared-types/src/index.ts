@@ -30,7 +30,8 @@ export type RegisterInput = z.infer<typeof RegisterSchema>;
 export const LoginSchema = z.object({
   email: z.string().email().toLowerCase().trim(),
   password: z.string().min(1).max(128),
-  twoFactorCode: z.string().regex(/^\d{6}$/).optional(),
+  // 6-digit TOTP, or a 10-char hex recovery code. Must match the API's LoginDto.
+  twoFactorCode: z.string().trim().regex(/^(\d{6}|[0-9a-fA-F]{10})$/).optional(),
 });
 export type LoginInput = z.infer<typeof LoginSchema>;
 

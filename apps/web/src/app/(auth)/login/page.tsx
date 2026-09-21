@@ -71,11 +71,13 @@ function LoginForm() {
             </Field>
 
             {requires2FA && (
-              <Field label="6-digit authenticator code" error={errors.twoFactorCode?.message}>
+              <Field label="Authenticator code or recovery code" error={errors.twoFactorCode?.message}>
                 <input
-                  inputMode="numeric"
-                  pattern="\d{6}"
-                  maxLength={6}
+                  // Text, not numeric: recovery codes contain a-f. 10 chars fits both.
+                  inputMode="text"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  maxLength={10}
                   autoComplete="one-time-code"
                   {...register('twoFactorCode')}
                   className="w-full px-4 py-3 rounded-xl bg-[color:var(--bg-soft)] border border-[color:var(--border)] focus:border-[color:var(--accent)] outline-none transition-colors font-mono text-center text-xl tracking-[0.5em]"
