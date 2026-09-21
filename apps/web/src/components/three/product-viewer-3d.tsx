@@ -20,23 +20,28 @@ function Model({ url }: { url: string }) {
   );
 }
 
-/** Photo on a glass panel above a lit plinth; sways instead of spinning so the back never shows. */
+/**
+ * Photo on a glass panel above a lit plinth; sways instead of spinning so the
+ * back never shows. Sized and positioned to fit inside the shared camera's
+ * frame with margin — the camera itself stays untouched so Model/Bounds
+ * framing in the glTF path is unaffected.
+ */
 function PhotoPlinth({ url, sway }: { url: string; sway: boolean }) {
   const panel = useRef<Group>(null);
   useFrame(({ clock }) => {
-    if (sway && panel.current) panel.current.rotation.y = Math.sin(clock.elapsedTime * 0.6) * 0.45;
+    if (sway && panel.current) panel.current.rotation.y = Math.sin(clock.elapsedTime * 0.6) * 0.25;
   });
   return (
-    <group position={[0, -0.2, 0]}>
-      <group ref={panel} position={[0, 0.55, 0]}>
-        <DreiImage url={url} scale={[2.3, 2.3]} radius={0.1} />
+    <group>
+      <group ref={panel} position={[0, -0.02, 0]}>
+        <DreiImage url={url} scale={[1.6, 1.6]} radius={0.08} />
       </group>
-      <mesh position={[0, -0.85, 0]}>
-        <cylinderGeometry args={[1.25, 1.4, 0.22, 64]} />
+      <mesh position={[0, -1.01, 0]}>
+        <cylinderGeometry args={[1.0, 1.1, 0.18, 64]} />
         <meshStandardMaterial color="#0d1122" metalness={0.8} roughness={0.25} />
       </mesh>
-      <mesh position={[0, -0.73, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[1.26, 0.02, 12, 96]} />
+      <mesh position={[0, -0.9, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[1.0, 0.02, 12, 96]} />
         <meshStandardMaterial color="#22e5ff" emissive="#22e5ff" emissiveIntensity={2.4} />
       </mesh>
     </group>
