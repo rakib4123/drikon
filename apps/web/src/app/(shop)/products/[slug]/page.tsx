@@ -7,7 +7,7 @@ import { ShieldCheck, Truck, RefreshCw } from 'lucide-react';
 import { apiGet, ApiError } from '@/lib/api-client';
 import { SITE_URL } from '@/lib/site';
 import { ProductCarousel } from '@/components/shop/product-carousel';
-import { ProductGallery } from '@/components/shop/product-gallery';
+import { ProductMedia } from '@/components/shop/product-media';
 import { StarRating } from '@/components/shop/star-rating';
 import { SectionHeader } from '@/components/home/section-header';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
@@ -38,6 +38,7 @@ interface ProductDetail extends ProductSummary {
   brandId?: string | null;
   categoryId: string;
   videoUrl?: string | null;
+  modelUrl?: string | null;
 }
 
 interface ProductListResponse {
@@ -190,9 +191,11 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
         {/* ─── Gallery · details ─── */}
         <div className="mt-5 card !p-4 sm:!p-6 grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
-          <ProductGallery
+          <ProductMedia
             images={product.images ?? []}
             name={name}
+            modelUrl={product.modelUrl ?? null}
+            labels={{ view3d: t('view3d'), photos: t('viewPhotos'), hint: t('viewerHint') }}
             badge={
               <>
                 {onSale && <span className="badge-sale !text-xs">{t('offBadge', { discount })}</span>}
