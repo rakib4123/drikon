@@ -8,32 +8,32 @@
    still override --color-accent at runtime (see layout.tsx) and
    every utility follows.
 
-   Dark neon cyber. Text on accent fills uses --color-accent-fg (dark), not
+   Warm premium: cream page, solid cards, black buttons, bronze highlights. Text on accent fills uses --color-accent-fg (cream), not
    white — the accent is a bright cyan.
    ═══════════════════════════════════════════════════════════════ */
 @theme {
-  --color-bg:        #05060d;
-  --color-bg-soft:   #0b0e1c;
-  --color-fg:        #e6ecff;
-  --color-fg-muted:  #8a93b8;
-  --color-border:    rgba(120, 140, 255, 0.16);
-  --color-accent:    #22e5ff;
-  --color-accent-2:  #8b5cf6;
-  --color-accent-fg: #03121a;
-  --color-ring:      #22e5ff;
+  --color-bg:        #f5f1ea;
+  --color-bg-soft:   #efe9df;
+  --color-fg:        #1c1917;
+  --color-fg-muted:  #57534e;
+  --color-border:    #e7dfd3;
+  --color-accent:    #1c1917;
+  --color-accent-2:  #b45309;
+  --color-accent-fg: #fffdf9;
+  --color-ring:      #b45309;
 
-  --color-ink:       #070914;
-  --color-ink-soft:  #0e1224;
-  --color-sale:      #ff2e88;
-  --color-success:   #2ee59d;
-  --color-star:      #ffc940;
+  --color-ink:       #1c1917;
+  --color-ink-soft:  #292524;
+  --color-sale:      #b91c1c;
+  --color-success:   #15803d;
+  --color-star:      #d97706;
 
   --font-sans: var(--font-jakarta), var(--font-bangla), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-grotesk), var(--font-bangla), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), var(--font-bangla), ui-serif, Georgia, serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
 
-  --radius-card: 14px;
-  --radius-ctl:  10px;
+  --radius-card: 16px;
+  --radius-ctl:  12px;
 
   /* Radix primitives animate off their own data-state rather than Motion —
      AnimatePresence can't drive an exit for content Radix unmounts itself. */
@@ -76,18 +76,18 @@
 }
 
 :root {
-  --surface:       rgba(20, 24, 48, 0.55);
-  --surface-solid: #0d1122;
-  --image-well:    radial-gradient(120% 120% at 50% 30%, #f4f7ff 0%, #dfe6f7 100%);
-  --border-strong: rgba(140, 160, 255, 0.32);
-  --glow-edge:     rgba(34, 229, 255, 0.45);
-  --glass:         var(--surface);
-  --grid-line:     rgba(120, 140, 255, 0.07);
-  --shadow:        rgba(0, 0, 0, 0.45);
+  --surface:       #fffdf9;
+  --surface-solid: #fffdf9;
+  --image-well:    #efe9df;
+  --border-strong: #d6cbbb;
+  --glow-edge:     #d6cbbb;
+  --glass:         #fffdf9;
+  --grid-line:     transparent;
+  --shadow:        rgba(28, 25, 23, 0.08);
   /* Skeleton shimmer highlight — dim on the storefront's dark surfaces, bright
      on admin's light ones (see .theme-classic below). */
-  --skeleton-shine: rgba(255, 255, 255, 0.06);
-  color-scheme: dark;
+  --skeleton-shine: rgba(255, 253, 249, 0.7);
+  color-scheme: light;
 }
 
 /* Admin keeps the previous light megastore look (spec §1). */
@@ -235,8 +235,8 @@ html, body {
   /* Frosted neon glass panel. */
   .glass {
     background: var(--glass);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     border: 1px solid var(--border);
   }
 
@@ -290,8 +290,8 @@ html, body {
      the cursor. Interactive tiles opt in with .card-hover. */
   .card {
     background: var(--surface);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     border: 1px solid var(--border);
     border-radius: var(--radius-card);
     padding: 1.5rem;

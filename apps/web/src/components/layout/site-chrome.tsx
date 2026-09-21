@@ -1,7 +1,6 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { BackdropLoader } from '@/components/three/backdrop-loader';
 
 /**
  * Shows the storefront's space backdrop, header and footer everywhere except the admin panel,
@@ -24,7 +23,6 @@ export function SiteChrome({
   if (isAdmin) return <main id="main" className="flex-1">{children}</main>;
   return (
     <>
-      <BackdropLoader />
       {header}
       <main id="main" className="flex-1">{children}</main>
       {footer}
