@@ -1,8 +1,8 @@
 'use client';
 
-import { Suspense, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { Float, Image as DreiImage } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import { useReducedMotion } from 'motion/react';
@@ -10,8 +10,6 @@ import type { Group, Mesh } from 'three';
 import { SceneBoundary, SceneCanvas } from './scene-canvas';
 
 export type HeroProduct = { slug: string; name: string; image: string };
-
-const RADIUS = 2.6;
 
 function Core({ spin }: { spin: boolean }) {
   const shell = useRef<Mesh>(null);
@@ -45,7 +43,7 @@ function BlankPanel() {
   );
 }
 
-function Panel({ product, angle }: { product: HeroProduct; angle: number }) {
+function Panel({ product, angle, radius }: { product: HeroProduct; angle: number; radius: number }) {
   const router = useRouter();
   const ref = useRef<Group>(null);
   const [hovered, setHovered] = useState(false);
@@ -55,10 +53,17 @@ function Panel({ product, angle }: { product: HeroProduct; angle: number }) {
     const target = hovered ? 1.18 : 1;
     g.scale.setScalar(g.scale.x + (target - g.scale.x) * Math.min(1, d * 10));
   });
+  // Hover, click and router.push unmount the scene before onPointerOut fires
+  // — reset the cursor on unmount too, or it stays stuck as a pointer.
+  useEffect(() => {
+    return () => {
+      document.body.style.cursor = '';
+    };
+  }, []);
   return (
     <group
       ref={ref}
-      position={[Math.cos(angle) * RADIUS, Math.sin(angle * 2) * 0.35, Math.sin(angle) * RADIUS]}
+      position={[Math.cos(angle) * radius, Math.sin(angle * 2) * 0.35, Math.sin(angle) * radius]}
       onPointerOver={(e) => {
         e.stopPropagation();
         setHovered(true);
@@ -68,7 +73,10 @@ function Panel({ product, angle }: { product: HeroProduct; angle: number }) {
         setHovered(false);
         document.body.style.cursor = '';
       }}
-      onClick={() => router.push(`/products/${product.slug}`)}
+      onClick={() => {
+        document.body.style.cursor = '';
+        router.push(`/products/${product.slug}`);
+      }}
     >
       <SceneBoundary fallback={<BlankPanel />}>
         <Suspense fallback={<BlankPanel />}>
@@ -79,7 +87,7 @@ function Panel({ product, angle }: { product: HeroProduct; angle: number }) {
   );
 }
 
-function Orbit({ products, spin }: { products: HeroProduct[]; spin: boolean }) {
+function Orbit({ products, spin, radius }: { products: HeroProduct[]; spin: boolean; radius: number }) {
   const ring = useRef<Group>(null);
   useFrame(({ camera }, d) => {
     if (spin && ring.current) ring.current.rotation.y += d * 0.15;
@@ -89,19 +97,24 @@ function Orbit({ products, spin }: { products: HeroProduct[]; spin: boolean }) {
   return (
     <group ref={ring}>
       {products.map((p, i) => (
-        <Panel key={p.slug} product={p} angle={(i / products.length) * Math.PI * 2} />
+        <Panel key={p.slug} product={p} angle={(i / products.length) * Math.PI * 2} radius={radius} />
       ))}
     </group>
   );
 }
 
-export default function HeroScene({ products, tier }: { products: HeroProduct[]; tier: 'low' | 'high' }) {
-  const spin = !useReducedMotion();
+/**
+ * The core, floating shapes and orbit, shifted toward the empty half of the
+ * canvas on wide layouts so the composition sits beside the HTML text
+ * instead of centred under it. `useThree` only works inside the Canvas, so
+ * this reads the viewport itself rather than HeroScene computing it.
+ */
+function Composition({ products, spin }: { products: HeroProduct[]; spin: boolean }) {
+  const { width, height } = useThree((s) => s.viewport);
+  const aspectWide = width / height > 1.2;
+  const radius = Math.min(2.6, width * 0.26);
   return (
-    <SceneCanvas name="hero" tier={tier} fallback={null} className="h-full w-full" camera={{ position: [0, 1.2, 7], fov: 42 }}>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[4, 4, 4]} intensity={40} color="#22e5ff" />
-      <pointLight position={[-4, -2, 2]} intensity={30} color="#8b5cf6" />
+    <group position={[aspectWide ? width * 0.2 : 0, 0, 0]}>
       <Float speed={spin ? 2 : 0} rotationIntensity={0.4} floatIntensity={0.6}>
         <Core spin={spin} />
       </Float>
@@ -117,10 +130,22 @@ export default function HeroScene({ products, tier }: { products: HeroProduct[];
           <meshStandardMaterial color="#22e5ff" emissive="#22e5ff" emissiveIntensity={1.2} wireframe />
         </mesh>
       </Float>
-      <Orbit products={products.slice(0, 6)} spin={spin} />
+      <Orbit products={products.slice(0, 6)} spin={spin} radius={radius} />
+    </group>
+  );
+}
+
+export default function HeroScene({ products, tier }: { products: HeroProduct[]; tier: 'low' | 'high' }) {
+  const spin = !useReducedMotion();
+  return (
+    <SceneCanvas name="hero" tier={tier} fallback={null} className="h-full w-full" camera={{ position: [0, 1.2, 7], fov: 42 }}>
+      <ambientLight intensity={0.5} />
+      <pointLight position={[4, 4, 4]} intensity={40} color="#22e5ff" />
+      <pointLight position={[-4, -2, 2]} intensity={30} color="#8b5cf6" />
+      <Composition products={products} spin={spin} />
       {tier === 'high' && (
         <EffectComposer>
-          <Bloom intensity={0.9} luminanceThreshold={0.25} mipmapBlur />
+          <Bloom intensity={0.8} luminanceThreshold={0.7} mipmapBlur />
         </EffectComposer>
       )}
     </SceneCanvas>
