@@ -20,7 +20,8 @@ services:
     runtime: node
     plan: free # Free web services spin down after inactivity — upgrade for an always-on API.
     buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter api db:generate && pnpm --filter api build
-    startCommand: pnpm --filter api exec prisma migrate deploy && pnpm --filter api start
+    # DIRECT_URL falls back to DATABASE_URL so a non-pooled database needs no extra var.
+    startCommand: export DIRECT_URL="${DIRECT_URL:-$DATABASE_URL}" && pnpm --filter api exec prisma migrate deploy && pnpm --filter api start
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
@@ -29,6 +30,11 @@ services:
         fromDatabase:
           name: drikon-db
           property: connectionString
+      # Only needed when DATABASE_URL is a pooled connection (Neon "-pooler",
+      # PgBouncer): set it to the direct, non-pooled URL so migrations can take
+      # their advisory lock. Leave unset otherwise.
+      - key: DIRECT_URL
+        sync: false
 
       # Cross-domain auth: Vercel and Render are different registrable
       # domains, so cookies must NOT scope to a Domain attribute — leave this

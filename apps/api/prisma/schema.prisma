@@ -9,9 +9,14 @@ generator client {
   previewFeatures = ["fullTextSearch", "postgresqlExtensions"]
 }
 
+// DATABASE_URL may be a pooled connection (e.g. Neon's "-pooler" host, which is
+// PgBouncer in transaction mode). `prisma migrate` needs a session-level
+// advisory lock that a pooler can't hold, so migrations use DIRECT_URL — the
+// non-pooled host. Locally both are the same URL.
 datasource db {
   provider   = "postgresql"
   url        = env("DATABASE_URL")
+  directUrl  = env("DIRECT_URL")
   extensions = [pg_trgm]
 }
 
