@@ -31,7 +31,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (!initialized || !user || !isAdmin) {
     return (
-      <div className="min-h-screen grid place-items-center bg-[color:var(--bg-soft)]">
+      <div className="theme-classic min-h-screen grid place-items-center bg-[color:var(--bg-soft)]">
         <Loader2 aria-label="Loading" className="w-6 h-6 animate-spin text-[color:var(--accent)]" />
       </div>
     );
@@ -40,7 +40,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const current = ADMIN_NAV.flatMap((s) => s.items).find((i) => isActive(pathname, i));
 
   return (
-    <div className="min-h-screen flex bg-[color:var(--bg-soft)]">
+    <div className="theme-classic min-h-screen flex bg-[color:var(--bg-soft)]">
       <aside className="hidden lg:block w-64 shrink-0 sticky top-0 h-screen">
         <AdminSidebar />
       </aside>

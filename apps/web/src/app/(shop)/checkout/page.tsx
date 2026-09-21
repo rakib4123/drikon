@@ -168,10 +168,10 @@ export default function CheckoutPage() {
               return (
                 <li key={`${item.productId}-${item.variantId ?? ''}`} className="flex gap-3 text-sm">
                   <div className="relative w-14 h-14 shrink-0">
-                    <div className="absolute inset-0 rounded-[var(--radius-ctl)] overflow-hidden border border-[color:var(--border)] bg-white">
+                    <div className="absolute inset-0 rounded-[var(--radius-ctl)] overflow-hidden border border-[color:var(--border)] [background:var(--image-well)]">
                       <ProductThumb src={q?.image ?? item.image} sizes="56px" />
                     </div>
-                    <span className="absolute -top-1.5 -right-1.5 min-w-5 h-5 px-1 rounded-full bg-[color:var(--fg)] text-white text-[10px] font-bold grid place-items-center">
+                    <span className="absolute -top-1.5 -right-1.5 min-w-5 h-5 px-1 rounded-full bg-[color:var(--fg)] text-[color:var(--accent-fg)] text-[10px] font-bold grid place-items-center">
                       {item.quantity}
                     </span>
                   </div>
@@ -242,7 +242,7 @@ export default function CheckoutPage() {
 function StepHeading({ id, n, title }: { id: string; n: number; title: string }) {
   return (
     <h2 id={id} className="flex items-center gap-3 text-lg font-extrabold mb-5">
-      <span className="w-8 h-8 rounded-full bg-[color:var(--accent)] text-white text-sm grid place-items-center">{n}</span>
+      <span className="w-8 h-8 rounded-full bg-[color:var(--accent)] text-[color:var(--accent-fg)] text-sm grid place-items-center">{n}</span>
       {title}
     </h2>
   );

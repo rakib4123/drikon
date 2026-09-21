@@ -159,7 +159,11 @@
     "noReviewsYet": "No reviews yet",
     "sku": "SKU",
     "youSave": "You save {amount}",
-    "viewAll": "View all"
+    "viewAll": "View all",
+    "view3d": "3D view",
+    "viewPhotos": "Photos",
+    "viewerHint": "Drag to rotate",
+    "viewerTapHint": "Tap to rotate"
   },
   "about": {
     "eyebrow": "About {brand}",

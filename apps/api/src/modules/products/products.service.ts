@@ -205,6 +205,7 @@ export class ProductsService {
           brandId: dto.brandId,
           attributes: dto.attributes as any,
           videoUrl: dto.videoUrl || null,
+          modelUrl: dto.modelUrl || null,
           metaTitle: dto.metaTitle,
           metaDescription: dto.metaDescription,
           images: { create: dto.images ?? [] },
@@ -225,13 +226,14 @@ export class ProductsService {
   async update(id: string, dto: UpdateProductDto) {
     await this.findById(id); // 404 if missing
 
-    const { images, price, compareAtPrice, videoUrl, ...rest } = dto;
+    const { images, price, compareAtPrice, videoUrl, modelUrl, ...rest } = dto;
 
     return this.products.updateWithImages(
       id,
       {
         ...rest,
         ...(videoUrl !== undefined && { videoUrl: videoUrl || null }),
+        ...(modelUrl !== undefined && { modelUrl: modelUrl || null }),
         ...(price !== undefined && { price: new Prisma.Decimal(price) }),
         ...(compareAtPrice !== undefined && {
           compareAtPrice: compareAtPrice === null ? null : new Prisma.Decimal(compareAtPrice),

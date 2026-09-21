@@ -68,7 +68,7 @@ export function FlashSaleSection() {
 
   return (
     <section className="shell py-8" aria-labelledby="deal-heading">
-      <div className="rounded-[var(--radius-card)] border-2 border-[color:var(--accent-2)] bg-white p-4 sm:p-6">
+      <div className="rounded-[var(--radius-card)] border-2 border-[color:var(--accent-2)] bg-[color:var(--surface)] p-4 sm:p-6">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mb-5">
           <h2 id="deal-heading" className="flex items-center gap-2.5 text-xl md:text-2xl font-extrabold">
             <span className="w-9 h-9 rounded-full bg-[color:var(--accent-2)] text-[color:var(--color-ink)] grid place-items-center">

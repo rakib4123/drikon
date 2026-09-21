@@ -261,6 +261,8 @@ model Product {
   attributes         Json?
   // Optional product video (YouTube/Vimeo/MP4 URL)
   videoUrl           String?
+  // Optional 3D model (.glb/.gltf, https) for the storefront's WebGL viewer
+  modelUrl           String?
   // SEO
   metaTitle          String?
   metaDescription    String?

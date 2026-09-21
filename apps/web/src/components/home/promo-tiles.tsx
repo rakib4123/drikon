@@ -48,7 +48,7 @@ export async function PromoTiles({
       {pick && (
         <Link
           href={`/products/${pick.slug}`}
-          className="group relative flex-1 overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--border)] bg-white p-5 flex gap-3"
+          className="group relative flex-1 overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--border)] bg-[color:var(--surface)] neon-edge p-5 flex gap-3"
         >
           <span className="flex flex-col justify-between min-w-0">
             <span>

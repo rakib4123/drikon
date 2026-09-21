@@ -159,7 +159,11 @@
     "noReviewsYet": "এখনও কোনো রিভিউ নেই",
     "sku": "SKU",
     "youSave": "আপনি সাশ্রয় করছেন {amount}",
-    "viewAll": "সব দেখুন"
+    "viewAll": "সব দেখুন",
+    "view3d": "থ্রিডি ভিউ",
+    "viewPhotos": "ছবি",
+    "viewerHint": "ঘোরাতে টেনে ধরুন",
+    "viewerTapHint": "ঘোরাতে ট্যাপ করুন"
   },
   "about": {
     "eyebrow": "{brand} সম্পর্কে",

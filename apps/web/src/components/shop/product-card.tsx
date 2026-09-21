@@ -9,13 +9,14 @@ import { formatPrice, effectivePrice } from '@/lib/utils';
 import { useCartStore } from '@/store/cart-store';
 import { localize } from '@/lib/localize';
 import type { Locale } from '@/i18n/request';
+import { TiltCard } from '@/components/ui/tilt-card';
 import { WishlistButton } from './wishlist-button';
 import { CompareButton } from './compare-button';
 import { StarRating } from './star-rating';
 import { ProductThumb } from './product-thumb';
 
 /**
- * Megastore product tile: product on white, badges top-left, wishlist/compare
+ * Neon glass product tile with CSS 3D tilt: product on white, badges top-left, wishlist/compare
  * rail top-right, rating, price, and a full-width add-to-cart.
  *
  * The action rail is hidden until hover only on devices that CAN hover. It
@@ -48,8 +49,9 @@ export function ProductCard({ product }: { product: ProductSummary }) {
     '[@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 focus-visible:opacity-100 aria-[pressed=true]:opacity-100 transition-opacity';
 
   return (
-    <article className="group card card-hover !p-0 overflow-hidden flex flex-col h-full">
-      <div className="relative aspect-square bg-white overflow-hidden">
+    <TiltCard className="group h-full">
+      <article className="card card-hover !p-0 overflow-hidden flex flex-col h-full">
+      <div className="relative aspect-square [background:var(--image-well)] overflow-hidden">
         <Link href={`/products/${product.slug}`} className="absolute inset-0" tabIndex={-1} aria-hidden>
           <ProductThumb
             src={product.images?.[0]?.url}
@@ -64,6 +66,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
           {onFlashSale && (
             <span className="badge-deal">{t('flashSaleBadge')}</span>
           )}
+          {/* .badge-sale's text is var(--bg) (dark) — on this --fg fill that's ~17:1, not the ~1.2:1 white-on-white it used to be. */}
           {soldOut && <span className="badge-sale !bg-[color:var(--fg)]">{t('soldOut')}</span>}
         </div>
 
@@ -108,8 +111,8 @@ export function ProductCard({ product }: { product: ProductSummary }) {
             toast.success(t('addedToCartToastTitle'), { description: name });
           }}
           className="mt-3 w-full inline-flex items-center justify-center gap-2 h-10 rounded-[var(--radius-ctl)] text-[13px] font-bold
-                     border border-[color:var(--accent)] text-[color:var(--accent)] bg-white
-                     enabled:hover:bg-[color:var(--accent)] enabled:hover:text-white enabled:group-hover:bg-[color:var(--accent)] enabled:group-hover:text-white
+                     border border-[color:var(--accent)] text-[color:var(--accent)] bg-transparent
+                     enabled:hover:bg-[color:var(--accent)] enabled:hover:text-[color:var(--accent-fg)] enabled:group-hover:bg-[color:var(--accent)] enabled:group-hover:text-[color:var(--accent-fg)]
                      transition-colors disabled:border-[color:var(--border)] disabled:text-[color:var(--fg-muted)]
                      disabled:bg-[color:var(--bg-soft)] disabled:cursor-not-allowed"
         >
@@ -118,5 +121,6 @@ export function ProductCard({ product }: { product: ProductSummary }) {
         </button>
       </div>
     </article>
+    </TiltCard>
   );
 }

@@ -2,6 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { Toaster } from 'sonner';
 import type { SiteSettings } from '@drikon/shared-types';
 import { SettingsProvider } from '@/components/layout/settings-context';
@@ -31,11 +32,15 @@ export function Providers({
         },
       }),
   );
+  // Admin (.theme-classic, see admin/layout.tsx) kept its original light
+  // look — its toasts stay light too. The storefront is dark neon by default.
+  const pathname = usePathname();
+  const isAdmin = pathname?.startsWith('/admin') ?? false;
   return (
     <SettingsProvider settings={settings}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
       <Toaster
-        theme="light"
+        theme={isAdmin ? 'light' : 'dark'}
         position="bottom-right"
         richColors
         closeButton

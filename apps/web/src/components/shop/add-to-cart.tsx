@@ -86,7 +86,7 @@ export function AddToCart({
   return (
     <div className={`flex flex-wrap gap-3 ${className ?? ''}`}>
       {/* Quantity stepper */}
-      <div className="inline-flex items-center border border-[#d0d5dd] rounded-[var(--radius-ctl)] overflow-hidden shrink-0 h-12">
+      <div className="inline-flex items-center border border-[color:var(--border-strong)] rounded-[var(--radius-ctl)] overflow-hidden shrink-0 h-12">
         <button
           type="button"
           aria-label={t('decreaseQuantity')}

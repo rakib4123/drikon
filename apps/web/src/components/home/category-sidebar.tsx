@@ -32,7 +32,7 @@ export async function CategorySidebar({
   return (
     <nav
       aria-label={t('allCategories')}
-      className="hidden lg:flex flex-col bg-white border border-t-0 border-[color:var(--border)] rounded-b-[var(--radius-card)]"
+      className="hidden lg:flex flex-col bg-[color:var(--surface)] backdrop-blur-md border border-t-0 border-[color:var(--border)] rounded-b-[var(--radius-card)]"
     >
       <ul className="py-1.5">
         {top.map((c) => (
