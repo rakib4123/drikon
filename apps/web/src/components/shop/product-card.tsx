@@ -50,7 +50,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
 
   return (
     <TiltCard className="group h-full">
-      <article className="card card-hover !p-0 overflow-hidden flex flex-col">
+      <article className="card card-hover !p-0 overflow-hidden flex flex-col h-full">
       <div className="relative aspect-square [background:var(--image-well)] overflow-hidden">
         <Link href={`/products/${product.slug}`} className="absolute inset-0" tabIndex={-1} aria-hidden>
           <ProductThumb
