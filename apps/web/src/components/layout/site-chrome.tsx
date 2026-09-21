@@ -1,9 +1,10 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { BackdropLoader } from '@/components/three/backdrop-loader';
 
 /**
- * Shows the storefront's header and footer everywhere except the admin panel,
+ * Shows the storefront's space backdrop, header and footer everywhere except the admin panel,
  * which has its own sidebar and top bar. The chrome itself stays server-rendered
  * and is passed in as props; this only decides whether to show it.
  */
@@ -23,6 +24,7 @@ export function SiteChrome({
   if (isAdmin) return <main id="main" className="flex-1">{children}</main>;
   return (
     <>
+      <BackdropLoader />
       {header}
       <main id="main" className="flex-1">{children}</main>
       {footer}
