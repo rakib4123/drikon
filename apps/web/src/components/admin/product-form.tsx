@@ -404,7 +404,7 @@ export function ProductForm({ mode, productId, initial }: ProductFormProps) {
           type="url"
           value={state.modelUrl}
           onChange={(e) => update('modelUrl', e.target.value)}
-          placeholder="https://…/product.glb — shown in the storefront's 3D viewer"
+          placeholder="https://res.cloudinary.com/…/product.glb — uncompressed .glb; other hosts need NEXT_PUBLIC_MODEL_HOSTS"
           pattern="https://.+\.(glb|gltf)(\?.*)?"
           className="input"
         />

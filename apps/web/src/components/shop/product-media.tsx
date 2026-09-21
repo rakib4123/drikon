@@ -47,6 +47,9 @@ export function ProductMedia({
   }, []);
 
   const choose = (m: Mode) => {
+    // A fresh viewer mounts each time we come back to 3D — show the loader
+    // again instead of leaving it hidden from the previous mount's onReady.
+    if (m === '3d') setReady(false);
     setMode(m);
     try {
       localStorage.setItem(KEY, m);
