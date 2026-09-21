@@ -71,7 +71,7 @@ export function HeroSlider({ slides }: { slides: Banner[] }) {
                 animate={active && !reduce ? { opacity: 1, y: 0 } : reduce ? {} : { opacity: 0, y: 24 }}
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: active ? 0.18 : 0 }}
               >
-                <h1 className="display text-2xl sm:text-4xl lg:text-5xl mb-3 text-glow">{localize(b.heading, b.headingBn, locale)}</h1>
+                <h2 className="display text-2xl sm:text-4xl lg:text-5xl mb-3 text-glow">{localize(b.heading, b.headingBn, locale)}</h2>
                 {b.subheading && (
                   <p className="text-white/85 text-sm sm:text-base mb-5 sm:mb-7 max-w-md line-clamp-2 sm:line-clamp-none">
                     {localize(b.subheading, b.subheadingBn, locale)}
