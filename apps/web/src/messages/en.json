@@ -162,7 +162,8 @@
     "viewAll": "View all",
     "view3d": "3D view",
     "viewPhotos": "Photos",
-    "viewerHint": "Drag to rotate"
+    "viewerHint": "Drag to rotate",
+    "viewerTapHint": "Tap to rotate"
   },
   "about": {
     "eyebrow": "About {brand}",
