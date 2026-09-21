@@ -1,10 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
 import { Search, X, Loader2, CornerDownLeft, Mic, MicOff, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLocale, useTranslations } from 'next-intl';
@@ -15,6 +14,13 @@ import { parseVoiceCommand } from '@/lib/voice-command';
 import { useCartStore } from '@/store/cart-store';
 import { localize } from '@/lib/localize';
 import type { Locale } from '@/i18n/request';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 const SPEECH_ERROR_MESSAGES: Record<string, string> = {
   'not-allowed':
@@ -30,6 +36,19 @@ const SPEECH_ERROR_MESSAGES: Record<string, string> = {
     "Your phone's speech recognition service couldn't start — this isn't a permission issue. Try updating the Google app from the Play Store, or type your search instead.",
 };
 
+/**
+ * Command-palette search.
+ *
+ * The modal shell is Radix Dialog now. It replaces a hand-rolled portal, a
+ * `mounted` guard, a `document.body.style.overflow` lock, a 50ms focus timeout
+ * and a manual Escape listener — and adds the focus trap the old panel never
+ * had, so Tab no longer walks out into the page behind the overlay.
+ *
+ * The ⌘K shortcut stays a window listener: it has to work when the dialog is
+ * closed, which is outside anything Radix owns.
+ *
+ * All voice-search behaviour below is unchanged.
+ */
 export function SearchCommand() {
   const router = useRouter();
   const t = useTranslations('search');
@@ -39,17 +58,13 @@ export function SearchCommand() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ProductSummary[]>([]);
   const [loading, setLoading] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [listening, setListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
   const [micBlocked, setMicBlocked] = useState(false);
   const [voiceConfirm, setVoiceConfirm] = useState<{ quantity: number; product: ProductSummary } | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const stoppedByUserRef = useRef(false);
   const cartAdd = useCartStore((s) => s.add);
-
-  useEffect(() => setMounted(true), []);
 
   // Feature-detect the Web Speech API (Chrome/Safari only, prefixed).
   useEffect(() => {
@@ -83,7 +98,7 @@ export function SearchCommand() {
     return () => recognitionRef.current?.stop();
   }, []);
 
-  // ⌘K / Ctrl+K to open, Esc handled by the panel below.
+  // ⌘K / Ctrl+K to toggle. Escape, scroll lock and focus are Radix's now.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
@@ -95,17 +110,6 @@ export function SearchCommand() {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  // Lock scroll + focus input while open.
-  useEffect(() => {
-    if (!open) return;
-    const t = setTimeout(() => inputRef.current?.focus(), 50);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      clearTimeout(t);
-      document.body.style.overflow = '';
-    };
-  }, [open]);
-
   // Debounced live search.
   useEffect(() => {
     const q = query.trim();
@@ -116,7 +120,7 @@ export function SearchCommand() {
     }
     setLoading(true);
     const ctrl = new AbortController();
-    const t = setTimeout(async () => {
+    const timer = setTimeout(async () => {
       try {
         const data = await apiGet<ProductListResponse>(
           `/api/v1/products?search=${encodeURIComponent(q)}&limit=6`,
@@ -130,17 +134,22 @@ export function SearchCommand() {
       }
     }, 250);
     return () => {
-      clearTimeout(t);
+      clearTimeout(timer);
       ctrl.abort();
     };
   }, [query]);
 
-  const close = useCallback(() => {
-    setOpen(false);
-    setQuery('');
-    setResults([]);
-    setVoiceConfirm(null);
+  /** Clears the transient state whenever the dialog closes, however it closed. */
+  const onOpenChange = useCallback((next: boolean) => {
+    setOpen(next);
+    if (!next) {
+      setQuery('');
+      setResults([]);
+      setVoiceConfirm(null);
+    }
   }, []);
+
+  const close = useCallback(() => onOpenChange(false), [onOpenChange]);
 
   const goToResults = useCallback(() => {
     const q = query.trim();
@@ -255,211 +264,179 @@ export function SearchCommand() {
   }, [micBlocked, listening, startListening, stopListening]);
 
   return (
-    <>
-      <button
-        type="button"
-        aria-label={t('searchLabel')}
-        onClick={() => setOpen(true)}
-        className="p-2 rounded-lg hover:bg-[color:var(--bg-soft)] transition-colors"
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogTrigger asChild>
+        <button
+          type="button"
+          aria-label={t('searchLabel')}
+          className="p-2 rounded-lg hover:bg-[color:var(--bg-soft)] transition-colors"
+        >
+          <Search className="w-5 h-5" />
+        </button>
+      </DialogTrigger>
+
+      <DialogContent
+        onKeyDown={(e) => {
+          // Escape is Radix's. Enter falls through to the full results page.
+          if (e.key === 'Enter') goToResults();
+        }}
       >
-        <Search className="w-5 h-5" />
-      </button>
+        <DialogTitle className="sr-only">{t('searchLabel')}</DialogTitle>
 
-      {mounted &&
-        createPortal(
-          <AnimatePresence>
-            {open && (
-          <motion.div
-            className="fixed inset-0 z-[60] flex items-start justify-center px-4 pt-[12vh]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-          >
-            {/* Backdrop */}
-            <div
-              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-              onClick={close}
-              aria-hidden
-            />
-
-            {/* Panel */}
-            <motion.div
-              role="dialog"
-              aria-modal="true"
-              aria-label="Search products"
-              className="relative w-full max-w-xl rounded-2xl border border-[color:var(--border)] bg-[color:var(--bg)] shadow-2xl overflow-hidden"
-              initial={{ opacity: 0, y: -12, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -8, scale: 0.98 }}
-              transition={{ duration: 0.18, ease: 'easeOut' }}
-              onKeyDown={(e) => {
-                if (e.key === 'Escape') close();
-                if (e.key === 'Enter') goToResults();
-              }}
+        <div className="flex items-center gap-3 px-4 border-b border-[color:var(--border)]">
+          {loading ? (
+            <Loader2 className="w-5 h-5 animate-spin text-[color:var(--fg-muted)]" />
+          ) : (
+            <Search className="w-5 h-5 text-[color:var(--fg-muted)]" />
+          )}
+          <input
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setVoiceConfirm(null);
+            }}
+            placeholder={t('searchPlaceholder')}
+            className="flex-1 bg-transparent py-4 text-[15px] outline-none placeholder:text-[color:var(--fg-muted)]"
+          />
+          {speechSupported && (
+            <button
+              type="button"
+              onClick={handleMicClick}
+              aria-label={micBlocked ? t('micBlocked') : listening ? t('stopVoiceSearch') : t('searchByVoice')}
+              aria-pressed={listening}
+              title={micBlocked ? t('micBlocked') : undefined}
+              className={cn(
+                'p-1.5 rounded-md transition-colors',
+                micBlocked
+                  ? 'text-red-500 hover:bg-red-500/10'
+                  : listening
+                    ? 'text-[color:var(--accent)] bg-[color:var(--bg-soft)] animate-pulse'
+                    : 'text-[color:var(--fg-muted)] hover:bg-[color:var(--bg-soft)]',
+              )}
             >
-              <div className="flex items-center gap-3 px-4 border-b border-[color:var(--border)]">
-                {loading ? (
-                  <Loader2 className="w-5 h-5 animate-spin text-[color:var(--fg-muted)]" />
-                ) : (
-                  <Search className="w-5 h-5 text-[color:var(--fg-muted)]" />
-                )}
-                <input
-                  ref={inputRef}
-                  value={query}
-                  onChange={(e) => {
-                    setQuery(e.target.value);
-                    setVoiceConfirm(null);
-                  }}
-                  placeholder={t('searchPlaceholder')}
-                  className="flex-1 bg-transparent py-4 text-[15px] outline-none placeholder:text-[color:var(--fg-muted)]"
-                />
-                {speechSupported && (
-                  <button
-                    type="button"
-                    onClick={handleMicClick}
-                    aria-label={micBlocked ? t('micBlocked') : listening ? t('stopVoiceSearch') : t('searchByVoice')}
-                    aria-pressed={listening}
-                    title={micBlocked ? t('micBlocked') : undefined}
-                    className={cn(
-                      'p-1.5 rounded-md transition-colors',
-                      micBlocked
-                        ? 'text-red-500 hover:bg-red-500/10'
-                        : listening
-                          ? 'text-[color:var(--accent)] bg-[color:var(--bg-soft)] animate-pulse'
-                          : 'text-[color:var(--fg-muted)] hover:bg-[color:var(--bg-soft)]',
-                    )}
-                  >
-                    {micBlocked ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={close}
-                  aria-label={t('closeSearch')}
-                  className="p-1.5 rounded-md text-[color:var(--fg-muted)] hover:bg-[color:var(--bg-soft)]"
-                >
-                  <X className="w-4 h-4" />
+              {micBlocked ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            </button>
+          )}
+          <DialogClose
+            aria-label={t('closeSearch')}
+            className="p-1.5 rounded-md text-[color:var(--fg-muted)] hover:bg-[color:var(--bg-soft)] transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </DialogClose>
+        </div>
+
+        <div className="max-h-[50vh] overflow-y-auto">
+          {listening ? (
+            <motion.p
+              role="status"
+              initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="px-4 py-8 flex items-center justify-center gap-2 text-sm text-[color:var(--fg-muted)]"
+            >
+              <span className="relative flex h-2 w-2 shrink-0">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
+              </span>
+              {t('listeningHint')}
+            </motion.p>
+          ) : voiceConfirm ? (
+            <div className="px-4 py-6">
+              <p className="text-xs text-[color:var(--fg-muted)] mb-3">{t('didYouMean')}</p>
+              <div className="flex items-center gap-3 p-3 rounded-xl border border-[color:var(--border)] mb-4">
+                <span className="relative w-12 h-14 rounded-md overflow-hidden bg-[color:var(--bg-soft)] shrink-0">
+                  {voiceConfirm.product.images?.[0]?.url && (
+                    <Image
+                      src={voiceConfirm.product.images[0].url}
+                      alt={
+                        voiceConfirm.product.images[0].alt ??
+                        localize(voiceConfirm.product.name, voiceConfirm.product.nameBn, locale)
+                      }
+                      fill
+                      sizes="48px"
+                      className="object-cover"
+                    />
+                  )}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium line-clamp-2">
+                    {voiceConfirm.quantity} × {localize(voiceConfirm.product.name, voiceConfirm.product.nameBn, locale)}
+                  </div>
+                  <div className="text-xs text-[color:var(--fg-muted)] mt-0.5">
+                    {formatPrice(
+                      typeof voiceConfirm.product.price === 'string'
+                        ? parseFloat(voiceConfirm.product.price)
+                        : voiceConfirm.product.price,
+                      voiceConfirm.product.currency,
+                    )}{' '}
+                    {t('each')}
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button type="button" onClick={confirmAddToCart} className="btn-primary flex-1 justify-center">
+                  <ShoppingCart className="w-4 h-4" /> {t('addToCart')}
+                </button>
+                <button type="button" onClick={searchInstead} className="btn-ghost flex-1 justify-center">
+                  {t('searchInstead')}
                 </button>
               </div>
-
-              <div className="max-h-[50vh] overflow-y-auto">
-                {listening ? (
-                  <motion.p
-                    role="status"
-                    initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                    className="px-4 py-8 flex items-center justify-center gap-2 text-sm text-[color:var(--fg-muted)]"
-                  >
-                    <span className="relative flex h-2 w-2 shrink-0">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
-                      <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
-                    </span>
-                    {t('listeningHint')}
-                  </motion.p>
-                ) : voiceConfirm ? (
-                  <div className="px-4 py-6">
-                    <p className="text-xs text-[color:var(--fg-muted)] mb-3">{t('didYouMean')}</p>
-                    <div className="flex items-center gap-3 p-3 rounded-xl border border-[color:var(--border)] mb-4">
-                      <span className="relative w-12 h-14 rounded-md overflow-hidden bg-[color:var(--bg-soft)] shrink-0">
-                        {voiceConfirm.product.images?.[0]?.url && (
+            </div>
+          ) : query.trim().length < 2 ? (
+            <p className="px-4 py-8 text-center text-sm text-[color:var(--fg-muted)]">
+              {t('typeAtLeastTwoChars')}
+            </p>
+          ) : results.length === 0 && !loading ? (
+            <p className="px-4 py-8 text-center text-sm text-[color:var(--fg-muted)]">
+              {t('noProductsMatch', { query: query.trim() })}
+            </p>
+          ) : (
+            <ul className="py-2">
+              {results.map((p) => {
+                const price = typeof p.price === 'string' ? parseFloat(p.price) : p.price;
+                const name = localize(p.name, p.nameBn, locale);
+                return (
+                  <li key={p.id}>
+                    <button
+                      type="button"
+                      onClick={() => pick(p.slug)}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-[color:var(--bg-soft)] transition-colors"
+                    >
+                      <span className="relative w-10 h-12 rounded-md overflow-hidden bg-[color:var(--bg-soft)] shrink-0">
+                        {p.images?.[0]?.url && (
                           <Image
-                            src={voiceConfirm.product.images[0].url}
-                            alt={
-                              voiceConfirm.product.images[0].alt ??
-                              localize(voiceConfirm.product.name, voiceConfirm.product.nameBn, locale)
-                            }
+                            src={p.images[0].url}
+                            alt={p.images[0].alt ?? name}
                             fill
-                            sizes="48px"
+                            sizes="40px"
                             className="object-cover"
                           />
                         )}
                       </span>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium line-clamp-2">
-                          {voiceConfirm.quantity} × {localize(voiceConfirm.product.name, voiceConfirm.product.nameBn, locale)}
-                        </div>
-                        <div className="text-xs text-[color:var(--fg-muted)] mt-0.5">
-                          {formatPrice(
-                            typeof voiceConfirm.product.price === 'string'
-                              ? parseFloat(voiceConfirm.product.price)
-                              : voiceConfirm.product.price,
-                            voiceConfirm.product.currency,
-                          )}{' '}
-                          {t('each')}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <button type="button" onClick={confirmAddToCart} className="btn-primary flex-1 justify-center">
-                        <ShoppingCart className="w-4 h-4" /> {t('addToCart')}
-                      </button>
-                      <button type="button" onClick={searchInstead} className="btn-ghost flex-1 justify-center">
-                        {t('searchInstead')}
-                      </button>
-                    </div>
-                  </div>
-                ) : query.trim().length < 2 ? (
-                  <p className="px-4 py-8 text-center text-sm text-[color:var(--fg-muted)]">
-                    {t('typeAtLeastTwoChars')}
-                  </p>
-                ) : results.length === 0 && !loading ? (
-                  <p className="px-4 py-8 text-center text-sm text-[color:var(--fg-muted)]">
-                    {t('noProductsMatch', { query: query.trim() })}
-                  </p>
-                ) : (
-                  <ul className="py-2">
-                    {results.map((p) => {
-                      const price = typeof p.price === 'string' ? parseFloat(p.price) : p.price;
-                      const name = localize(p.name, p.nameBn, locale);
-                      return (
-                        <li key={p.id}>
-                          <button
-                            type="button"
-                            onClick={() => pick(p.slug)}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-[color:var(--bg-soft)] transition-colors"
-                          >
-                            <span className="relative w-10 h-12 rounded-md overflow-hidden bg-[color:var(--bg-soft)] shrink-0">
-                              {p.images?.[0]?.url && (
-                                <Image
-                                  src={p.images[0].url}
-                                  alt={p.images[0].alt ?? name}
-                                  fill
-                                  sizes="40px"
-                                  className="object-cover"
-                                />
-                              )}
-                            </span>
-                            <span className="flex-1 min-w-0">
-                              <span className="block text-sm font-medium line-clamp-1">{name}</span>
-                              <span className="block text-xs text-[color:var(--fg-muted)]">
-                                {p.brand?.name ?? p.category.name}
-                              </span>
-                            </span>
-                            <span className="text-sm font-semibold shrink-0">
-                              {formatPrice(price, p.currency)}
-                            </span>
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-              </div>
+                      <span className="flex-1 min-w-0">
+                        <span className="block text-sm font-medium line-clamp-1">{name}</span>
+                        <span className="block text-xs text-[color:var(--fg-muted)]">
+                          {p.brand?.name ?? p.category.name}
+                        </span>
+                      </span>
+                      <span className="text-sm font-semibold shrink-0">
+                        {formatPrice(price, p.currency)}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
 
-              <div className="flex items-center justify-between px-4 py-2.5 border-t border-[color:var(--border)] text-[11px] text-[color:var(--fg-muted)]">
-                <span className="inline-flex items-center gap-1.5">
-                  <CornerDownLeft className="w-3 h-3" /> {t('seeAllResults')}
-                </span>
-                <span>{t('escToClose')}</span>
-              </div>
-            </motion.div>
-          </motion.div>
-            )}
-          </AnimatePresence>,
-          document.body,
-        )}
-    </>
+        <div className="flex items-center justify-between px-4 py-2.5 border-t border-[color:var(--border)] text-[11px] text-[color:var(--fg-muted)]">
+          <span className="inline-flex items-center gap-1.5">
+            <CornerDownLeft className="w-3 h-3" /> {t('seeAllResults')}
+          </span>
+          <span>{t('escToClose')}</span>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
