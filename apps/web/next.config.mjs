@@ -11,6 +11,13 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 // the platform uses its own default build output.
 const standalone = process.env.BUILD_STANDALONE === '1';
 
+// Origins the 3D viewer may fetch .glb/.gltf models from (connect-src). Add more
+// with NEXT_PUBLIC_MODEL_HOSTS=https://cdn.example.com,https://models.example.net
+const modelHosts = [
+  'https://res.cloudinary.com',
+  ...(process.env.NEXT_PUBLIC_MODEL_HOSTS ?? '').split(',').map((h) => h.trim()).filter(Boolean),
+];
+
 // Content-Security-Policy. Next.js needs inline scripts/styles for hydration;
 // dev additionally needs eval + websockets for HMR. Everything else is locked
 // to self + the API origin + the fonts/CDN we actually use.
@@ -21,7 +28,7 @@ const csp = [
   "font-src 'self' data: https://fonts.gstatic.com",
   "img-src 'self' data: blob: https:",
   "media-src 'self' https: blob:",
-  `connect-src 'self' ${apiUrl} https://api.cloudinary.com${isDev ? ' ws: http://localhost:4000' : ''}`,
+  `connect-src 'self' ${apiUrl} https://api.cloudinary.com ${modelHosts.join(' ')} blob:${isDev ? ' ws: http://localhost:4000' : ''}`,
   "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",

@@ -8,7 +8,9 @@ import type { Group } from 'three';
 import { SceneBoundary, SceneCanvas } from './scene-canvas';
 
 function Model({ url }: { url: string }) {
-  const { scene } = useGLTF(url);
+  // Draco/Meshopt decoding needs worker-src blob:, gstatic, and 'wasm-unsafe-eval'
+  // in the CSP, which we don't grant — plain, uncompressed .glb/.gltf only.
+  const { scene } = useGLTF(url, false, false);
   return (
     <Bounds fit clip observe margin={1.25}>
       <Center>
