@@ -25,6 +25,7 @@ import {
   ResetPasswordDto,
   VerifyEmailDto,
   Enable2FADto,
+  Disable2FADto,
 } from './dto/auth.dto';
 import type { TokenPair } from './interfaces/jwt.interface';
 
@@ -239,7 +240,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Disable 2FA (requires current TOTP code)' })
   async disable2FA(
     @CurrentUser() user: AuthenticatedUser,
-    @Body() dto: Enable2FADto,
+    @Body() dto: Disable2FADto,
   ) {
     return this.authService.disable2FA(user.id, dto.code);
   }
