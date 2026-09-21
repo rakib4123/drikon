@@ -80,7 +80,7 @@ export function HeroSlider({ slides }: { slides: Banner[] }) {
                 {b.ctaLabel && (
                   <Link
                     href={b.ctaHref || '/products'}
-                    className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-[var(--radius-ctl)] bg-[color:var(--accent)] text-white font-bold hover:brightness-110 transition-[filter] shadow-lg"
+                    className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-[var(--radius-ctl)] bg-[color:var(--accent)] text-[color:var(--accent-fg)] font-bold hover:brightness-110 transition-[filter] shadow-lg"
                   >
                     {b.ctaLabel} <ArrowRight className="w-4 h-4" />
                   </Link>

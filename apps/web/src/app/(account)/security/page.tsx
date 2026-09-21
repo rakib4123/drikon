@@ -111,7 +111,7 @@ export default function SecurityPage() {
           {/* ─── Scan + confirm ─── */}
           {!enabled && step === 'scan' && setup && (
             <div className="grid gap-6 md:grid-cols-[220px_minmax(0,1fr)] items-start">
-              <div className="rounded-[var(--radius-card)] border border-[color:var(--border)] bg-white p-3">
+              <div className="rounded-[var(--radius-card)] border border-[color:var(--border)] bg-[color:var(--surface-solid)] p-3">
                 {/* eslint-disable-next-line @next/next/no-img-element -- a data: URL, nothing for next/image to optimise */}
                 <img src={setup.qrCodeDataUrl} alt={t('qrAlt')} className="w-full h-auto" />
               </div>

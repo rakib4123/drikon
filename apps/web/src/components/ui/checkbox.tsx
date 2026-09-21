@@ -25,7 +25,7 @@ export function Checkbox({ className, ...props }: React.ComponentProps<typeof Ch
       )}
       {...props}
     >
-      <CheckboxPrimitive.Indicator className="flex items-center justify-center text-white">
+      <CheckboxPrimitive.Indicator className="flex items-center justify-center text-[color:var(--accent-fg)]">
         <Check className="h-3 w-3 stroke-[3.5]" />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>

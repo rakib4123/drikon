@@ -26,7 +26,7 @@ export function AuthShell({
 
   return (
     <div className="shell py-8 sm:py-12">
-      <div className="mx-auto max-w-4xl grid md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] rounded-[var(--radius-card)] border border-[color:var(--border)] bg-white shadow-[0_24px_60px_-30px_rgba(16,24,40,0.35)] overflow-hidden">
+      <div className="mx-auto max-w-4xl grid md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] rounded-[var(--radius-card)] border border-[color:var(--border)] bg-[color:var(--surface)] backdrop-blur-md shadow-[0_24px_60px_-30px_rgba(16,24,40,0.35)] overflow-hidden">
         <div className="p-6 sm:p-10">
           <h1 className="text-2xl sm:text-[28px] font-extrabold tracking-tight">{title}</h1>
           {subtitle && <p className="mt-1.5 text-sm text-[color:var(--fg-muted)]">{subtitle}</p>}

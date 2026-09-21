@@ -54,7 +54,7 @@ export function Pagination({
         n === null ? (
           <span key={`gap-${i}`} aria-hidden className="px-1 text-[color:var(--fg-muted)]">…</span>
         ) : n === page ? (
-          <span key={n} aria-current="page" className={`${cell} bg-[color:var(--accent)] text-white`}>
+          <span key={n} aria-current="page" className={`${cell} bg-[color:var(--accent)] text-[color:var(--accent-fg)]`}>
             {n}
           </span>
         ) : (

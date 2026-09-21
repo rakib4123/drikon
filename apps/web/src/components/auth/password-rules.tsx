@@ -22,7 +22,7 @@ export function PasswordRules({ password }: { password: string }) {
         >
           <span
             aria-hidden
-            className={`w-4 h-4 rounded-full grid place-items-center shrink-0 ${r.ok ? 'bg-[color:var(--color-success)] text-white' : 'border border-[#d0d5dd]'}`}
+            className={`w-4 h-4 rounded-full grid place-items-center shrink-0 ${r.ok ? 'bg-[color:var(--color-success)] text-white' : 'border border-[color:var(--border-strong)]'}`}
           >
             {r.ok && <Check className="w-2.5 h-2.5" strokeWidth={3.5} />}
           </span>

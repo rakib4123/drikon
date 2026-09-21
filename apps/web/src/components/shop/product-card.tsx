@@ -49,7 +49,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
 
   return (
     <article className="group card card-hover !p-0 overflow-hidden flex flex-col h-full">
-      <div className="relative aspect-square bg-white overflow-hidden">
+      <div className="relative aspect-square [background:var(--image-well)] overflow-hidden">
         <Link href={`/products/${product.slug}`} className="absolute inset-0" tabIndex={-1} aria-hidden>
           <ProductThumb
             src={product.images?.[0]?.url}
@@ -108,8 +108,8 @@ export function ProductCard({ product }: { product: ProductSummary }) {
             toast.success(t('addedToCartToastTitle'), { description: name });
           }}
           className="mt-3 w-full inline-flex items-center justify-center gap-2 h-10 rounded-[var(--radius-ctl)] text-[13px] font-bold
-                     border border-[color:var(--accent)] text-[color:var(--accent)] bg-white
-                     enabled:hover:bg-[color:var(--accent)] enabled:hover:text-white enabled:group-hover:bg-[color:var(--accent)] enabled:group-hover:text-white
+                     border border-[color:var(--accent)] text-[color:var(--accent)] bg-transparent
+                     enabled:hover:bg-[color:var(--accent)] enabled:hover:text-[color:var(--accent-fg)] enabled:group-hover:bg-[color:var(--accent)] enabled:group-hover:text-[color:var(--accent-fg)]
                      transition-colors disabled:border-[color:var(--border)] disabled:text-[color:var(--fg-muted)]
                      disabled:bg-[color:var(--bg-soft)] disabled:cursor-not-allowed"
         >

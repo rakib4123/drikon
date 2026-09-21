@@ -91,7 +91,7 @@ export function HeaderSearch() {
       }}
       className="relative w-full"
     >
-      <div className="flex h-11 items-stretch rounded-[var(--radius-ctl)] border-2 border-[color:var(--accent)] bg-white overflow-hidden">
+      <div className="flex h-11 items-stretch rounded-[var(--radius-ctl)] border-2 border-[color:var(--accent)] bg-[color:var(--surface-solid)] overflow-hidden">
         <input
           name="search"
           type="search"
@@ -126,7 +126,7 @@ export function HeaderSearch() {
         <button
           type="submit"
           aria-label={t('searchLabel')}
-          className="px-5 bg-[color:var(--accent)] text-white hover:brightness-110 transition-[filter] inline-flex items-center"
+          className="px-5 bg-[color:var(--accent)] text-[color:var(--accent-fg)] hover:brightness-110 transition-[filter] inline-flex items-center"
         >
           {loading ? <Loader2 className="w-[18px] h-[18px] animate-spin" /> : <Search className="w-[18px] h-[18px]" />}
         </button>
@@ -138,7 +138,7 @@ export function HeaderSearch() {
           role="listbox"
           aria-label={t('searchLabel')}
           className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 rounded-[var(--radius-card)] border border-[color:var(--border)]
-                     bg-white shadow-[0_18px_40px_-16px_rgba(16,24,40,0.3)] overflow-hidden animate-dk-pop-in"
+                     bg-[color:var(--surface-solid)] shadow-[0_18px_40px_-16px_rgba(16,24,40,0.3)] overflow-hidden animate-dk-pop-in"
         >
           {results.length === 0 ? (
             <div role="status" className="px-4 py-5 text-sm text-[color:var(--fg-muted)]">
