@@ -23,6 +23,14 @@ which origin to trust.
    and `COOKIE_SECURE` are already set correctly by the blueprint — nothing to
    do there.
 3. Leave `WEB_ORIGIN` unset for now; you'll come back and set it in step 3.
+   **Using Neon (or any pooled Postgres) instead of `drikon-db`?** Set
+   `DATABASE_URL` to Neon's **pooled** string (host contains `-pooler`) and
+   `DIRECT_URL` to the **direct** string (same URL without `-pooler`).
+   `prisma migrate deploy` takes a session advisory lock that PgBouncer can't
+   hold, so without `DIRECT_URL` the deploy fails with
+   `P1002 … Timed out trying to acquire a postgres advisory lock`. With
+   Render's own Postgres there's no pooler — leave `DIRECT_URL` unset and the
+   start command falls back to `DATABASE_URL`.
 4. Deploy. `prisma migrate deploy` runs automatically as part of the start
    command on every deploy, so the schema is created for you. Watch the
    Render dashboard's logs for `Nest application successfully started`.
@@ -124,7 +132,8 @@ logged-out, check that this wasn't accidentally overridden.
   project → Deployments → (a deployment) → Logs.
 - **Run a migration manually** (normally automatic on every Render deploy):
   ```bash
-  DATABASE_URL="<external connection string>" pnpm --filter @drikon/api db:migrate:deploy
+  DATABASE_URL="<connection string>" DIRECT_URL="<direct, non-pooled connection string>" \
+    pnpm --filter @drikon/api db:migrate:deploy
   ```
 - **Database backup:** Render's Postgres dashboard has built-in automated
   backups on paid plans; on the free tier, use `pg_dump` against the external
