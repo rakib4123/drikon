@@ -108,12 +108,12 @@ export function PaymentMethodField({
               instructions used to replace this text entirely, and it was the only
               place the amount appeared. */}
           <div className="grid sm:grid-cols-2 gap-3">
-            <div className="rounded-[var(--radius-ctl)] bg-white border border-[color:var(--border)] p-3">
+            <div className="rounded-[var(--radius-ctl)] bg-[color:var(--surface-solid)] border border-[color:var(--border)] p-3">
               <div className="text-xs font-semibold text-[color:var(--fg-muted)]">{t('amountToSend')}</div>
               <div className="price-now text-xl mt-0.5">{formatPrice(total, currency)}</div>
             </div>
             {settings.bkashNumber && (
-              <div className="rounded-[var(--radius-ctl)] bg-white border border-[color:var(--border)] p-3">
+              <div className="rounded-[var(--radius-ctl)] bg-[color:var(--surface-solid)] border border-[color:var(--border)] p-3">
                 <div className="text-xs font-semibold text-[color:var(--fg-muted)]">{t('sendTo')}</div>
                 <div className="font-mono text-lg font-bold mt-0.5 select-all">{settings.bkashNumber}</div>
               </div>
@@ -182,16 +182,16 @@ function MethodOption({
       aria-checked={selected}
       onClick={onSelect}
       className={`relative flex items-center gap-3 rounded-[var(--radius-card)] border-2 p-4 text-left transition-colors ${
-        selected ? 'border-[color:var(--accent)] bg-[color:var(--accent)]/5' : 'border-[color:var(--border)] hover:border-[#d0d5dd]'
+        selected ? 'border-[color:var(--accent)] bg-[color:var(--accent)]/5' : 'border-[color:var(--border)] hover:border-[color:var(--border-strong)]'
       }`}
     >
-      <span className="w-10 h-10 rounded-full bg-white border border-[color:var(--border)] grid place-items-center shrink-0">{icon}</span>
+      <span className="w-10 h-10 rounded-full bg-[color:var(--surface-solid)] border border-[color:var(--border)] grid place-items-center shrink-0">{icon}</span>
       <span className="min-w-0">
         <span className="block font-bold text-sm">{title}</span>
         <span className="block text-xs text-[color:var(--fg-muted)]">{subtitle}</span>
       </span>
       {selected && (
-        <span className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-[color:var(--accent)] text-white grid place-items-center">
+        <span className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-[color:var(--accent)] text-[color:var(--accent-fg)] grid place-items-center">
           <Check aria-hidden className="w-3 h-3" />
         </span>
       )}

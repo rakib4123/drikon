@@ -7,7 +7,7 @@ import { BrandStrip } from '@/components/shop/brand-strip';
 import { RecommendedForYou } from '@/components/shop/recommended-for-you';
 import { CategorySidebar } from '@/components/home/category-sidebar';
 import { PromoTiles } from '@/components/home/promo-tiles';
-import { StaticHero } from '@/components/home/static-hero';
+import { HeroStage } from '@/components/home/hero-stage';
 import { ServiceStrip } from '@/components/home/service-strip';
 import { CategoryGrid } from '@/components/home/category-grid';
 import { ProductRow } from '@/components/home/product-row';
@@ -58,13 +58,19 @@ export default async function HomePage() {
         <div className="grid gap-4 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)_280px]">
           <CategorySidebar categories={categories} brands={brands} />
           <div className="lg:pt-4">
-            {banners.length > 0 ? <HeroSlider slides={banners} /> : <StaticHero c={c} />}
+            <HeroStage c={c} products={featured} />
           </div>
           <div className="hidden xl:flex lg:pt-4">
             <PromoTiles dealsTitle={c.dealsTitle} dealsBlurb={c.dealsBlurb} dealsImage={c.dealsImage} pick={featured[0]} />
           </div>
         </div>
       </section>
+
+      {banners.length > 0 && (
+        <section className="shell mt-4">
+          <HeroSlider slides={banners} />
+        </section>
+      )}
 
       <ServiceStrip features={c.features} />
 

@@ -22,7 +22,7 @@ export function StarRating({
       aria-label={`${clamped.toFixed(1)} out of 5${count !== undefined ? `, ${count} reviews` : ''}`}
     >
       <span className="relative inline-flex" aria-hidden>
-        <span className="flex text-[#d0d5dd]">
+        <span className="flex text-[color:var(--border-strong)]">
           {Array.from({ length: 5 }, (_, i) => (
             <Star key={i} style={{ width: size, height: size }} className="fill-current" />
           ))}

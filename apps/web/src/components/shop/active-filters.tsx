@@ -39,7 +39,7 @@ export function ActiveFilters({ brands, categories }: { brands: FilterBrand[]; c
           onClick={() => navigate((next) => next.delete(c.key))}
           aria-label={t('removeFilter', { filter: c.label })}
           className="inline-flex items-center gap-1.5 h-8 pl-3 pr-2 rounded-full text-xs font-semibold
-                     bg-[color:var(--accent)]/10 text-[color:var(--accent)] hover:bg-[color:var(--accent)] hover:text-white transition-colors"
+                     bg-[color:var(--accent)]/10 text-[color:var(--accent)] hover:bg-[color:var(--accent)] hover:text-[color:var(--accent-fg)] transition-colors"
         >
           {c.label}
           <X aria-hidden className="w-3.5 h-3.5" />

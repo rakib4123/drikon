@@ -33,6 +33,7 @@ interface ProductFormState {
   imageUrl: string;
   imageAlt: string;
   videoUrl: string;
+  modelUrl: string;
 }
 
 interface ProductFormProps {
@@ -60,6 +61,7 @@ interface ProductPayload {
   compareAtPrice?: number;
   brandId?: string;
   videoUrl?: string;
+  modelUrl?: string;
   images?: { url: string; alt: string; position: number }[];
 }
 
@@ -84,6 +86,7 @@ const emptyState: ProductFormState = {
   imageUrl: '',
   imageAlt: '',
   videoUrl: '',
+  modelUrl: '',
 };
 
 export function ProductForm({ mode, productId, initial }: ProductFormProps) {
@@ -144,6 +147,7 @@ export function ProductForm({ mode, productId, initial }: ProductFormProps) {
       if (state.compareAtPrice.trim()) payload.compareAtPrice = parseFloat(state.compareAtPrice);
       if (state.brandId) payload.brandId = state.brandId;
       payload.videoUrl = state.videoUrl.trim();
+      payload.modelUrl = state.modelUrl.trim();
 
       // Image is optional and editable in both modes. Provided → set it;
       // empty → clear it (placeholder shows). The API replaces the image set.
@@ -391,6 +395,17 @@ export function ProductForm({ mode, productId, initial }: ProductFormProps) {
           value={state.videoUrl}
           onChange={(e) => update('videoUrl', e.target.value)}
           placeholder="YouTube, Vimeo, or .mp4 link"
+          className="input"
+        />
+      </Field>
+
+      <Field label="3D model URL (optional)">
+        <input
+          type="url"
+          value={state.modelUrl}
+          onChange={(e) => update('modelUrl', e.target.value)}
+          placeholder="https://res.cloudinary.com/…/product.glb — uncompressed .glb; other hosts need NEXT_PUBLIC_MODEL_HOSTS"
+          pattern="https://.+\.(glb|gltf)(\?.*)?"
           className="input"
         />
       </Field>

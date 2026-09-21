@@ -1,6 +1,7 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 import { booleanFromString } from '../../../common/utils/zod-boolean';
+import { modelUrlSchema } from '../../../common/utils/model-url';
 
 export const CreateProductSchema = z.object({
   name: z.string().min(2).max(200),
@@ -22,6 +23,7 @@ export const CreateProductSchema = z.object({
   brandId: z.string().min(1).optional(),
   attributes: z.record(z.any()).optional(),
   videoUrl: z.string().url().optional().or(z.literal('')),
+  modelUrl: modelUrlSchema,
   metaTitle: z.string().max(160).optional(),
   metaDescription: z.string().max(320).optional(),
   // Images are optional — a product can be created now and have photos added

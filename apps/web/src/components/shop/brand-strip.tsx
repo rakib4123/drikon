@@ -22,7 +22,7 @@ export async function BrandStrip({ brands }: { brands: Brand[] }) {
           <li key={b.id}>
             <Link
               href={`/products?brand=${b.slug}`}
-              className="group h-20 flex items-center justify-center rounded-[var(--radius-card)] border border-[color:var(--border)] bg-white px-4
+              className="group h-20 flex items-center justify-center rounded-[var(--radius-card)] border border-[color:var(--border)] [background:var(--image-well)] px-4
                          hover:border-[color:var(--accent)] hover:shadow-[0_10px_24px_-14px_rgba(16,24,40,0.3)] transition"
             >
               {b.logoUrl ? (

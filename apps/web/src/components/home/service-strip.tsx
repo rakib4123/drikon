@@ -31,7 +31,7 @@ export function ServiceStrip({ features }: { features: { title: string; body: st
   if (features.length === 0) return null;
   return (
     <section className="shell py-5">
-      <ul className="grid grid-cols-2 lg:grid-cols-4 rounded-[var(--radius-card)] border border-[color:var(--border)] bg-white divide-[color:var(--border)] lg:divide-x [&>li:nth-child(n+3)]:border-t lg:[&>li:nth-child(n+3)]:border-t-0 [&>li:nth-child(even)]:border-l lg:[&>li:nth-child(even)]:border-l-0">
+      <ul className="grid grid-cols-2 lg:grid-cols-4 rounded-[var(--radius-card)] border border-[color:var(--border)] bg-[color:var(--surface)] divide-[color:var(--border)] lg:divide-x [&>li:nth-child(n+3)]:border-t lg:[&>li:nth-child(n+3)]:border-t-0 [&>li:nth-child(even)]:border-l lg:[&>li:nth-child(even)]:border-l-0">
         {features.slice(0, 4).map((f) => {
           const Icon = iconFor(`${f.title} ${f.body}`);
           return (

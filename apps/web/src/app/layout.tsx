@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Plus_Jakarta_Sans, Hind_Siliguri, JetBrains_Mono } from 'next/font/google';
+import { Plus_Jakarta_Sans, Hind_Siliguri, JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import '../styles/globals.css';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
@@ -12,6 +12,7 @@ import { SiteChrome } from '@/components/layout/site-chrome';
 import { getSettings, resolveContent } from '@/lib/settings';
 import { getCategories } from '@/lib/catalog';
 import { SITE_URL } from '@/lib/site';
+import { accentForeground } from '@/lib/contrast';
 
 // Self-hosted via next/font: no render-blocking stylesheet round-trip to Google,
 // automatic `font-display: swap`, and a size-adjusted fallback so swapping the
@@ -40,6 +41,14 @@ const jetbrainsMono = JetBrains_Mono({
   display: 'swap',
 });
 
+// Display face for the neon-cyber headings; body copy stays Plus Jakarta.
+const grotesk = Space_Grotesk({
+  subsets: ['latin'],
+  weight: ['500', '600', '700'],
+  variable: '--font-grotesk',
+  display: 'swap',
+});
+
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();
   const content = resolveContent(s);
@@ -62,8 +71,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  // Matches the navy utility bar, so the mobile browser chrome blends into it.
-  themeColor: '#0b1424',
+  // Matches the dark storefront background.
+  themeColor: '#05060d',
   width: 'device-width',
   initialScale: 1,
 };
@@ -74,27 +83,36 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const content = resolveContent(s);
   const brand = { siteName: s.siteName, logoUrl: s.logoUrl ?? null, tagline: s.tagline ?? null };
 
-  // Runtime accent override from admin branding — applies across light + dark.
-  // Sets the --color-* theme tokens (not the aliases), so both the hand-written
-  // `var(--accent)` call sites AND the Tailwind-generated utilities that read
-  // --color-accent pick the brand colour up without a redeploy.
+  // Runtime accent override from admin branding — applies to both the
+  // storefront (:root) and the admin surface (.theme-classic), so admin
+  // previews the brand accent too instead of staying pinned to its hardcoded
+  // #0b57d0. Sets the --color-* theme tokens (not the aliases), so both the
+  // hand-written `var(--accent)` call sites AND the Tailwind-generated
+  // utilities that read --color-accent pick the brand colour up without a
+  // redeploy. --color-accent-fg is recomputed from the accent's WCAG relative
+  // luminance too — an arbitrary admin-picked accent can be light or dark, and
+  // the fixed #03121a default only reads well against light ones.
   const accentCss =
     s.accentColor || s.accentColor2
-      ? `:root,.dark{${s.accentColor ? `--color-accent:${s.accentColor};--color-ring:${s.accentColor};` : ''}${s.accentColor2 ? `--color-accent-2:${s.accentColor2};` : ''}}`
+      ? `:root,.theme-classic{${
+          s.accentColor
+            ? `--color-accent:${s.accentColor};--color-ring:${s.accentColor};--color-accent-fg:${accentForeground(s.accentColor)};`
+            : ''
+        }${s.accentColor2 ? `--color-accent-2:${s.accentColor2};` : ''}}`
       : null;
 
   return (
     <html
       lang={locale}
       suppressHydrationWarning
-      className={`${jakarta.variable} ${bangla.variable} ${jetbrainsMono.variable}`}
+      className={`${jakarta.variable} ${bangla.variable} ${jetbrainsMono.variable} ${grotesk.variable}`}
     >
       <body>
         {accentCss && <style dangerouslySetInnerHTML={{ __html: accentCss }} />}
         <div className="relative z-10 min-h-screen flex flex-col">
           <a
             href="#main"
-            className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-[color:var(--accent)] focus:text-white focus:font-medium"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-[color:var(--accent)] focus:text-[color:var(--accent-fg)] focus:font-medium"
           >
             {t('skipToContent')}
           </a>

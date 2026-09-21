@@ -13,6 +13,7 @@ import { CouponField } from '@/components/shop/coupon-field';
 import { CartRecommendations } from '@/components/shop/cart-recommendations';
 import { ProductThumb } from '@/components/shop/product-thumb';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
+import { CartOrbLoader } from '@/components/three/cart-orb-loader';
 
 export default function CartPage() {
   const t = useTranslations('cart');
@@ -54,9 +55,12 @@ export default function CartPage() {
   return (
     <div className="shell py-6">
       <Breadcrumbs homeLabel={tNav('home')} items={[{ label: t('title') }]} />
-      <h1 className="mt-4 mb-6 text-2xl md:text-3xl font-extrabold tracking-tight">
-        {t('title')} <span className="text-[color:var(--fg-muted)] font-semibold text-lg">({t('itemCount', { count: itemCount })})</span>
-      </h1>
+      <div className="mt-4 mb-6 flex items-center gap-4">
+        <CartOrbLoader count={itemCount} />
+        <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight">
+          {t('title')} <span className="text-[color:var(--fg-muted)] font-semibold text-lg">({t('itemCount', { count: itemCount })})</span>
+        </h1>
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px] items-start">
         <div className="card !p-0 overflow-hidden">
@@ -79,7 +83,7 @@ export default function CartPage() {
                 <li key={`${item.productId}-${item.variantId ?? ''}`} className="p-4 md:px-5">
                   <div className="grid grid-cols-[72px_minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_120px_140px_120px_44px] gap-x-4 gap-y-3 items-center">
                     <div className="flex items-center gap-4 min-w-0 md:col-span-1 col-span-2">
-                      <Link href={`/products/${item.slug}`} className="relative w-[72px] h-[72px] shrink-0 rounded-[var(--radius-ctl)] overflow-hidden border border-[color:var(--border)] bg-white">
+                      <Link href={`/products/${item.slug}`} className="relative w-[72px] h-[72px] shrink-0 rounded-[var(--radius-ctl)] overflow-hidden border border-[color:var(--border)] [background:var(--image-well)]">
                         <ProductThumb src={q?.image ?? item.image} sizes="72px" />
                       </Link>
                       <div className="min-w-0">
@@ -96,7 +100,7 @@ export default function CartPage() {
                     </div>
 
                     <div className="col-start-2 md:col-start-auto flex items-center gap-3">
-                      <div className="inline-flex items-center h-10 border border-[#d0d5dd] rounded-[var(--radius-ctl)] overflow-hidden">
+                      <div className="inline-flex items-center h-10 border border-[color:var(--border-strong)] rounded-[var(--radius-ctl)] overflow-hidden">
                         <button
                           type="button"
                           onClick={() => updateQty(item.productId, item.quantity - 1, item.variantId)}
@@ -166,7 +170,7 @@ export default function CartPage() {
                   ? t('addForFreeShipping', { amount: formatPrice(toFreeShipping, currency) })
                   : t('freeShippingUnlocked')}
               </p>
-              <div className="mt-2.5 h-2 rounded-full bg-white overflow-hidden" aria-hidden>
+              <div className="mt-2.5 h-2 rounded-full bg-[color:var(--bg-soft)] overflow-hidden" aria-hidden>
                 <div className="h-full rounded-full bg-[color:var(--color-success)] transition-[width] duration-500" style={{ width: `${freeShipProgress}%` }} />
               </div>
             </div>

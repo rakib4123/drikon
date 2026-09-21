@@ -1,40 +1,39 @@
 @import 'tailwindcss';
 
 /* ═══════════════════════════════════════════════════════════════
-   Design tokens — tech megastore
-   White base, cool grey sections, deep-navy chrome, one strong
-   accent. Declared in @theme so Tailwind generates utilities
-   (bg-bg, text-fg-muted, bg-ink, text-sale, …). Tailwind emits each
-   as a real custom property on :root, so the admin brand settings
-   can still override --color-accent at runtime (see layout.tsx) and
+   Design tokens — dark neon cyber
+   Declared in @theme so Tailwind generates utilities (bg-bg,
+   text-fg-muted, bg-ink, text-sale, …). Tailwind emits each as a
+   real custom property on :root, so the admin brand settings can
+   still override --color-accent at runtime (see layout.tsx) and
    every utility follows.
 
-   The accent MUST stay dark enough to carry white text — the whole
-   codebase renders `text-white` on it. That is why the default is a
-   tech blue rather than the yellow many megastore themes use.
+   Dark neon cyber. Text on accent fills uses --color-accent-fg (dark), not
+   white — the accent is a bright cyan.
    ═══════════════════════════════════════════════════════════════ */
 @theme {
-  --color-bg:        #ffffff;
-  --color-bg-soft:   #f3f5f8;
-  --color-fg:        #111827;
-  --color-fg-muted:  #667085;
-  --color-border:    #e4e7ec;
-  --color-accent:    #0b57d0;
-  --color-accent-2:  #ff7a00;
-  --color-ring:      #0b57d0;
+  --color-bg:        #05060d;
+  --color-bg-soft:   #0b0e1c;
+  --color-fg:        #e6ecff;
+  --color-fg-muted:  #8a93b8;
+  --color-border:    rgba(120, 140, 255, 0.16);
+  --color-accent:    #22e5ff;
+  --color-accent-2:  #8b5cf6;
+  --color-accent-fg: #03121a;
+  --color-ring:      #22e5ff;
 
-  /* Chrome and commerce signals. */
-  --color-ink:       #0b1424;  /* utility bar, footer, admin sidebar */
-  --color-ink-soft:  #16223a;
-  --color-sale:      #e0302f;  /* discount badges, sale prices */
-  --color-success:   #12a150;
-  --color-star:      #ffb400;
+  --color-ink:       #070914;
+  --color-ink-soft:  #0e1224;
+  --color-sale:      #ff2e88;
+  --color-success:   #2ee59d;
+  --color-star:      #ffc940;
 
   --font-sans: var(--font-jakarta), var(--font-bangla), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-grotesk), var(--font-bangla), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
 
-  --radius-card: 10px;
-  --radius-ctl:  8px;
+  --radius-card: 14px;
+  --radius-ctl:  10px;
 
   /* Radix primitives animate off their own data-state rather than Motion —
      AnimatePresence can't drive an exit for content Radix unmounts itself. */
@@ -57,9 +56,13 @@
 @keyframes dk-pop-in  { from { opacity: 0; transform: translateY(-4px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes dk-pop-out { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(-2px) scale(0.98); } }
 
-:root {
-  /* Aliases → the @theme tokens, so existing `var(--accent)` call sites keep
-     working. Overriding --color-accent at runtime flows through both names. */
+/* Aliases → the @theme tokens, so existing `var(--accent)` call sites keep
+   working. Overriding --color-accent at runtime flows through both names.
+   Custom properties resolve where they're declared, so .theme-classic must
+   re-declare these aliases too, or admin would inherit the dark values
+   already resolved on :root. */
+:root,
+.theme-classic {
   --bg:        var(--color-bg);
   --bg-soft:   var(--color-bg-soft);
   --fg:        var(--color-fg);
@@ -67,16 +70,65 @@
   --border:    var(--color-border);
   --accent:    var(--color-accent);
   --accent-2:  var(--color-accent-2);
+  --accent-fg: var(--color-accent-fg);
   --ring:      var(--color-ring);
+  --glow:      color-mix(in srgb, var(--color-accent) 22%, transparent);
+}
 
-  /* Not colour-scale tokens — no utility would be generated, so they stay here. */
-  --glow:      color-mix(in srgb, var(--color-accent) 18%, transparent);
-  --glass:     rgba(255, 255, 255, 0.92);
-  --grid-line: rgba(17, 24, 39, 0.05);
-  --shadow:    rgba(16, 24, 40, 0.08);
+:root {
+  --surface:       rgba(20, 24, 48, 0.55);
+  --surface-solid: #0d1122;
+  --image-well:    radial-gradient(120% 120% at 50% 30%, #f4f7ff 0%, #dfe6f7 100%);
+  --border-strong: rgba(140, 160, 255, 0.32);
+  --glow-edge:     rgba(34, 229, 255, 0.45);
+  --glass:         var(--surface);
+  --grid-line:     rgba(120, 140, 255, 0.07);
+  --shadow:        rgba(0, 0, 0, 0.45);
+  /* Skeleton shimmer highlight — dim on the storefront's dark surfaces, bright
+     on admin's light ones (see .theme-classic below). */
+  --skeleton-shine: rgba(255, 255, 255, 0.06);
+  color-scheme: dark;
+}
+
+/* Admin keeps the previous light megastore look (spec §1). */
+.theme-classic {
+  --color-bg:        #ffffff;
+  --color-bg-soft:   #f3f5f8;
+  --color-fg:        #111827;
+  --color-fg-muted:  #667085;
+  --color-border:    #e4e7ec;
+  --color-accent:    #0b57d0;
+  --color-accent-2:  #ff7a00;
+  --color-accent-fg: #ffffff;
+  --color-ring:      #0b57d0;
+  --color-ink:       #0b1424;
+  --color-ink-soft:  #16223a;
+  --color-sale:      #e0302f;
+  --color-success:   #12a150;
+  --color-star:      #ffb400;
+  --surface:       #ffffff;
+  --surface-solid: #ffffff;
+  --image-well:    #ffffff;
+  --border-strong: #d0d5dd;
+  --skeleton-shine: rgba(255, 255, 255, 0.7);
+  --glow-edge:     color-mix(in srgb, var(--color-accent) 18%, transparent);
+  --radius-card:   10px;
+  --radius-ctl:    8px;
+  --glass:         rgba(255, 255, 255, 0.92);
+  --grid-line:     rgba(17, 24, 39, 0.05);
+  --shadow:        rgba(16, 24, 40, 0.08);
+  color-scheme: light;
+  background: var(--bg);
+  color: var(--fg);
 }
 
 * { border-color: var(--border); }
+/* Unlayered, like the rule above, so it actually beats it: `.input`'s own
+   border-color living inside `@layer components` (below) loses to this
+   universal selector regardless of specificity — CSS cascade layers rank an
+   unlayered author rule above every layered one. Same trick would apply to
+   any other component that needs a stronger border than the page default. */
+.input { border-color: var(--border-strong); }
 
 html, body {
   background: var(--bg);
@@ -93,13 +145,13 @@ html, body {
   border-radius: 4px;
 }
 
-::selection { background: var(--accent); color: #ffffff; }
+::selection { background: var(--accent); color: var(--accent-fg); }
 
 /* ─── Scrollbar ─── */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: #d0d5dd;
+  background: var(--border-strong);
   border-radius: 999px;
   border: 2px solid var(--bg);
 }
@@ -122,17 +174,17 @@ html, body {
 
   /* ─── Headings ─── */
   .display {
-    font-family: var(--font-sans);
+    font-family: var(--font-display);
     font-weight: 800;
     letter-spacing: -0.02em;
     line-height: 1.15;
   }
-  .font-display { font-family: var(--font-sans); }
 
   /* Section header: bold title with an accent underline block — the megastore
      signature, used on every homepage row. */
   .section-title {
     position: relative;
+    font-family: var(--font-display);
     font-size: 1.25rem;
     font-weight: 800;
     letter-spacing: -0.01em;
@@ -180,12 +232,11 @@ html, body {
   }
 
   /* ─── Surfaces ─── */
-  /* Kept for existing call sites; on this design it's an opaque white panel,
-     not frosted glass. */
+  /* Frosted neon glass panel. */
   .glass {
     background: var(--glass);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     border: 1px solid var(--border);
   }
 
@@ -211,18 +262,18 @@ html, body {
   }
   .btn-primary {
     background: var(--accent);
-    color: #ffffff;
+    color: var(--accent-fg);
     border: 1px solid var(--accent);
-    box-shadow: 0 1px 2px var(--shadow);
+    box-shadow: 0 0 0 1px var(--accent), 0 8px 24px -10px var(--glow-edge);
   }
   .btn-primary:hover {
-    background: color-mix(in srgb, var(--accent) 86%, #000);
+    background: color-mix(in srgb, var(--accent) 88%, #fff);
     border-color: color-mix(in srgb, var(--accent) 86%, #000);
-    box-shadow: 0 6px 16px -6px var(--glow);
+    box-shadow: 0 0 0 1px var(--accent), 0 10px 32px -8px var(--glow-edge);
   }
   .btn-ghost {
     border: 1px solid var(--border);
-    background: var(--bg);
+    background: var(--surface);
     color: var(--fg);
   }
   .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
@@ -231,35 +282,43 @@ html, body {
     color: #ffffff;
     border: 1px solid var(--color-ink);
   }
-  .btn-dark:hover { background: var(--accent); border-color: var(--accent); }
+  .btn-dark:hover { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
   .btn-primary:disabled, .btn-ghost:disabled, .btn-dark:disabled { opacity: 0.5; cursor: not-allowed; }
 
   /* ─── Card ─── */
   /* Containers don't move on hover — admin panels and forms were lifting under
      the cursor. Interactive tiles opt in with .card-hover. */
   .card {
-    background: var(--bg);
+    background: var(--surface);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     border: 1px solid var(--border);
     border-radius: var(--radius-card);
     padding: 1.5rem;
-    box-shadow: 0 1px 2px var(--shadow);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 10px 30px -18px var(--shadow);
   }
   .card-hover {
     transition: box-shadow 0.2s ease, border-color 0.2s ease;
   }
   .card-hover:hover {
-    border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
-    box-shadow: 0 12px 28px -14px rgba(16, 24, 40, 0.22);
+    border-color: var(--glow-edge);
+    box-shadow: 0 0 0 1px var(--glow-edge), 0 18px 40px -18px var(--glow);
   }
 
   /* ─── Commerce ─── */
+  /* Dark text, not white: white on the storefront's magenta --color-sale is
+     ~3.5:1 and fails WCAG AA for text this size. `var(--bg)` resolves to the
+     near-black storefront background (#05060d → ~5.8:1 on the magenta fill)
+     and, inside .theme-classic, to admin's white background — so this keeps
+     admin's original white-on-red badge (#ffffff on #e0302f, ~4.5:1)
+     unchanged without a separate override. */
   .badge-sale {
     display: inline-flex;
     align-items: center;
     padding: 0.2rem 0.45rem;
     border-radius: 5px;
     background: var(--color-sale);
-    color: #ffffff;
+    color: var(--bg);
     font-size: 0.7rem;
     font-weight: 800;
     line-height: 1;
@@ -297,8 +356,8 @@ html, body {
     width: 100%;
     padding: 0.65rem 0.85rem;
     border-radius: var(--radius-ctl);
-    background-color: var(--bg);
-    border: 1px solid #d0d5dd;
+    background-color: var(--surface-solid);
+    border: 1px solid var(--border-strong);
     color: var(--fg);
     font-size: 0.9rem;
     transition: border-color 150ms, box-shadow 150ms;
@@ -343,7 +402,7 @@ html, body {
   .skeleton {
     position: relative;
     overflow: hidden;
-    background: #eef0f4;
+    background: var(--bg-soft);
     border-radius: var(--radius-ctl);
   }
   .skeleton::after {
@@ -351,14 +410,51 @@ html, body {
     position: absolute;
     inset: 0;
     transform: translateX(-100%);
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+    background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent);
     animation: shimmer 1.4s infinite;
   }
+  /* Admin keeps its original light skeleton (spec §1) — the dark tokens above
+     are for the storefront's neon surfaces. */
+  .theme-classic .skeleton { background: #eef0f4; }
 
   .text-glow { text-shadow: 0 2px 24px rgba(0, 0, 0, 0.25); }
 
   @keyframes glow-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
   .animate-glow-pulse { animation: glow-pulse 2.4s ease-in-out infinite; }
+
+  .font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
+  .neon-edge { transition: box-shadow 0.2s ease, border-color 0.2s ease; }
+  .neon-edge:hover { border-color: var(--glow-edge); box-shadow: 0 0 0 1px var(--glow-edge), 0 0 28px -6px var(--glow); }
+  .grid-texture {
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+  /* Static stand-in for the WebGL backdrop — always painted, the canvas sits above it. */
+  .space-fallback {
+    background:
+      radial-gradient(60% 50% at 20% 0%, rgba(139, 92, 246, 0.22), transparent 70%),
+      radial-gradient(50% 40% at 90% 10%, rgba(34, 229, 255, 0.16), transparent 70%),
+      linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 56px 56px,
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 56px 56px,
+      var(--bg);
+  }
+
+  /* Admin (.theme-classic) keeps the pre-neon component look — spec §1. */
+  .theme-classic .btn-primary { color: #ffffff; box-shadow: 0 1px 2px var(--shadow); }
+  .theme-classic .btn-primary:hover {
+    background: color-mix(in srgb, var(--accent) 86%, #000);
+    border-color: color-mix(in srgb, var(--accent) 86%, #000);
+    box-shadow: 0 6px 16px -6px var(--glow);
+  }
+  .theme-classic .card { backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: 0 1px 2px var(--shadow); }
+  .theme-classic .card-hover:hover {
+    border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+    box-shadow: 0 12px 28px -14px rgba(16, 24, 40, 0.22);
+  }
+  .theme-classic .display,
+  .theme-classic .section-title { font-family: var(--font-sans); }
 }
 
 @media (prefers-reduced-motion: reduce) {

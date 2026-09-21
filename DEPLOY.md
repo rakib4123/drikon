@@ -78,6 +78,7 @@ repository is public, so any default written here is known to everyone.
    | `NEXT_PUBLIC_APP_URL` | Your production domain, if using a custom one | No — falls back to Vercel's own URL automatically |
    | `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | Your Cloudinary cloud name | Only if using image uploads |
    | `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET` | An unsigned upload preset from your Cloudinary settings | Only if using image uploads |
+   | `NEXT_PUBLIC_MODEL_HOSTS` | Comma-separated origins the storefront's 3D product viewer may fetch `.glb`/`.gltf` models from, e.g. `https://cdn.example.com` | No — Cloudinary is allowed by default. Models must be uncompressed `.glb`/`.gltf` (no Draco/Meshopt compression) |
 
 3. Deploy. Vercel builds and hosts the frontend; no Dockerfile or build config
    needed — the platform handles it.
