@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
+import Image from '@/components/ui/smart-image';
 import { Loader2, Plus, Pencil, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { apiGet, apiPost, apiPatch, apiDelete, ApiError } from '@/lib/api-client';

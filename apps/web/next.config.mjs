@@ -30,6 +30,16 @@ const csp = [
   ...(isDev ? [] : ['upgrade-insecure-requests']),
 ].join('; ');
 
+// Image hosts worth optimising: Cloudinary (admin uploads) and the seed data's
+// hosts. Add more with NEXT_PUBLIC_IMAGE_HOSTS=cdn.example.com,.example.net
+// (a leading dot also matches subdomains).
+const imageHosts = [
+  'res.cloudinary.com',
+  'images.unsplash.com',
+  'dlcdnwebimgs.asus.com',
+  ...(process.env.NEXT_PUBLIC_IMAGE_HOSTS ?? '').split(',').map((h) => h.trim()).filter(Boolean),
+];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -43,7 +53,19 @@ const nextConfig = {
   // Product images can come from any CDN an admin pastes in, so allow any
   // HTTPS host (Next still optimizes + proxies them).
   images: {
-    remotePatterns: [{ protocol: 'https', hostname: '**' }],
+    // Only these hosts go through /_next/image. It used to be `https://**`,
+    // which made the optimizer an open image proxy on the hosting bill. Images
+    // from other hosts still render — components/ui/smart-image.tsx loads them
+    // straight from the source instead.
+    remotePatterns: imageHosts.map((host) =>
+      host.startsWith('.')
+        ? { protocol: 'https', hostname: `**${host}` }
+        : { protocol: 'https', hostname: host },
+    ),
+  },
+  env: {
+    // Read by smart-image.tsx to decide which images to optimise.
+    IMAGE_HOSTS: imageHosts.join(','),
   },
   experimental: {
     optimizePackageImports: ['lucide-react', 'motion'],

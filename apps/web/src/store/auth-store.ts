@@ -9,6 +9,8 @@ interface AuthState {
   fetchMe: () => Promise<void>;
   login: (input: { email: string; password: string; twoFactorCode?: string }) => Promise<{ requiresTwoFactor: boolean }>;
   register: (input: { name: string; email: string; password: string }) => Promise<{ message: string }>;
+  /** Finishes a sign-in waiting on its second factor (Google sign-in for a 2FA account). */
+  verifyTwoFactor: (code: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -40,6 +42,13 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ user: result.user });
     }
     return { requiresTwoFactor: result.requiresTwoFactor };
+  },
+
+  async verifyTwoFactor(code) {
+    await apiPost('/api/v1/auth/2fa/verify', { code });
+    // The verify response has only the JWT summary; /me has the full profile.
+    set({ initialized: false });
+    await useAuthStore.getState().fetchMe();
   },
 
   async register(input) {

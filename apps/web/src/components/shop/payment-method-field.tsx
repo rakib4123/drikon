@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Banknote, Smartphone } from 'lucide-react';
+import { useEffect, useId, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { Banknote, Smartphone, Check, Loader2 } from 'lucide-react';
 import { apiGet } from '@/lib/api-client';
 import { formatPrice } from '@/lib/utils';
 import type { PaymentInput, PaymentMethod } from '@drikon/shared-types';
@@ -22,6 +23,8 @@ export function PaymentMethodField({
   currency: string;
   onChange: (payment: PaymentInput | null) => void;
 }) {
+  const t = useTranslations('checkout');
+  const ids = useId();
   const [settings, setSettings] = useState<SettingsSubset | null>(null);
   const [method, setMethod] = useState<PaymentMethod | null>(null);
   const [payerReference, setPayerReference] = useState('');
@@ -57,92 +60,141 @@ export function PaymentMethodField({
     }
   }, [method, payerReference, providerPaymentId, onChange]);
 
-  if (!settings) return null;
+  if (!settings) {
+    return (
+      <div className="py-4 grid place-items-center text-[color:var(--fg-muted)]">
+        <Loader2 aria-label={t('loading')} className="w-5 h-5 animate-spin" />
+      </div>
+    );
+  }
 
   const bkashOn = settings.bkashEnabled !== false;
   const codOn = settings.codEnabled !== false;
 
   if (!bkashOn && !codOn) {
     return (
-      <div className="card border-red-500/30 bg-red-500/5 text-sm text-red-600">
-        Checkout is temporarily unavailable — no payment method is enabled. Please check back soon.
-      </div>
+      <p role="alert" className="rounded-[var(--radius-ctl)] bg-[color:var(--color-sale)]/8 p-4 text-sm font-semibold text-[color:var(--color-sale)]">
+        {t('noPaymentMethods')}
+      </p>
     );
   }
 
   return (
-    <div className="card space-y-4">
-      <div className="font-semibold">Payment method</div>
-
-      <div className="grid sm:grid-cols-2 gap-3">
+    <div className="space-y-4">
+      <div role="radiogroup" aria-label={t('payment')} className="grid sm:grid-cols-2 gap-3">
         {bkashOn && (
-          <button
-            type="button"
-            onClick={() => setMethod('BKASH_MANUAL')}
-            className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-sm text-left transition-colors ${
-              method === 'BKASH_MANUAL'
-                ? 'border-[color:var(--accent)] bg-[color:var(--accent)]/5'
-                : 'border-[color:var(--border)]'
-            }`}
-          >
-            <Smartphone className="w-4 h-4 shrink-0" />
-            bKash (Send Money)
-          </button>
+          <MethodOption
+            selected={method === 'BKASH_MANUAL'}
+            onSelect={() => setMethod('BKASH_MANUAL')}
+            icon={<Smartphone className="w-5 h-5 text-[#e2136e]" />}
+            title={t('bkash')}
+            subtitle={t('bkashSub')}
+          />
         )}
         {codOn && (
-          <button
-            type="button"
-            onClick={() => setMethod('COD')}
-            className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-sm text-left transition-colors ${
-              method === 'COD'
-                ? 'border-[color:var(--accent)] bg-[color:var(--accent)]/5'
-                : 'border-[color:var(--border)]'
-            }`}
-          >
-            <Banknote className="w-4 h-4 shrink-0" />
-            Cash on delivery
-          </button>
+          <MethodOption
+            selected={method === 'COD'}
+            onSelect={() => setMethod('COD')}
+            icon={<Banknote className="w-5 h-5 text-[color:var(--color-success)]" />}
+            title={t('cod')}
+            subtitle={t('codSub')}
+          />
         )}
       </div>
 
       {method === 'BKASH_MANUAL' && (
-        <div className="space-y-3 pt-1">
-          <p className="text-xs text-[color:var(--fg-muted)] leading-relaxed">
-            {settings.bkashInstructions ||
-              `Open bKash → Send Money → send ${formatPrice(total, currency)} to ${
-                settings.bkashNumber ?? 'our bKash number'
-              } → enter the sender number and Transaction ID below.`}
-          </p>
-          <div>
-            <span className="block text-xs font-medium text-[color:var(--fg-muted)] mb-1.5">
-              Your bKash number
-            </span>
-            <input
-              className="input"
-              value={payerReference}
-              onChange={(e) => setPayerReference(e.target.value)}
-              placeholder="01XXXXXXXXX"
-            />
+        <div className="rounded-[var(--radius-card)] border border-[color:var(--border)] bg-[color:var(--bg-soft)]/60 p-4 space-y-4">
+          {/* Always shown, whatever the admin's custom instructions say: custom
+              instructions used to replace this text entirely, and it was the only
+              place the amount appeared. */}
+          <div className="grid sm:grid-cols-2 gap-3">
+            <div className="rounded-[var(--radius-ctl)] bg-white border border-[color:var(--border)] p-3">
+              <div className="text-xs font-semibold text-[color:var(--fg-muted)]">{t('amountToSend')}</div>
+              <div className="price-now text-xl mt-0.5">{formatPrice(total, currency)}</div>
+            </div>
+            {settings.bkashNumber && (
+              <div className="rounded-[var(--radius-ctl)] bg-white border border-[color:var(--border)] p-3">
+                <div className="text-xs font-semibold text-[color:var(--fg-muted)]">{t('sendTo')}</div>
+                <div className="font-mono text-lg font-bold mt-0.5 select-all">{settings.bkashNumber}</div>
+              </div>
+            )}
           </div>
-          <div>
-            <span className="block text-xs font-medium text-[color:var(--fg-muted)] mb-1.5">
-              Transaction ID (TrxID)
-            </span>
-            <input
-              className="input"
-              value={providerPaymentId}
-              onChange={(e) => setProviderPaymentId(e.target.value)}
-              placeholder="e.g. 8N7A6C5D4E"
-            />
+
+          <p className="text-sm text-[color:var(--fg-muted)] leading-relaxed">
+            {settings.bkashInstructions || t('bkashSteps')}
+          </p>
+
+          <div className="grid sm:grid-cols-2 gap-3">
+            <label className="block" htmlFor={`${ids}-payer`}>
+              <span className="block text-[13px] font-semibold mb-1.5">{t('yourBkashNumber')}</span>
+              <input
+                id={`${ids}-payer`}
+                className="input"
+                type="tel"
+                inputMode="tel"
+                value={payerReference}
+                onChange={(e) => setPayerReference(e.target.value)}
+                placeholder="01XXXXXXXXX"
+              />
+            </label>
+            <label className="block" htmlFor={`${ids}-trx`}>
+              <span className="block text-[13px] font-semibold mb-1.5">{t('trxId')}</span>
+              <input
+                id={`${ids}-trx`}
+                className="input font-mono uppercase"
+                autoCapitalize="characters"
+                spellCheck={false}
+                value={providerPaymentId}
+                onChange={(e) => setProviderPaymentId(e.target.value)}
+                placeholder="8N7A6C5D4E"
+              />
+            </label>
           </div>
         </div>
       )}
 
       {method === 'COD' && (
-        <p className="text-xs text-[color:var(--fg-muted)]">
-          Pay {formatPrice(total, currency)} in cash when your order arrives.
+        <p className="rounded-[var(--radius-ctl)] bg-[color:var(--bg-soft)] p-4 text-sm">
+          {t('codNote', { amount: formatPrice(total, currency) })}
         </p>
       )}
     </div>
+  );
+}
+
+function MethodOption({
+  selected,
+  onSelect,
+  icon,
+  title,
+  subtitle,
+}: {
+  selected: boolean;
+  onSelect: () => void;
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+}) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={selected}
+      onClick={onSelect}
+      className={`relative flex items-center gap-3 rounded-[var(--radius-card)] border-2 p-4 text-left transition-colors ${
+        selected ? 'border-[color:var(--accent)] bg-[color:var(--accent)]/5' : 'border-[color:var(--border)] hover:border-[#d0d5dd]'
+      }`}
+    >
+      <span className="w-10 h-10 rounded-full bg-white border border-[color:var(--border)] grid place-items-center shrink-0">{icon}</span>
+      <span className="min-w-0">
+        <span className="block font-bold text-sm">{title}</span>
+        <span className="block text-xs text-[color:var(--fg-muted)]">{subtitle}</span>
+      </span>
+      {selected && (
+        <span className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-[color:var(--accent)] text-white grid place-items-center">
+          <Check aria-hidden className="w-3 h-3" />
+        </span>
+      )}
+    </button>
   );
 }

@@ -1,12 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { motion } from 'motion/react';
+import { useTranslations } from 'next-intl';
 import { Zap } from 'lucide-react';
+import type { ProductSummary } from '@drikon/shared-types';
 import { apiGet } from '@/lib/api-client';
-import { formatPrice } from '@/lib/utils';
+import { ProductCard } from './product-card';
 
 interface ActiveSale {
   id: string;
@@ -14,29 +13,27 @@ interface ActiveSale {
   endsAt: string;
   items: {
     salePrice: string | number;
-    product: {
-      id: string;
-      name: string;
-      slug: string;
-      price: string | number;
-      currency: string;
-      images: { url: string; alt: string | null }[];
-    };
+    soldCount: number;
+    inventoryCap: number | null;
+    product: Omit<ProductSummary, 'salePrice' | 'saleEndsAt'>;
   }[];
 }
 
-function useCountdown(target: string | null) {
-  const [left, setLeft] = useState('');
+type Remaining = { d: number; h: number; m: number; s: number; done: boolean };
+
+function useCountdown(target: string | null): Remaining | null {
+  const [left, setLeft] = useState<Remaining | null>(null);
   useEffect(() => {
     if (!target) return;
     const tick = () => {
-      const ms = new Date(target).getTime() - Date.now();
-      if (ms <= 0) return setLeft('00:00:00');
-      const h = Math.floor(ms / 3.6e6);
-      const m = Math.floor((ms % 3.6e6) / 6e4);
-      const s = Math.floor((ms % 6e4) / 1000);
-      const pad = (n: number) => String(n).padStart(2, '0');
-      setLeft(`${pad(h)}:${pad(m)}:${pad(s)}`);
+      const ms = Math.max(0, new Date(target).getTime() - Date.now());
+      setLeft({
+        d: Math.floor(ms / 8.64e7),
+        h: Math.floor((ms % 8.64e7) / 3.6e6),
+        m: Math.floor((ms % 3.6e6) / 6e4),
+        s: Math.floor((ms % 6e4) / 1000),
+        done: ms === 0,
+      });
     };
     tick();
     const id = setInterval(tick, 1000);
@@ -45,7 +42,13 @@ function useCountdown(target: string | null) {
   return left;
 }
 
+/**
+ * "Deal of the day" row. Renders only while a flash sale is live, using the
+ * standard product card so sale items look and behave like every other product
+ * (the sale price comes through `salePrice`, which the card already honours).
+ */
 export function FlashSaleSection() {
+  const t = useTranslations('home');
   const [sale, setSale] = useState<ActiveSale | null>(null);
   const left = useCountdown(sale?.endsAt ?? null);
 
@@ -55,56 +58,70 @@ export function FlashSaleSection() {
       .catch(() => setSale(null));
   }, []);
 
-  if (!sale || sale.items.length === 0) return null;
+  if (!sale || sale.items.length === 0 || left?.done) return null;
+
+  const products: ProductSummary[] = sale.items.slice(0, 5).map((it) => ({
+    ...it.product,
+    salePrice: it.salePrice,
+    saleEndsAt: sale.endsAt,
+  }));
 
   return (
-    <section className="max-w-7xl mx-auto px-6 py-12">
-      <div className="relative overflow-hidden rounded-3xl glass aurora p-6 md:p-8">
-        <div className="relative z-10 flex flex-wrap items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-xl bg-[color:var(--accent)]/15 grid place-items-center text-[color:var(--accent)]">
-              <Zap className="w-5 h-5" />
+    <section className="shell py-8" aria-labelledby="deal-heading">
+      <div className="rounded-[var(--radius-card)] border-2 border-[color:var(--accent-2)] bg-white p-4 sm:p-6">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mb-5">
+          <h2 id="deal-heading" className="flex items-center gap-2.5 text-xl md:text-2xl font-extrabold">
+            <span className="w-9 h-9 rounded-full bg-[color:var(--accent-2)] text-[color:var(--color-ink)] grid place-items-center">
+              <Zap aria-hidden className="w-5 h-5 fill-current" />
             </span>
-            <div>
-              <div className="text-xs font-mono uppercase tracking-[0.2em] text-[color:var(--accent)]">Flash sale</div>
-              <h2 className="display text-2xl">{sale.name}</h2>
+            {sale.name}
+          </h2>
+
+          {left && (
+            <div className="flex items-center gap-2" role="timer" aria-label={t('endsIn')}>
+              <span className="text-sm font-semibold text-[color:var(--fg-muted)]">{t('endsIn')}</span>
+              <div className="flex items-center gap-1 font-extrabold tabular-nums">
+                {left.d > 0 && <TimeBox value={left.d} unit={t('daysShort')} />}
+                <TimeBox value={left.h} unit={t('hoursShort')} />
+                <TimeBox value={left.m} unit={t('minutesShort')} />
+                <TimeBox value={left.s} unit={t('secondsShort')} />
+              </div>
             </div>
-          </div>
-          <div className="text-right">
-            <div className="text-[11px] text-[color:var(--fg-muted)] uppercase tracking-wider mb-1">Ends in</div>
-            <div className="font-mono text-2xl font-bold tabular-nums neon-text">{left}</div>
-          </div>
+          )}
+
         </div>
 
-        <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          {sale.items.slice(0, 5).map((it) => {
-            const orig = typeof it.product.price === 'string' ? parseFloat(it.product.price) : it.product.price;
-            const sp = typeof it.salePrice === 'string' ? parseFloat(it.salePrice) : it.salePrice;
-            const off = orig > sp ? Math.round(((orig - sp) / orig) * 100) : 0;
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+          {products.map((p, i) => {
+            const it = sale.items[i];
+            const claimed = it.inventoryCap ? Math.min(100, Math.round((it.soldCount / it.inventoryCap) * 100)) : null;
             return (
-              <motion.div key={it.product.id} whileHover={{ y: -4 }}>
-                <Link href={`/products/${it.product.slug}`} className="block rounded-2xl overflow-hidden border border-[color:var(--border)] bg-[color:var(--bg)]">
-                  <div className="relative aspect-square bg-[color:var(--bg-soft)]">
-                    {it.product.images?.[0]?.url && (
-                      <Image src={it.product.images[0].url} alt={it.product.images[0].alt ?? it.product.name} fill sizes="20vw" className="object-cover" />
-                    )}
-                    {off > 0 && (
-                      <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-bold rounded-md bg-[color:var(--accent)] text-white">−{off}%</span>
-                    )}
-                  </div>
-                  <div className="p-3">
-                    <div className="text-xs font-medium line-clamp-1">{it.product.name}</div>
-                    <div className="flex items-baseline gap-1.5 mt-1">
-                      <span className="text-sm font-bold text-[color:var(--accent)]">{formatPrice(sp, it.product.currency)}</span>
-                      {off > 0 && <span className="text-[11px] text-[color:var(--fg-muted)] line-through">{formatPrice(orig, it.product.currency)}</span>}
+              <div key={p.id} className="flex flex-col gap-2 h-full">
+                <ProductCard product={p} />
+                {claimed !== null && (
+                  <div>
+                    <div className="h-1.5 rounded-full bg-[color:var(--bg-soft)] overflow-hidden">
+                      <div className="h-full rounded-full bg-[color:var(--accent-2)]" style={{ width: `${claimed}%` }} />
+                    </div>
+                    <div className="mt-1 text-[11.5px] text-[color:var(--fg-muted)]">
+                      {t('claimed', { percent: claimed })}
                     </div>
                   </div>
-                </Link>
-              </motion.div>
+                )}
+              </div>
             );
           })}
         </div>
       </div>
     </section>
+  );
+}
+
+function TimeBox({ value, unit }: { value: number; unit: string }) {
+  return (
+    <span className="inline-flex items-baseline gap-0.5 rounded-md bg-[color:var(--color-ink)] text-white px-2 py-1 text-sm">
+      {String(value).padStart(2, '0')}
+      <span className="text-[10px] font-semibold text-white/60">{unit}</span>
+    </span>
   );
 }

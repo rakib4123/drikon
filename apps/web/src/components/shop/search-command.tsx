@@ -2,13 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import Image from '@/components/ui/smart-image';
 import { motion, useReducedMotion } from 'motion/react';
 import { Search, X, Loader2, CornerDownLeft, Mic, MicOff, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLocale, useTranslations } from 'next-intl';
 import type { ProductListResponse, ProductSummary } from '@drikon/shared-types';
 import { apiGet } from '@/lib/api-client';
+import { OPEN_SEARCH_EVENT, useProductSearch, type OpenSearchDetail } from '@/lib/use-product-search';
 import { cn, formatPrice } from '@/lib/utils';
 import { parseVoiceCommand } from '@/lib/voice-command';
 import { useCartStore } from '@/store/cart-store';
@@ -56,8 +57,6 @@ export function SearchCommand() {
   const reduceMotion = useReducedMotion();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<ProductSummary[]>([]);
-  const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
   const [micBlocked, setMicBlocked] = useState(false);
@@ -110,34 +109,8 @@ export function SearchCommand() {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  // Debounced live search.
-  useEffect(() => {
-    const q = query.trim();
-    if (q.length < 2) {
-      setResults([]);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    const ctrl = new AbortController();
-    const timer = setTimeout(async () => {
-      try {
-        const data = await apiGet<ProductListResponse>(
-          `/api/v1/products?search=${encodeURIComponent(q)}&limit=6`,
-          { signal: ctrl.signal },
-        );
-        setResults(data.items);
-      } catch {
-        // Aborted or failed — leave prior results, just stop the spinner.
-      } finally {
-        setLoading(false);
-      }
-    }, 250);
-    return () => {
-      clearTimeout(timer);
-      ctrl.abort();
-    };
-  }, [query]);
+  // Debounced live search — shared with the header search field.
+  const { results, loading, setResults } = useProductSearch(query);
 
   /** Clears the transient state whenever the dialog closes, however it closed. */
   const onOpenChange = useCallback((next: boolean) => {
@@ -253,6 +226,18 @@ export function SearchCommand() {
     stoppedByUserRef.current = true;
     recognitionRef.current?.stop();
   }, []);
+
+  // Other components (the header's mic button) open the palette with an event
+  // rather than sharing state, so the header stays independent of this dialog.
+  useEffect(() => {
+    const onOpen = (e: Event) => {
+      const { voice } = (e as CustomEvent<OpenSearchDetail>).detail ?? {};
+      setOpen(true);
+      if (voice && speechSupported && !micBlocked) startListening();
+    };
+    window.addEventListener(OPEN_SEARCH_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_SEARCH_EVENT, onOpen);
+  }, [speechSupported, micBlocked, startListening]);
 
   const handleMicClick = useCallback(() => {
     if (micBlocked) {

@@ -54,22 +54,25 @@ export function BrandMark({
   href = '/',
   className,
   showTagline = false,
+  inverted = false,
 }: {
   brand: BrandInfo;
   href?: string | null;
   className?: string;
   showTagline?: boolean;
+  /** White mark for dark surfaces (footer, admin sidebar). */
+  inverted?: boolean;
 }) {
   const inner = brand.logoUrl ? (
     // eslint-disable-next-line @next/next/no-img-element
     <img src={brand.logoUrl} alt={brand.siteName} className="h-9 w-auto object-contain" />
   ) : (
     <>
-      <NetworkIcon className="w-9 h-9 text-[color:var(--fg)] transition-transform group-hover:scale-105 shrink-0" />
+      <NetworkIcon className={`w-9 h-9 transition-transform group-hover:scale-105 shrink-0 ${inverted ? 'text-white' : 'text-[color:var(--fg)]'}`} />
       <span className="flex flex-col leading-none">
-        <span className="font-display text-xl tracking-tight">{brand.siteName}</span>
+        <span className={`font-display text-[22px] font-extrabold tracking-tight ${inverted ? 'text-white' : ''}`}>{brand.siteName}</span>
         {showTagline && brand.tagline && (
-          <span className="text-[10px] font-medium uppercase tracking-[0.25em] text-[color:var(--accent)] mt-1">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--accent-2)] mt-1">
             {brand.tagline}
           </span>
         )}

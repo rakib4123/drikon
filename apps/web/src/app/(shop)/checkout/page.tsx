@@ -3,10 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Lock, ArrowRight, ShoppingBag } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
+import { Loader2, Lock, ArrowRight, ShoppingCart, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   ShippingAddressSchema,
@@ -16,19 +16,26 @@ import {
 } from '@drikon/shared-types';
 import { apiPost, ApiError } from '@/lib/api-client';
 import { formatPrice } from '@/lib/utils';
-import { CouponField, type CouponState } from '@/components/shop/coupon-field';
+import { localize } from '@/lib/localize';
+import type { Locale } from '@/i18n/request';
+import { useCartQuote } from '@/lib/use-cart-quote';
+import { CouponField } from '@/components/shop/coupon-field';
 import { PaymentMethodField } from '@/components/shop/payment-method-field';
+import { ProductThumb } from '@/components/shop/product-thumb';
+import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { useCartStore } from '@/store/cart-store';
 import { useAuthStore } from '@/store/auth-store';
 
-const FREE_SHIPPING_THRESHOLD = 3000;
-const FLAT_SHIPPING_FEE = 60;
-
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, subtotal, clear } = useCartStore();
+  const t = useTranslations('checkout');
+  const tCart = useTranslations('cart');
+  const tNav = useTranslations('nav');
+  const locale = useLocale() as Locale;
+  const { items, clear } = useCartStore();
   const couponCode = useCartStore((s) => s.couponCode);
   const { user, initialized, fetchMe } = useAuthStore();
+  const { quote, loading: quoting, issueFor } = useCartQuote();
 
   useEffect(() => {
     if (!initialized) fetchMe();
@@ -47,167 +54,184 @@ export default function CheckoutPage() {
     defaultValues: { country: 'BD' },
   });
 
-  const [coupon, setCoupon] = useState<CouponState>({ code: null, discount: 0, freeShipping: false });
-  const onCoupon = useCallback((s: CouponState) => setCoupon(s), []);
-
   const [payment, setPayment] = useState<PaymentInput | null>(null);
   const onPayment = useCallback((p: PaymentInput | null) => setPayment(p), []);
-
-  const sub = subtotal();
-  const currency = items[0]?.currency ?? 'BDT';
-  const freeShip = coupon.freeShipping || sub >= FREE_SHIPPING_THRESHOLD;
-  const shipping = freeShip ? 0 : items.length ? FLAT_SHIPPING_FEE : 0;
-  const discount = Math.min(coupon.discount, sub);
-  const total = Math.max(0, sub + shipping - discount);
+  const onCoupon = useCallback(() => {}, []);
   const lines = useMemo(
     () => items.map((i) => ({ productId: i.productId, quantity: i.quantity, unitPrice: i.unitPrice })),
     [items],
   );
 
+  const currency = quote?.currency ?? items[0]?.currency ?? 'BDT';
+  const hasIssues = (quote?.issues.length ?? 0) > 0;
+  // Never let an order go in against a stale or missing quote: the bKash amount
+  // shown to the customer must be the amount the order will record.
+  const canPlace = !!quote && !quoting && !hasIssues && !!payment;
+
   const onSubmit = async (address: ShippingAddressInput) => {
-    if (items.length === 0) {
-      toast.error('Your cart is empty');
-      return;
-    }
-    if (!payment) {
-      toast.error('Please choose and complete a payment method');
-      return;
-    }
+    if (!canPlace) return;
     try {
       const order = await apiPost<OrderSummary>('/api/v1/orders', {
-        items: items.map((i) => ({
-          productId: i.productId,
-          variantId: i.variantId,
-          quantity: i.quantity,
-        })),
+        items: items.map((i) => ({ productId: i.productId, variantId: i.variantId, quantity: i.quantity })),
         shippingAddress: address,
         couponCode: couponCode ?? undefined,
         payment,
       });
       clear();
-      toast.success('Order placed!', { description: order.orderNumber });
+      toast.success(t('orderPlaced'), { description: order.orderNumber });
       router.push(`/orders/${order.orderNumber}?new=1`);
     } catch (err) {
-      const message =
-        err instanceof ApiError ? err.message : 'Could not place your order. Please try again.';
-      toast.error('Checkout failed', { description: message });
+      toast.error(t('checkoutFailed'), { description: err instanceof ApiError ? err.message : t('tryAgain') });
     }
   };
 
   if (!user) {
     return (
-      <div className="max-w-7xl mx-auto px-6 py-24 text-center text-[color:var(--fg-muted)]">
-        Loading…
+      <div className="shell py-24 grid place-items-center text-[color:var(--fg-muted)]">
+        <Loader2 aria-label={t('loading')} className="w-6 h-6 animate-spin" />
       </div>
     );
   }
 
   if (items.length === 0) {
     return (
-      <div className="max-w-3xl mx-auto px-6 py-24 text-center">
-        <div className="w-14 h-14 rounded-2xl bg-[color:var(--bg-soft)] grid place-items-center mx-auto mb-5 text-[color:var(--fg-muted)]">
-          <ShoppingBag className="w-6 h-6" />
+      <div className="shell py-16">
+        <div className="card max-w-lg mx-auto text-center !py-14">
+          <div className="w-16 h-16 rounded-full bg-[color:var(--bg-soft)] grid place-items-center mx-auto mb-5 text-[color:var(--fg-muted)]">
+            <ShoppingCart className="w-7 h-7" />
+          </div>
+          <h1 className="text-2xl font-extrabold mb-2">{t('nothingTitle')}</h1>
+          <p className="text-[color:var(--fg-muted)] mb-6">{t('nothingBody')}</p>
+          <Link href="/products" className="btn-primary">
+            {tCart('browseShop')} <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
-        <h1 className="display text-3xl mb-2">Nothing to check out</h1>
-        <p className="text-[color:var(--fg-muted)] mb-6">Add something to your cart first.</p>
-        <Link href="/products" className="btn-primary">
-          Browse the shop <ArrowRight className="w-4 h-4" />
-        </Link>
       </div>
     );
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-14">
-      <h1 className="display text-4xl mb-8">Checkout</h1>
+    <div className="shell py-6">
+      <Breadcrumbs homeLabel={tNav('home')} items={[{ label: tCart('title'), href: '/cart' }, { label: t('title') }]} />
+      <h1 className="mt-4 mb-6 text-2xl md:text-3xl font-extrabold tracking-tight">{t('title')}</h1>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="grid lg:grid-cols-[1fr_360px] gap-10">
-        {/* ── Shipping form ── */}
-        <div className="space-y-4">
-          <div className="card space-y-4">
-            <div className="font-semibold">Shipping address</div>
-
-            <Field label="Full name" error={errors.fullName?.message}>
-              <input className="input" {...register('fullName')} placeholder="Jane Doe" />
-            </Field>
-            <Field label="Phone" error={errors.phone?.message}>
-              <input className="input" {...register('phone')} placeholder="+880 1XXX-XXXXXX" />
-            </Field>
-            <Field label="Address line 1" error={errors.line1?.message}>
-              <input className="input" {...register('line1')} placeholder="House, road, area" />
-            </Field>
-            <Field label="Address line 2 (optional)" error={errors.line2?.message}>
-              <input className="input" {...register('line2')} placeholder="Apartment, landmark" />
-            </Field>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Field label="City" error={errors.city?.message}>
-                <input className="input" {...register('city')} placeholder="Dhaka" />
+      <form onSubmit={handleSubmit(onSubmit)} className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_400px] items-start">
+        <div className="space-y-5">
+          <section className="card" aria-labelledby="step-address">
+            <StepHeading id="step-address" n={1} title={t('shippingAddress')} />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label={t('fullName')} error={errors.fullName?.message} className="sm:col-span-2">
+                <input className="input" autoComplete="name" {...register('fullName')} />
               </Field>
-              <Field label="State / Division (optional)" error={errors.state?.message}>
-                <input className="input" {...register('state')} placeholder="Dhaka" />
+              <Field label={t('phone')} error={errors.phone?.message}>
+                <input className="input" type="tel" autoComplete="tel" {...register('phone')} placeholder="+880 1XXX-XXXXXX" />
               </Field>
+              <Field label={t('city')} error={errors.city?.message}>
+                <input className="input" autoComplete="address-level2" {...register('city')} />
+              </Field>
+              <Field label={t('line1')} error={errors.line1?.message} className="sm:col-span-2">
+                <input className="input" autoComplete="address-line1" {...register('line1')} placeholder={t('line1Placeholder')} />
+              </Field>
+              <Field label={t('line2')} error={errors.line2?.message} className="sm:col-span-2">
+                <input className="input" autoComplete="address-line2" {...register('line2')} placeholder={t('line2Placeholder')} />
+              </Field>
+              <Field label={t('state')} error={errors.state?.message}>
+                <input className="input" autoComplete="address-level1" {...register('state')} />
+              </Field>
+              <Field label={t('postalCode')} error={errors.postalCode?.message}>
+                <input className="input" autoComplete="postal-code" {...register('postalCode')} />
+              </Field>
+              <input type="hidden" {...register('country')} />
             </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Field label="Postal code" error={errors.postalCode?.message}>
-                <input className="input" {...register('postalCode')} placeholder="1207" />
-              </Field>
-              <Field label="Country" error={errors.country?.message}>
-                <input className="input" {...register('country')} placeholder="BD" />
-              </Field>
-            </div>
-          </div>
+          </section>
 
-          <PaymentMethodField total={total} currency={currency} onChange={onPayment} />
+          <section className="card" aria-labelledby="step-payment">
+            <StepHeading id="step-payment" n={2} title={t('payment')} />
+            {quote ? (
+              // The instructions ("send ৳X via bKash") use the server-quoted total.
+              <PaymentMethodField total={quote.total} currency={currency} onChange={onPayment} />
+            ) : (
+              <div className="py-6 grid place-items-center text-[color:var(--fg-muted)]">
+                <Loader2 aria-label={t('loading')} className="w-5 h-5 animate-spin" />
+              </div>
+            )}
+          </section>
         </div>
 
-        {/* ── Order summary ── */}
-        <aside className="card h-fit lg:sticky lg:top-24">
-          <div className="font-semibold mb-4">Order summary</div>
+        <aside className="card lg:sticky lg:top-[140px] space-y-5">
+          <h2 className="text-lg font-extrabold">{t('orderSummary')}</h2>
 
-          <ul className="space-y-3 mb-4 max-h-64 overflow-y-auto">
-            {items.map((item) => (
-              <li key={`${item.productId}-${item.variantId ?? ''}`} className="flex gap-3 text-sm">
-                <div className="relative w-12 h-14 rounded-lg overflow-hidden bg-[color:var(--bg)] shrink-0">
-                  {item.image && (
-                    <Image src={item.image} alt={item.name} fill sizes="48px" className="object-cover" />
-                  )}
-                  <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[color:var(--accent)] text-white text-[10px] font-bold grid place-items-center">
-                    {item.quantity}
-                  </span>
-                </div>
-                <span className="flex-1 min-w-0 line-clamp-2">{item.name}</span>
-                <span className="font-medium shrink-0">
-                  {formatPrice(item.unitPrice * item.quantity, item.currency)}
-                </span>
-              </li>
-            ))}
+          <ul className="space-y-3 max-h-72 overflow-y-auto -mr-2 pr-2 pt-2 -mt-2">
+            {items.map((item) => {
+              const q = quote?.lines.find((l) => l.productId === item.productId && (l.variantId ?? undefined) === item.variantId);
+              const issue = issueFor(item.productId, item.variantId);
+              return (
+                <li key={`${item.productId}-${item.variantId ?? ''}`} className="flex gap-3 text-sm">
+                  <div className="relative w-14 h-14 shrink-0">
+                    <div className="absolute inset-0 rounded-[var(--radius-ctl)] overflow-hidden border border-[color:var(--border)] bg-white">
+                      <ProductThumb src={q?.image ?? item.image} sizes="56px" />
+                    </div>
+                    <span className="absolute -top-1.5 -right-1.5 min-w-5 h-5 px-1 rounded-full bg-[color:var(--fg)] text-white text-[10px] font-bold grid place-items-center">
+                      {item.quantity}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="line-clamp-2 font-medium">{q ? localize(q.name, q.nameBn, locale) : item.name}</span>
+                    {issue && (
+                      <span className="mt-1 flex items-center gap-1 text-xs font-semibold text-[color:var(--color-sale)]">
+                        <AlertTriangle aria-hidden className="w-3.5 h-3.5" />
+                        {issue.reason === 'unavailable' ? tCart('issueUnavailable') : tCart('issueStock', { available: issue.available })}
+                      </span>
+                    )}
+                  </div>
+                  <span className="font-bold shrink-0">{formatPrice(q?.lineTotal ?? item.unitPrice * item.quantity, currency)}</span>
+                </li>
+              );
+            })}
           </ul>
 
-          {/* Coupon */}
-          <div className="mt-4">
-            <CouponField subtotal={sub} items={lines} onChange={onCoupon} />
-          </div>
+          <CouponField subtotal={quote?.subtotal ?? 0} items={lines} onChange={onCoupon} />
 
-          <div className="h-px bg-[color:var(--border)] my-4" />
-          <Row label="Subtotal" value={formatPrice(sub, currency)} />
-          <Row
-            label="Shipping"
-            value={freeShip ? 'Free' : formatPrice(shipping, currency)}
-          />
-          {discount > 0 && (
-            <Row label={`Discount${coupon.code ? ` (${coupon.code})` : ''}`} value={`− ${formatPrice(discount, currency)}`} />
+          <dl className={`space-y-2.5 text-sm border-t border-[color:var(--border)] pt-4 transition-opacity ${quoting ? 'opacity-60' : ''}`} aria-busy={quoting}>
+            <Row label={tCart('subtotal')} value={quote ? formatPrice(quote.subtotal, currency) : '—'} />
+            <Row
+              label={tCart('shipping')}
+              value={quote ? (quote.shipping === 0 ? tCart('free') : formatPrice(quote.shipping, currency)) : '—'}
+            />
+            {quote && quote.discount > 0 && (
+              <Row
+                label={quote.coupon ? tCart('discountWithCode', { code: quote.coupon.code }) : tCart('discount')}
+                value={`− ${formatPrice(quote.discount, currency)}`}
+              />
+            )}
+            <div className="pt-3 border-t border-[color:var(--border)] flex items-baseline justify-between">
+              <dt className="font-extrabold">{tCart('total')}</dt>
+              <dd className="price-now text-2xl">{quote ? formatPrice(quote.total, currency) : '—'}</dd>
+            </div>
+          </dl>
+
+          {hasIssues && (
+            <p role="alert" className="text-sm font-semibold text-[color:var(--color-sale)]">
+              {t('fixCartFirst')}{' '}
+              <Link href="/cart" className="underline underline-offset-4">{t('backToCart')}</Link>
+            </p>
           )}
-          <div className="h-px bg-[color:var(--border)] my-4" />
-          <Row label="Total" value={formatPrice(total, currency)} strong />
 
-          <button type="submit" disabled={isSubmitting || !payment} className="btn-primary w-full mt-5">
-            {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Place order <ArrowRight className="w-4 h-4" /></>}
+          <button type="submit" disabled={!canPlace || isSubmitting} className="btn-primary w-full h-12">
+            {isSubmitting ? (
+              <Loader2 aria-label={t('placing')} className="w-4 h-4 animate-spin" />
+            ) : (
+              <>
+                {t('placeOrder')} {quote && `· ${formatPrice(quote.total, currency)}`}
+              </>
+            )}
           </button>
-          <p className="text-[11px] text-[color:var(--fg-muted)] mt-3 text-center inline-flex items-center gap-1 justify-center w-full">
-            <Lock className="w-3 h-3" />
-            {payment?.method === 'BKASH_MANUAL'
-              ? "We'll verify your payment and update your order shortly."
-              : 'Your order is placed as soon as you submit.'}
+          {!payment && quote && !hasIssues && (
+            <p className="text-xs text-[color:var(--fg-muted)] text-center">{t('choosePaymentFirst')}</p>
+          )}
+          <p className="text-xs text-[color:var(--fg-muted)] text-center inline-flex items-center justify-center gap-1.5 w-full">
+            <Lock aria-hidden className="w-3.5 h-3.5" />
+            {payment?.method === 'BKASH_MANUAL' ? t('bkashNote') : t('placedNote')}
           </p>
         </aside>
       </form>
@@ -215,29 +239,41 @@ export default function CheckoutPage() {
   );
 }
 
+function StepHeading({ id, n, title }: { id: string; n: number; title: string }) {
+  return (
+    <h2 id={id} className="flex items-center gap-3 text-lg font-extrabold mb-5">
+      <span className="w-8 h-8 rounded-full bg-[color:var(--accent)] text-white text-sm grid place-items-center">{n}</span>
+      {title}
+    </h2>
+  );
+}
+
 function Field({
   label,
   error,
+  className = '',
   children,
 }: {
   label: string;
   error?: string;
+  className?: string;
   children: React.ReactNode;
 }) {
   return (
-    <label className="block">
-      <span className="block text-xs font-medium text-[color:var(--fg-muted)] mb-1.5">{label}</span>
+    <label className={`block ${className}`}>
+      <span className="block text-[13px] font-semibold mb-1.5">{label}</span>
       {children}
-      {error && <span className="block text-xs text-red-600 mt-1">{error}</span>}
+      {error && <span role="alert" className="block text-xs text-[color:var(--color-sale)] mt-1">{error}</span>}
     </label>
   );
 }
 
-function Row({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
+function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className={`flex justify-between ${strong ? 'font-semibold' : 'text-sm mb-2'}`}>
-      <span className={strong ? '' : 'text-[color:var(--fg-muted)]'}>{label}</span>
-      <span>{value}</span>
+    <div className="flex items-center justify-between gap-4">
+      <dt className="text-[color:var(--fg-muted)]">{label}</dt>
+      <dd className="font-semibold">{value}</dd>
     </div>
   );
 }
+

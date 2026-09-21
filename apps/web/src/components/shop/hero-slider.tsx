@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import Image from '@/components/ui/smart-image';
 import { motion, useReducedMotion } from 'motion/react';
 import { useLocale } from 'next-intl';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
@@ -31,7 +31,7 @@ export function HeroSlider({ slides }: { slides: Banner[] }) {
 
   return (
     <section
-      className="relative h-[440px] md:h-[560px] overflow-hidden grid-overlay"
+      className="relative h-[240px] sm:h-[340px] lg:h-[420px] overflow-hidden rounded-[var(--radius-card)] bg-[color:var(--color-ink)]"
       aria-roledescription="carousel"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
@@ -54,33 +54,33 @@ export function HeroSlider({ slides }: { slides: Banner[] }) {
                   alt=""
                   fill
                   priority={i === 0}
-                  sizes="100vw"
+                  sizes="(min-width: 1280px) 780px, (min-width: 1024px) 70vw, 100vw"
                   className={`object-cover transition-transform ease-out duration-[6000ms] ${active && !reduce ? 'scale-110' : 'scale-100'}`}
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0b1322]/88 via-[#0b1322]/55 to-[#0b1322]/10" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0b1424]/85 via-[#0b1424]/45 to-transparent" />
               </>
             ) : (
               <div className="absolute inset-0 bg-drikon-gradient" />
             )}
 
             {/* Content */}
-            <div className="relative z-10 h-full max-w-7xl mx-auto px-6 flex items-center">
+            <div className="relative z-10 h-full px-6 sm:px-10 lg:px-14 flex items-center">
               <motion.div
                 className="max-w-xl text-white"
                 initial={false}
                 animate={active && !reduce ? { opacity: 1, y: 0 } : reduce ? {} : { opacity: 0, y: 24 }}
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: active ? 0.18 : 0 }}
               >
-                <h1 className="display text-4xl md:text-6xl mb-4 text-glow">{localize(b.heading, b.headingBn, locale)}</h1>
+                <h1 className="display text-2xl sm:text-4xl lg:text-5xl mb-3 text-glow">{localize(b.heading, b.headingBn, locale)}</h1>
                 {b.subheading && (
-                  <p className="text-white/85 text-base md:text-lg mb-7 max-w-lg">
+                  <p className="text-white/85 text-sm sm:text-base mb-5 sm:mb-7 max-w-md line-clamp-2 sm:line-clamp-none">
                     {localize(b.subheading, b.subheadingBn, locale)}
                   </p>
                 )}
                 {b.ctaLabel && (
                   <Link
                     href={b.ctaHref || '/products'}
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-[#14233f] font-semibold hover:bg-white/90 transition-colors shadow-lg"
+                    className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-[var(--radius-ctl)] bg-[color:var(--accent)] text-white font-bold hover:brightness-110 transition-[filter] shadow-lg"
                   >
                     {b.ctaLabel} <ArrowRight className="w-4 h-4" />
                   </Link>
@@ -97,7 +97,7 @@ export function HeroSlider({ slides }: { slides: Banner[] }) {
             type="button"
             onClick={() => go(index - 1)}
             aria-label="Previous slide"
-            className="absolute left-3 md:left-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/15 hover:bg-white/30 backdrop-blur grid place-items-center text-white transition-colors"
+            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white/90 hover:bg-white shadow grid place-items-center text-[color:var(--color-ink)] transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -105,7 +105,7 @@ export function HeroSlider({ slides }: { slides: Banner[] }) {
             type="button"
             onClick={() => go(index + 1)}
             aria-label="Next slide"
-            className="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/15 hover:bg-white/30 backdrop-blur grid place-items-center text-white transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white/90 hover:bg-white shadow grid place-items-center text-[color:var(--color-ink)] transition-colors"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
@@ -119,7 +119,7 @@ export function HeroSlider({ slides }: { slides: Banner[] }) {
                 aria-label={`Go to slide ${i + 1}`}
                 aria-current={i === index}
                 className={`h-2 rounded-full transition-all ${
-                  i === index ? 'w-6 bg-white' : 'w-2 bg-white/50 hover:bg-white/80'
+                  i === index ? 'w-6 bg-[color:var(--accent-2)]' : 'w-2 bg-white/60 hover:bg-white'
                 }`}
               />
             ))}

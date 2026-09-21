@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import Image from 'next/image';
+import Image from '@/components/ui/smart-image';
 import Link from 'next/link';
 import { motion, useScroll, useTransform, AnimatePresence, useReducedMotion } from 'motion/react';
 import { ArrowLeft, ChevronDown, ShieldCheck, Truck, Headphones } from 'lucide-react';
