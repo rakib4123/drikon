@@ -13,7 +13,6 @@ import { CouponField } from '@/components/shop/coupon-field';
 import { CartRecommendations } from '@/components/shop/cart-recommendations';
 import { ProductThumb } from '@/components/shop/product-thumb';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
-import { CartOrbLoader } from '@/components/three/cart-orb-loader';
 
 export default function CartPage() {
   const t = useTranslations('cart');
@@ -55,12 +54,9 @@ export default function CartPage() {
   return (
     <div className="shell py-6">
       <Breadcrumbs homeLabel={tNav('home')} items={[{ label: t('title') }]} />
-      <div className="mt-4 mb-6 flex items-center gap-4">
-        <CartOrbLoader count={itemCount} />
-        <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight">
-          {t('title')} <span className="text-[color:var(--fg-muted)] font-semibold text-lg">({t('itemCount', { count: itemCount })})</span>
-        </h1>
-      </div>
+      <h1 className="font-display mt-4 mb-6 text-2xl md:text-3xl">
+        {t('title')} <span className="text-[color:var(--fg-muted)] font-semibold text-lg">({t('itemCount', { count: itemCount })})</span>
+      </h1>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px] items-start">
         <div className="card !p-0 overflow-hidden">

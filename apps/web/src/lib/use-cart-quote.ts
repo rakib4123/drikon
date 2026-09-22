@@ -75,7 +75,7 @@ export function useCartQuote() {
         if (cancelled) return;
         setQuote(q);
         setFailed(false);
-        syncPrices(q.lines);
+        syncPrices(q.lines ?? []);
       } catch {
         if (!cancelled) setFailed(true);
       } finally {
@@ -91,7 +91,7 @@ export function useCartQuote() {
   }, [key]);
 
   const issueFor = (productId: string, variantId?: string | null) =>
-    quote?.issues.find((i) => i.productId === productId && (i.variantId ?? null) === (variantId ?? null));
+    quote?.issues?.find((i) => i.productId === productId && (i.variantId ?? null) === (variantId ?? null));
 
   return { quote, loading, failed, issueFor };
 }

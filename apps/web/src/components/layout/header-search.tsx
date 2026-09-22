@@ -91,7 +91,7 @@ export function HeaderSearch() {
       }}
       className="relative w-full"
     >
-      <div className="flex h-11 items-stretch rounded-[var(--radius-ctl)] border-2 border-[color:var(--accent)] bg-[color:var(--surface-solid)] overflow-hidden">
+      <div className="flex h-11 items-center gap-1 rounded-full bg-[color:var(--bg-soft)] pl-4 pr-1.5">
         <input
           name="search"
           type="search"
@@ -110,7 +110,7 @@ export function HeaderSearch() {
           aria-autocomplete="list"
           aria-activedescendant={showPanel && active >= 0 ? `${listId}-${active}` : undefined}
           aria-label={t('searchLabel')}
-          className="flex-1 min-w-0 px-4 text-sm outline-none bg-transparent placeholder:text-[color:var(--fg-muted)]
+          className="flex-1 min-w-0 bg-transparent text-sm placeholder:text-[color:var(--fg-muted)]
                      [&::-webkit-search-cancel-button]:hidden"
         />
         {voiceSupported && (
@@ -118,7 +118,7 @@ export function HeaderSearch() {
             type="button"
             onClick={() => openSearchPalette({ voice: true })}
             aria-label={t('searchByVoice')}
-            className="px-2.5 text-[color:var(--fg-muted)] hover:text-[color:var(--accent)] transition-colors"
+            className="p-2 rounded-full text-[color:var(--fg-muted)] hover:text-[color:var(--accent-2)] transition-colors"
           >
             <Mic className="w-[18px] h-[18px]" />
           </button>
@@ -126,7 +126,7 @@ export function HeaderSearch() {
         <button
           type="submit"
           aria-label={t('searchLabel')}
-          className="px-5 bg-[color:var(--accent)] text-[color:var(--accent-fg)] hover:brightness-110 transition-[filter] inline-flex items-center"
+          className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[color:var(--accent)] text-[color:var(--accent-fg)] hover:brightness-110 transition-[filter]"
         >
           {loading ? <Loader2 className="w-[18px] h-[18px] animate-spin" /> : <Search className="w-[18px] h-[18px]" />}
         </button>
@@ -138,7 +138,7 @@ export function HeaderSearch() {
           role="listbox"
           aria-label={t('searchLabel')}
           className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 rounded-[var(--radius-card)] border border-[color:var(--border)]
-                     bg-[color:var(--surface-solid)] shadow-[0_18px_40px_-16px_rgba(16,24,40,0.3)] overflow-hidden animate-dk-pop-in"
+                     bg-[color:var(--surface-solid)] shadow-[0_18px_40px_-16px_rgba(28,25,23,0.3)] overflow-hidden animate-dk-pop-in"
         >
           {results.length === 0 ? (
             <div role="status" className="px-4 py-5 text-sm text-[color:var(--fg-muted)]">

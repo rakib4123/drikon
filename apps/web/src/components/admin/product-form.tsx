@@ -188,14 +188,14 @@ export function ProductForm({ mode, productId, initial }: ProductFormProps) {
         <button
           type="button"
           onClick={() => setLang('en')}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium ${lang === 'en' ? 'bg-[color:var(--accent)] text-white' : 'text-[color:var(--fg-muted)] hover:bg-[color:var(--bg-soft)]'}`}
+          className={`px-3 py-1.5 rounded-lg text-sm font-medium ${lang === 'en' ? 'bg-[color:var(--accent)] text-[color:var(--accent-fg)]' : 'text-[color:var(--fg-muted)] hover:bg-[color:var(--bg-soft)]'}`}
         >
           English
         </button>
         <button
           type="button"
           onClick={() => setLang('bn')}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium ${lang === 'bn' ? 'bg-[color:var(--accent)] text-white' : 'text-[color:var(--fg-muted)] hover:bg-[color:var(--bg-soft)]'}`}
+          className={`px-3 py-1.5 rounded-lg text-sm font-medium ${lang === 'bn' ? 'bg-[color:var(--accent)] text-[color:var(--accent-fg)]' : 'text-[color:var(--fg-muted)] hover:bg-[color:var(--bg-soft)]'}`}
         >
           বাংলা
         </button>
