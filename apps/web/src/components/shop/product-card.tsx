@@ -95,7 +95,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
         </div>
 
         <div className="mt-2 flex items-baseline flex-wrap gap-x-2">
-          <span className={`price-now text-[17px] ${struckPrice ? 'is-sale' : ''}`}>{formatPrice(price, product.currency)}</span>
+          <span className={`price-now text-lg ${struckPrice ? 'is-sale' : ''}`}>{formatPrice(price, product.currency)}</span>
           {struckPrice !== null && <span className="price-was text-xs">{formatPrice(struckPrice, product.currency)}</span>}
         </div>
 
