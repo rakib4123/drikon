@@ -22,7 +22,7 @@ export function TabsTrigger({ className, ...props }: React.ComponentProps<typeof
   return (
     <TabsPrimitive.Trigger
       className={cn(
-        'relative shrink-0 px-4 sm:px-5 py-3.5 text-sm sm:text-sm font-bold text-[color:var(--fg-muted)] outline-none transition-colors',
+        'relative shrink-0 px-4 sm:px-5 py-3.5 text-sm font-bold text-[color:var(--fg-muted)] outline-none transition-colors',
         'hover:text-[color:var(--fg)]',
         'data-[state=active]:text-[color:var(--accent)]',
         'after:absolute after:inset-x-0 after:-bottom-px after:h-[3px] after:rounded-full after:bg-transparent',
