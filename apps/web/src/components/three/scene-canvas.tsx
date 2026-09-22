@@ -1,7 +1,7 @@
 'use client';
 
 import { Component, useEffect, useRef, useState, type ReactNode } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, invalidate } from '@react-three/fiber';
 import { useReducedMotion } from 'motion/react';
 import { cn } from '@/lib/utils';
 
@@ -54,6 +54,13 @@ export function SceneCanvas({
     io.observe(el);
     return () => io.disconnect();
   }, []);
+
+  // Re-entering the viewport flips frameloop back to 'always', but R3F's global
+  // RAF loop stays stopped if every canvas was paused at once — invalidate after
+  // the prop change has rendered, or the scene never paints again.
+  useEffect(() => {
+    if (visible) invalidate();
+  }, [visible]);
 
   const wrapped = <div data-scene-fallback={name} className="h-full w-full">{fallback}</div>;
   if (lost) return wrapped;
