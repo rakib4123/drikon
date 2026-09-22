@@ -70,7 +70,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      <Spotlight product={spotlight1} labels={{ kicker: 'Spotlight', viewProduct: t('viewProduct') }} />
+      <Spotlight product={spotlight1} labels={{ kicker: t('spotlightKicker'), viewProduct: t('viewProduct') }} />
 
       <PromoBanner
         heading={c.ctaHeading}
@@ -90,7 +90,7 @@ export default async function HomePage() {
       {/* Only renders while a flash sale is live. */}
       <FlashSaleSection />
 
-      <Spotlight product={spotlight2} flip labels={{ kicker: 'Spotlight', viewProduct: t('viewProduct') }} />
+      <Spotlight product={spotlight2} flip labels={{ kicker: t('spotlightKicker'), viewProduct: t('viewProduct') }} />
 
       <ProductRow
         id="best-sellers"

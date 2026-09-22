@@ -7,6 +7,7 @@ import { TiltCard } from '@/components/ui/tilt-card';
 import { Reveal } from '@/components/ui/reveal';
 import type { NavCategory } from '@/lib/catalog';
 import { localize } from '@/lib/localize';
+import { cn } from '@/lib/utils';
 import type { Locale } from '@/i18n/request';
 import { SectionHeader } from './section-header';
 
@@ -35,7 +36,13 @@ export async function CategoryTiles({ categories }: { categories: NavCategory[] 
                   href={`/products?category=${cat.slug}`}
                   className="card card-hover group !p-0 flex h-full flex-col overflow-hidden"
                 >
-                  <div className="relative aspect-[4/3] overflow-hidden [background:var(--image-well)]">
+                  <div
+                    className={cn(
+                      'relative overflow-hidden',
+                      cat.imageUrl ? 'aspect-[4/3] [background:var(--image-well)]' : 'h-40',
+                    )}
+                    style={cat.imageUrl ? undefined : { background: 'radial-gradient(circle at 50% 42%, #fffdf9, #efe9df)' }}
+                  >
                     {cat.imageUrl ? (
                       <Image
                         src={cat.imageUrl}
@@ -46,7 +53,9 @@ export async function CategoryTiles({ categories }: { categories: NavCategory[] 
                       />
                     ) : (
                       <div className="absolute inset-0 grid place-items-center">
-                        <CategoryIcon slug={cat.slug} className="h-12 w-12 text-[color:var(--fg-muted)]" />
+                        <span className="grid h-24 w-24 place-items-center rounded-full bg-[#fffdf9] shadow-[0_6px_18px_-8px_rgba(28,25,23,0.18)] transition-transform duration-500 group-hover:scale-105">
+                          <CategoryIcon slug={cat.slug} className="h-16 w-16 text-[color:var(--fg)]" />
+                        </span>
                       </div>
                     )}
                   </div>
