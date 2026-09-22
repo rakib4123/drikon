@@ -70,7 +70,7 @@ export function BrandMark({
     <>
       <NetworkIcon className={`w-9 h-9 transition-transform group-hover:scale-105 shrink-0 ${inverted ? 'text-white' : 'text-[color:var(--fg)]'}`} />
       <span className="flex flex-col leading-none">
-        <span className={`font-display text-[22px] font-extrabold tracking-tight ${inverted ? 'text-white' : ''}`}>{brand.siteName}</span>
+        <span className={`font-display text-xl font-extrabold tracking-tight ${inverted ? 'text-white' : ''}`}>{brand.siteName}</span>
         {showTagline && brand.tagline && (
           <span className="text-2xs font-semibold uppercase tracking-[0.2em] text-[color:var(--accent-2)] mt-1">
             {brand.tagline}
