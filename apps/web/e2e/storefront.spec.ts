@@ -56,7 +56,9 @@ test.describe('storefront', () => {
   test('unknown routes return the 404 page, not a crash', async ({ page }) => {
     const response = await page.goto('/this-route-does-not-exist');
     expect(response?.status()).toBe(404);
-    await expect(page.locator('main, body')).toContainText(/not found|404/i);
+    // `main, body` matched two elements, which Playwright's strict mode rejects.
+    // The body covers both cases: the 404 page renders inside main.
+    await expect(page.locator('body')).toContainText(/not found|404/i);
   });
 });
 
