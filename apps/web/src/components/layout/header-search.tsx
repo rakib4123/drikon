@@ -138,7 +138,7 @@ export function HeaderSearch() {
           role="listbox"
           aria-label={t('searchLabel')}
           className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 rounded-[var(--radius-card)] border border-[color:var(--border)]
-                     bg-[color:var(--surface-solid)] shadow-[0_18px_40px_-16px_rgba(16,24,40,0.3)] overflow-hidden animate-dk-pop-in"
+                     bg-[color:var(--surface-solid)] shadow-[0_18px_40px_-16px_rgba(28,25,23,0.3)] overflow-hidden animate-dk-pop-in"
         >
           {results.length === 0 ? (
             <div role="status" className="px-4 py-5 text-sm text-[color:var(--fg-muted)]">

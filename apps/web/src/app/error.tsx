@@ -18,7 +18,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="relative min-h-[70vh] grid place-items-center overflow-hidden aurora px-6">
+    <div className="relative min-h-[70vh] grid place-items-center overflow-hidden px-6">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}

@@ -26,7 +26,7 @@ export function TabsTrigger({ className, ...props }: React.ComponentProps<typeof
         'hover:text-[color:var(--fg)]',
         'data-[state=active]:text-[color:var(--accent)]',
         'after:absolute after:inset-x-0 after:-bottom-px after:h-[3px] after:rounded-full after:bg-transparent',
-        'data-[state=active]:after:bg-[color:var(--accent)]',
+        'data-[state=active]:after:bg-[color:var(--accent-2)]',
         className,
       )}
       {...props}

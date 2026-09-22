@@ -30,7 +30,7 @@ export function ProductThumb({
 
   if (!src || failed) {
     return (
-      <div className="w-full h-full bg-drikon-mesh grid place-items-center">
+      <div className="w-full h-full bg-[color:var(--image-well)] grid place-items-center">
         <Package aria-hidden className="w-10 h-10 text-[color:var(--fg-muted)]/40" />
       </div>
     );

@@ -67,7 +67,7 @@ export function WishlistButton({
       className={cn(
         'grid place-items-center transition-colors',
         variant === 'overlay'
-          ? 'w-9 h-9 rounded-full bg-[color:var(--bg)]/80 backdrop-blur border border-[color:var(--border)] hover:bg-[color:var(--bg)] shadow-sm'
+          ? 'w-9 h-9 rounded-full bg-[color:var(--bg)]/95 border border-[color:var(--border)] hover:bg-[color:var(--bg)] shadow-sm'
           : 'w-12 h-12 rounded-xl border border-[color:var(--border)] hover:bg-[color:var(--bg-soft)]',
         className,
       )}

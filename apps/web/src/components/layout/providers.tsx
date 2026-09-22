@@ -2,7 +2,6 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
-import { usePathname } from 'next/navigation';
 import { Toaster } from 'sonner';
 import type { SiteSettings } from '@drikon/shared-types';
 import { SettingsProvider } from '@/components/layout/settings-context';
@@ -32,15 +31,14 @@ export function Providers({
         },
       }),
   );
-  // Admin (.theme-classic, see admin/layout.tsx) kept its original light
-  // look — its toasts stay light too. The storefront is dark neon by default.
-  const pathname = usePathname();
-  const isAdmin = pathname?.startsWith('/admin') ?? false;
+  // Both admin (.theme-classic) and the storefront are light themes now, so
+  // the toast is always sonner's "light" variant — only the border/background
+  // custom properties differ per theme (see admin/layout.tsx).
   return (
     <SettingsProvider settings={settings}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
       <Toaster
-        theme={isAdmin ? 'light' : 'dark'}
+        theme="light"
         position="bottom-right"
         richColors
         closeButton
@@ -50,7 +48,7 @@ export function Providers({
             color: 'var(--fg)',
             border: '1px solid var(--border)',
             borderRadius: '14px',
-            boxShadow: '0 16px 40px -20px var(--glow), 0 2px 8px var(--shadow)',
+            boxShadow: '0 16px 40px -20px var(--shadow), 0 2px 8px var(--shadow)',
           },
         }}
       />
