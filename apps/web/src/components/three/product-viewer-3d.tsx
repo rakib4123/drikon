@@ -7,7 +7,7 @@ import { useReducedMotion } from 'motion/react';
 import type { Group } from 'three';
 import { useSafeTexture } from '@/lib/three/use-safe-texture';
 import { SceneBoundary, SceneCanvas } from './scene-canvas';
-import { Stand, Turntable } from './showcase-scene';
+import { FitCamera, Stand, Turntable } from './showcase-scene';
 
 function Model({ url }: { url: string }) {
   // Draco/Meshopt decoding needs worker-src blob:, gstatic, and 'wasm-unsafe-eval'
@@ -152,7 +152,10 @@ export default function ProductViewer3D({
                 <ReadySignal onReady={onReady} />
               </Turntable>
             ) : imageUrl ? (
-              <PhotoPlinth url={imageUrl} sway={!reduced} onFail={onFail} onReady={onReady} />
+              <>
+                <FitCamera radius={1.6} />
+                <PhotoPlinth url={imageUrl} sway={!reduced} onFail={onFail} onReady={onReady} />
+              </>
             ) : null}
           </Suspense>
         </SceneBoundary>
