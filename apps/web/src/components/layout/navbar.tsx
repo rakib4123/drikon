@@ -132,7 +132,7 @@ export function Navbar({
           <Link
             href="/cart"
             aria-label={t('cart')}
-            className="group flex items-center gap-2.5 pl-2 pr-1 py-1.5 rounded-full hover:bg-[color:var(--bg-soft)] transition-colors"
+            className="group flex items-center gap-2.5 pl-2 pr-1 py-1.5 min-h-[45px] min-w-[45px] rounded-full hover:bg-[color:var(--bg-soft)] transition-colors"
           >
             <span className="relative">
               <ShoppingCart className="w-5 h-5 text-[color:var(--fg)] group-hover:text-[color:var(--accent-2)] transition-colors" />

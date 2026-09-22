@@ -85,7 +85,7 @@ export function BrandMark({
   );
 
   return href ? (
-    <Link href={href} className="inline-flex">
+    <Link href={href} className="inline-flex min-h-[45px] items-center">
       {content}
     </Link>
   ) : (

@@ -26,7 +26,7 @@ export function PromoBanner({
         </div>
         <Link
           href={buttonHref}
-          className="self-start md:self-auto inline-flex items-center gap-2 rounded-[var(--radius-ctl)] bg-[color:var(--accent-2)] px-6 py-3 font-bold text-[color:var(--accent-fg)]
+          className="self-start md:self-auto inline-flex items-center gap-2 min-h-[45px] rounded-[var(--radius-ctl)] bg-[color:var(--accent-2)] px-6 py-3 font-bold text-[color:var(--accent-fg)]
                      hover:brightness-110 transition-[filter] shrink-0"
         >
           {buttonLabel} <ArrowRight aria-hidden className="w-4 h-4" />

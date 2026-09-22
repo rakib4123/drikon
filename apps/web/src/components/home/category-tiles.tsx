@@ -80,7 +80,7 @@ export async function CategoryTiles({ categories }: { categories: NavCategory[] 
           <li key={cat.id}>
             <Link
               href={`/products?category=${cat.slug}`}
-              className="inline-flex items-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold transition-colors hover:border-[color:var(--accent-2)] hover:text-[color:var(--accent-2)]"
+              className="inline-flex items-center min-h-[45px] rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold transition-colors hover:border-[color:var(--accent-2)] hover:text-[color:var(--accent-2)]"
             >
               {localize(cat.name, cat.nameBn, locale)}
             </Link>
