@@ -87,7 +87,13 @@
     "claimed": "{percent}% বিক্রি হয়েছে",
     "topBrands": "শীর্ষ ব্র্যান্ড",
     "previous": "আগের",
-    "next": "পরের"
+    "next": "পরের",
+    "shopTheCategory": "ক্যাটাগরি দেখুন",
+    "viewProduct": "প্রোডাক্ট দেখুন",
+    "trustDelivery": "৳৩,০০০-এর বেশি অর্ডারে ফ্রি ডেলিভারি",
+    "trustReturns": "১৪ দিনে রিটার্ন",
+    "trustGenuine": "আসল ডিভাইস",
+    "trustSupport": "সত্যিকারের সাপোর্ট"
   },
   "product": {
     "soldOut": "স্টক শেষ",

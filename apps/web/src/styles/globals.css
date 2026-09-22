@@ -83,9 +83,7 @@
   --surface-solid: #fffdf9;
   --image-well:    #efe9df;
   --border-strong: #d6cbbb;
-  --glow-edge:     #d6cbbb;
   --glass:         #fffdf9;
-  --grid-line:     transparent;
   --shadow:        rgba(28, 25, 23, 0.08);
   /* Skeleton shimmer highlight — cream on the storefront's warm surfaces,
      white on admin's cooler ones (see .theme-classic below). */
@@ -114,11 +112,9 @@
   --image-well:    #ffffff;
   --border-strong: #d0d5dd;
   --skeleton-shine: rgba(255, 255, 255, 0.7);
-  --glow-edge:     color-mix(in srgb, var(--color-accent) 18%, transparent);
   --radius-card:   10px;
   --radius-ctl:    8px;
   --glass:         rgba(255, 255, 255, 0.92);
-  --grid-line:     rgba(17, 24, 39, 0.05);
   --shadow:        rgba(16, 24, 40, 0.08);
   color-scheme: light;
   background: var(--bg);
@@ -422,14 +418,6 @@ html, body {
   .animate-glow-pulse { animation: glow-pulse 2.4s ease-in-out infinite; }
 
   .font-display { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.015em; }
-  .neon-edge { transition: box-shadow 0.2s ease, border-color 0.2s ease; }
-  .neon-edge:hover { border-color: var(--glow-edge); box-shadow: 0 0 0 1px var(--glow-edge), 0 0 28px -6px var(--glow); }
-  .grid-texture {
-    background-image:
-      linear-gradient(var(--grid-line) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-    background-size: 44px 44px;
-  }
   /* Admin (.theme-classic) keeps the pre-neon component look — spec §1. */
   .theme-classic .btn-primary { color: var(--accent-fg); box-shadow: 0 1px 2px var(--shadow); }
   .theme-classic .btn-primary:hover {

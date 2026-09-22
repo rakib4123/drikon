@@ -87,7 +87,13 @@
     "claimed": "{percent}% claimed",
     "topBrands": "Top brands",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "shopTheCategory": "Shop the category",
+    "viewProduct": "View product",
+    "trustDelivery": "Free delivery over ৳3,000",
+    "trustReturns": "14-day returns",
+    "trustGenuine": "Genuine devices",
+    "trustSupport": "Real support"
   },
   "product": {
     "soldOut": "SOLD OUT",
