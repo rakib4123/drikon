@@ -5,7 +5,7 @@ import { Canvas } from '@react-three/fiber';
 import { useReducedMotion } from 'motion/react';
 import { cn } from '@/lib/utils';
 
-export type SceneName = 'backdrop' | 'hero' | 'product' | 'cart';
+export type SceneName = 'hero' | 'spotlight' | 'product';
 
 /** Any throw inside a scene (bad texture, bad model, shader error) → 2D fallback. */
 export class SceneBoundary extends Component<{ fallback: ReactNode; children: ReactNode }, { failed: boolean }> {

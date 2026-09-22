@@ -2,30 +2,16 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import type { ResolvedContent } from '@/lib/settings';
 import type { ProductSummary } from '@drikon/shared-types';
-import { HeroSceneLoader } from '@/components/three/hero-scene-loader';
 
 /**
- * Opening hero: the WebGL scene fills the whole footprint, and the headline
- * and calls to action sit as HTML on top of it (SEO, keyboard, screen
- * readers), same overlay pattern as the old StaticHero. Every product shown
- * orbiting the core is also a normal link further down the page, so nothing
- * is reachable only in 3D.
+ * Opening hero, copy-only for now: the 3D orbiting-product scene is gone
+ * (warm editorial redesign drops the neon backdrop), so this renders just the
+ * headline and calls to action. `products` stays in the prop type — a later
+ * pass (spec Task 5) replaces this file with a warm hero that uses it again.
  */
-export function HeroStage({ c, products }: { c: ResolvedContent; products: ProductSummary[] }) {
-  const heroProducts = products
-    .filter((p) => p.images?.[0]?.url)
-    .slice(0, 6)
-    .map((p) => ({ slug: p.slug, name: p.name, image: p.images[0].url }));
-
+export function HeroStage({ c }: { c: ResolvedContent; products: ProductSummary[] }) {
   return (
     <section className="relative h-[300px] sm:h-[360px] lg:h-[420px] overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--border)] bg-[color:var(--surface)] grid-texture">
-      <div className="absolute inset-0">
-        <HeroSceneLoader products={heroProducts} />
-      </div>
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[color:var(--bg)] via-[color:var(--bg)]/70 to-transparent"
-      />
       <div className="pointer-events-none relative z-10 h-full px-6 sm:px-10 lg:px-12 flex items-center">
         <div className="max-w-md">
           <span className="badge-deal">{c.heroBadge}</span>

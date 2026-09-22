@@ -412,8 +412,8 @@ html, body {
     background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent);
     animation: shimmer 1.4s infinite;
   }
-  /* Admin keeps its original light skeleton (spec §1) — the dark tokens above
-     are for the storefront's neon surfaces. */
+  /* Admin keeps its original light skeleton (spec §1) — the tokens above
+     are for the storefront's warm surfaces. */
   .theme-classic .skeleton { background: #eef0f4; }
 
   .text-glow { text-shadow: 0 2px 24px rgba(0, 0, 0, 0.25); }
@@ -430,16 +430,6 @@ html, body {
       linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
     background-size: 44px 44px;
   }
-  /* Static stand-in for the WebGL backdrop — always painted, the canvas sits above it. */
-  .space-fallback {
-    background:
-      radial-gradient(60% 50% at 20% 0%, rgba(139, 92, 246, 0.22), transparent 70%),
-      radial-gradient(50% 40% at 90% 10%, rgba(34, 229, 255, 0.16), transparent 70%),
-      linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 56px 56px,
-      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 56px 56px,
-      var(--bg);
-  }
-
   /* Admin (.theme-classic) keeps the pre-neon component look — spec §1. */
   .theme-classic .btn-primary { color: var(--accent-fg); box-shadow: 0 1px 2px var(--shadow); }
   .theme-classic .btn-primary:hover {
