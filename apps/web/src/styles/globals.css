@@ -218,11 +218,15 @@ html, body {
   .measure { max-width: 68ch; }
 
   /* Product grids: the column floor is itself fluid, so the column count
-     follows the available width — 2 up on a phone, 5 on a laptop, 7 at 1920+
-     — and adapts inside narrower containers without extra classes. */
+     follows the available width — 2 up on a phone, 4 on a laptop, 6 at 4K —
+     and adapts inside narrower containers without extra classes.
+     Capped at 13rem, not the plan doc's original 15rem: inside the real
+     /products layout (shell's 1800px cap + the 260px filter sidebar) the
+     grid's content column is ~1447px at 4K, and 15rem only fits 5 tracks
+     there — short of the spec's 6+ at 2560/3840. 13rem fits 6. */
   .grid-auto-products {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(clamp(9.5rem, 22vw, 15rem), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(clamp(9.5rem, 22vw, 13rem), 1fr));
     gap: clamp(0.75rem, 0.6rem + 0.5vw, 1.5rem);
   }
 
@@ -352,7 +356,7 @@ html, body {
     border-radius: 5px;
     background: var(--color-sale);
     color: #ffffff;
-    font-size: 0.7rem;
+    font-size: var(--text-2xs);
     font-weight: 800;
     line-height: 1;
   }
@@ -363,7 +367,7 @@ html, body {
     border-radius: 5px;
     background: color-mix(in srgb, var(--accent) 10%, transparent);
     color: var(--accent);
-    font-size: 0.7rem;
+    font-size: var(--text-2xs);
     font-weight: 800;
     line-height: 1;
   }
@@ -376,7 +380,7 @@ html, body {
     border-radius: 5px;
     background: var(--color-accent-2);
     color: #fffdf9;
-    font-size: 0.7rem;
+    font-size: var(--text-2xs);
     font-weight: 800;
     line-height: 1;
   }
@@ -417,7 +421,7 @@ html, body {
   .table-clean { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
   .table-clean th {
     text-align: left;
-    font-size: 0.72rem;
+    font-size: var(--text-2xs);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;

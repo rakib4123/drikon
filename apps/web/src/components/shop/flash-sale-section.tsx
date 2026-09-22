@@ -103,7 +103,7 @@ export function FlashSaleSection() {
                     <div className="h-1.5 rounded-full bg-white/15 overflow-hidden">
                       <div className="h-full rounded-full bg-[color:var(--accent-2)]" style={{ width: `${claimed}%` }} />
                     </div>
-                    <div className="mt-1 text-[11.5px] text-[color:var(--accent-fg)]/70">
+                    <div className="mt-1 text-2xs text-[color:var(--accent-fg)]/70">
                       {t('claimed', { percent: claimed })}
                     </div>
                   </div>
