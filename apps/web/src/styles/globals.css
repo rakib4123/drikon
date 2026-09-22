@@ -35,6 +35,36 @@
   --font-display: var(--font-fraunces), var(--font-bangla), ui-serif, Georgia, serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
 
+  /* Fluid type: each step grows smoothly between a 360px phone and a 1920px
+     screen, then stops. Breakpoints never change type size — only layout.
+     12px is the floor; nothing on the storefront may compute smaller. */
+  --text-2xs: clamp(0.75rem, 0.734rem + 0.07vw, 0.8125rem);
+  --text-xs:  clamp(0.75rem, 0.718rem + 0.14vw, 0.875rem);
+  --text-sm:  clamp(0.8125rem, 0.781rem + 0.14vw, 0.9375rem);
+  --text-base: clamp(0.9375rem, 0.906rem + 0.14vw, 1.0625rem);
+  --text-lg:  clamp(1.0625rem, 1.0rem + 0.27vw, 1.25rem);
+  --text-xl:  clamp(1.1875rem, 1.075rem + 0.49vw, 1.5rem);
+  --text-2xl: clamp(1.375rem, 1.19rem + 0.82vw, 1.875rem);
+  --text-3xl: clamp(1.625rem, 1.35rem + 1.2vw, 2.375rem);
+  --text-4xl: clamp(1.875rem, 1.49rem + 1.7vw, 3.125rem);
+  --text-5xl: clamp(2.125rem, 1.51rem + 2.7vw, 4.25rem);
+
+  /* Fluid spacing: ~0.8x on phones, ~1.3x on 4K, relative to the old fixed rem
+     values. Tailwind's --spacing-* namespace drives p-*, gap-*, m-*, space-*. */
+  --spacing-1: clamp(0.2rem, 0.19rem + 0.05vw, 0.3rem);
+  --spacing-2: clamp(0.4rem, 0.37rem + 0.1vw, 0.6rem);
+  --spacing-3: clamp(0.6rem, 0.56rem + 0.16vw, 0.9rem);
+  --spacing-4: clamp(0.8rem, 0.74rem + 0.21vw, 1.2rem);
+  --spacing-5: clamp(1rem, 0.93rem + 0.26vw, 1.5rem);
+  --spacing-6: clamp(1.2rem, 1.11rem + 0.32vw, 1.8rem);
+  --spacing-8: clamp(1.6rem, 1.48rem + 0.42vw, 2.4rem);
+  --spacing-10: clamp(2rem, 1.85rem + 0.53vw, 3rem);
+  --spacing-12: clamp(2.4rem, 2.22rem + 0.63vw, 3.6rem);
+  --spacing-16: clamp(3.2rem, 2.96rem + 0.84vw, 4.8rem);
+
+  --breakpoint-2xl: 1536px;
+  --breakpoint-3xl: 1920px;
+
   --radius-card: 16px;
   --radius-ctl:  12px;
 
@@ -162,14 +192,17 @@ html, body {
    grew `!py-2`-style overrides. */
 @layer components {
   /* ─── Layout ─── */
-  /* The megastore page width: wider than max-w-7xl, with the standard gutter. */
+  /* Content column: grows with the screen up to 1800px, then centres. The
+     inline padding is fluid too, so a 320px phone keeps a 16px gutter and a
+     4K screen gets a generous one. */
   .shell {
-    width: 100%;
-    max-width: 1360px;
+    width: min(1800px, 94vw);
     margin-inline: auto;
-    padding-inline: 1rem;
+    padding-inline: clamp(1rem, 0.85rem + 0.7vw, 2rem);
   }
-  @media (min-width: 640px) { .shell { padding-inline: 1.5rem; } }
+
+  /* Readable line length for prose blocks on wide screens. */
+  .measure { max-width: 68ch; }
 
   /* ─── Headings ─── */
   .display {
@@ -412,6 +445,31 @@ html, body {
   }
   .theme-classic .display,
   .theme-classic .section-title { font-family: var(--font-sans); }
+
+  /* Admin keeps fixed type and spacing: its dense tables and forms were tuned
+     against the old scale, and it is out of scope for the responsive work. */
+  .theme-classic {
+    --text-2xs: 0.6875rem;
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
+    --text-5xl: 3rem;
+    --spacing-1: 0.25rem;
+    --spacing-2: 0.5rem;
+    --spacing-3: 0.75rem;
+    --spacing-4: 1rem;
+    --spacing-5: 1.25rem;
+    --spacing-6: 1.5rem;
+    --spacing-8: 2rem;
+    --spacing-10: 2.5rem;
+    --spacing-12: 3rem;
+    --spacing-16: 4rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
