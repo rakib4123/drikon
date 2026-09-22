@@ -69,7 +69,7 @@ export function AuthField({
   return (
     <div>
       <div className="flex items-baseline justify-between gap-3 mb-1.5">
-        <label htmlFor={id} className="text-[13px] font-semibold">{label}</label>
+        <label htmlFor={id} className="text-xs font-semibold">{label}</label>
         {aside}
       </div>
       {children}

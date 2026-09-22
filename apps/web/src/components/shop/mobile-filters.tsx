@@ -21,7 +21,7 @@ export function MobileFilters({ brands, categories }: { brands: FilterBrand[]; c
           <SlidersHorizontal aria-hidden className="w-4 h-4" />
           {t('filters')}
           {active > 0 && (
-            <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-[color:var(--accent)] text-[color:var(--accent-fg)] text-[10px] font-bold grid place-items-center">
+            <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-[color:var(--accent)] text-[color:var(--accent-fg)] text-2xs font-bold grid place-items-center">
               {active}
             </span>
           )}

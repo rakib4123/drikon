@@ -78,7 +78,7 @@ export function MobileMenu({ brand, categories }: { brand: BrandInfo; categories
 
           {topLevel.length > 0 && (
             <div className="mt-4 pt-4 border-t border-[color:var(--border)]">
-              <div className="px-3 font-display text-[13px] font-semibold uppercase tracking-wide text-[color:var(--fg-muted)] mb-2">
+              <div className="px-3 font-display text-xs font-semibold uppercase tracking-wide text-[color:var(--fg-muted)] mb-2">
                 {t('categories')}
               </div>
 

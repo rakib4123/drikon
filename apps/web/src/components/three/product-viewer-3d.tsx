@@ -176,13 +176,13 @@ export default function ProductViewer3D({
         <button
           type="button"
           onClick={() => setTapEnabled(true)}
-          className="pointer-events-auto absolute bottom-3 inset-x-0 mx-auto w-fit rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-[color:var(--fg)]"
+          className="pointer-events-auto absolute bottom-3 inset-x-0 mx-auto w-fit rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3.5 py-1.5 font-mono text-2xs uppercase tracking-[0.2em] text-[color:var(--fg)]"
         >
           {labels.tapHint}
         </button>
       )}
       {showDragHint && (
-        <p className="pointer-events-none absolute bottom-3 inset-x-0 text-center font-mono text-[11px] uppercase tracking-[0.2em] text-[color:var(--fg-muted)]">
+        <p className="pointer-events-none absolute bottom-3 inset-x-0 text-center font-mono text-2xs uppercase tracking-[0.2em] text-[color:var(--fg-muted)]">
           {labels.dragHint}
         </p>
       )}

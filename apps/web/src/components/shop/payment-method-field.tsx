@@ -126,7 +126,7 @@ export function PaymentMethodField({
 
           <div className="grid sm:grid-cols-2 gap-3">
             <label className="block" htmlFor={`${ids}-payer`}>
-              <span className="block text-[13px] font-semibold mb-1.5">{t('yourBkashNumber')}</span>
+              <span className="block text-xs font-semibold mb-1.5">{t('yourBkashNumber')}</span>
               <input
                 id={`${ids}-payer`}
                 className="input"
@@ -138,7 +138,7 @@ export function PaymentMethodField({
               />
             </label>
             <label className="block" htmlFor={`${ids}-trx`}>
-              <span className="block text-[13px] font-semibold mb-1.5">{t('trxId')}</span>
+              <span className="block text-xs font-semibold mb-1.5">{t('trxId')}</span>
               <input
                 id={`${ids}-trx`}
                 className="input font-mono uppercase"

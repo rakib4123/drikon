@@ -81,11 +81,11 @@ export function ProductCard({ product }: { product: ProductSummary }) {
       </div>
 
       <div className="px-3.5 pb-3.5 pt-3 flex-1 flex flex-col border-t border-[color:var(--border)]">
-        <div className="text-[11px] font-semibold uppercase tracking-wide text-[color:var(--fg-muted)] mb-1 truncate">
+        <div className="text-2xs font-semibold uppercase tracking-wide text-[color:var(--fg-muted)] mb-1 truncate">
           {product.brand?.name ?? product.category.name}
         </div>
         <Link href={`/products/${product.slug}`}>
-          <h3 className="text-[14px] font-semibold leading-snug line-clamp-2 min-h-[2.6em] hover:text-[color:var(--accent)] transition-colors">
+          <h3 className="text-sm font-semibold leading-snug line-clamp-2 min-h-[2.6em] hover:text-[color:var(--accent)] transition-colors">
             {name}
           </h3>
         </Link>
@@ -96,7 +96,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
 
         <div className="mt-2 flex items-baseline flex-wrap gap-x-2">
           <span className={`price-now text-[17px] ${struckPrice ? 'is-sale' : ''}`}>{formatPrice(price, product.currency)}</span>
-          {struckPrice !== null && <span className="price-was text-[13px]">{formatPrice(struckPrice, product.currency)}</span>}
+          {struckPrice !== null && <span className="price-was text-xs">{formatPrice(struckPrice, product.currency)}</span>}
         </div>
 
         <button
@@ -114,7 +114,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
             });
             toast.success(t('addedToCartToastTitle'), { description: name });
           }}
-          className="mt-3 w-full inline-flex items-center justify-center gap-2 h-10 rounded-[var(--radius-ctl)] text-[13px] font-bold
+          className="mt-3 w-full inline-flex items-center justify-center gap-2 h-10 rounded-[var(--radius-ctl)] text-xs font-bold
                      bg-[color:var(--accent)] text-[color:var(--accent-fg)] border border-[color:var(--accent)]
                      enabled:hover:bg-[#292524] enabled:hover:border-[#292524]
                      transition-colors disabled:border-[color:var(--border)] disabled:text-[color:var(--fg-muted)]

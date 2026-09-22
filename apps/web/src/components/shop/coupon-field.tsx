@@ -175,7 +175,7 @@ export function CouponField({
 
       {offers.length > 0 && (
         <div className="mt-2.5">
-          <div className="text-[11px] uppercase tracking-wider text-[color:var(--fg-muted)] mb-1.5 inline-flex items-center gap-1">
+          <div className="text-2xs uppercase tracking-wider text-[color:var(--fg-muted)] mb-1.5 inline-flex items-center gap-1">
             <Sparkles className="w-3 h-3 text-[color:var(--accent)]" /> Available offers
           </div>
           <div className="flex flex-wrap gap-1.5">

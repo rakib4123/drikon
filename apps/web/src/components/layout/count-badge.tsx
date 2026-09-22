@@ -20,7 +20,7 @@ export function CountBadge({ count, className }: { count: number; className?: st
           exit={{ scale: 0, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 520, damping: 17 }}
           className={cn(
-            'absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full text-[10px] font-bold grid place-items-center',
+            'absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full text-2xs font-bold grid place-items-center',
             'bg-[color:var(--accent-2)] text-[color:var(--accent-fg)] shadow-[0_2px_5px_-1px_rgba(28,25,23,0.35)]',
             className,
           )}
