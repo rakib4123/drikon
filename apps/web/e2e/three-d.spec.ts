@@ -56,14 +56,12 @@ async function firstProductHref(page: Page): Promise<string | null> {
 }
 
 test.describe('3D storefront (WebGL on)', () => {
-  test('home renders the backdrop and hero scenes without errors', async () => {
+  test('home has no canvases yet and exactly one h1', async () => {
     await withPage(WEBGL_ON_ARGS, async (page) => {
       const errors = collectErrors(page);
       await page.goto('/');
       await expect(page.locator('h1')).toHaveCount(1);
-      await expect(page.locator('[data-scene="backdrop"] canvas')).toBeVisible({ timeout: 15_000 });
-      const hero = page.locator('[data-scene="hero"] canvas');
-      if ((await page.locator('[data-scene-fallback="hero"]').count()) === 0) await expect(hero).toBeVisible({ timeout: 15_000 });
+      await expect(page.locator('canvas')).toHaveCount(0);
       expect(errors).toEqual([]);
     });
   });
@@ -115,8 +113,6 @@ test.describe('3D storefront (WebGL off)', () => {
     await withPage(WEBGL_OFF_ARGS, async (page) => {
       const errors = collectErrors(page);
       await page.goto('/');
-      await expect(page.locator('[data-scene-fallback="backdrop"]')).toBeVisible();
-      await expect(page.locator('[data-scene-fallback="hero"]')).toBeVisible();
       await expect(page.locator('canvas')).toHaveCount(0);
       const href = await firstProductHref(page);
       if (href) {
