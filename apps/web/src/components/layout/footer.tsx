@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Mail, Facebook, Instagram, Banknote, Smartphone } from 'lucide-react';
 import { getTranslations, getLocale } from 'next-intl/server';
 import { BrandMark } from '@/components/layout/brand-mark';
+import { LanguageSwitcher } from '@/components/layout/language-switcher';
 import type { BrandInfo } from '@/lib/settings';
 import type { NavCategory } from '@/lib/catalog';
 import { localize } from '@/lib/localize';
@@ -18,31 +19,19 @@ interface FooterProps {
   payments: { bkash: boolean; cod: boolean };
 }
 
-/** Deep-navy megastore footer: brand + contact, three link columns, accepted payments. */
+/** Ink footer: brand + tagline, categories, help, contact + socials, then payments/language/copyright. */
 export async function Footer({ brand, categories = [], note, supportEmail, facebook, instagram, payments }: FooterProps) {
   const t = await getTranslations('nav');
   const locale = (await getLocale()) as Locale;
   const topCats = categories.filter((c) => !c.parentId).slice(0, 6);
+  const hasContact = !!(supportEmail || facebook || instagram);
 
   return (
-    <footer className="mt-16 bg-[color:var(--color-ink)] text-white/70 text-sm">
-      <div className="shell py-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1.1fr]">
+    <footer className="mt-16 bg-[color:var(--color-ink)] text-[color:var(--border-strong)] text-sm">
+      <div className={`shell py-14 grid gap-10 sm:grid-cols-2 ${hasContact ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
         <div>
           <BrandMark brand={brand} href={null} showTagline inverted />
-          <p className="mt-4 max-w-xs leading-relaxed">
-            {brand.tagline || t('footerAbout')}
-          </p>
-          {supportEmail && (
-            <a href={`mailto:${supportEmail}`} className="mt-5 inline-flex items-center gap-2 text-white hover:text-[color:var(--accent-2)] transition-colors">
-              <Mail aria-hidden className="w-4 h-4" /> {supportEmail}
-            </a>
-          )}
-          {(facebook || instagram) && (
-            <div className="mt-5 flex gap-2">
-              {facebook && <SocialLink href={facebook} label="Facebook"><Facebook className="w-4 h-4" /></SocialLink>}
-              {instagram && <SocialLink href={instagram} label="Instagram"><Instagram className="w-4 h-4" /></SocialLink>}
-            </div>
-          )}
+          <p className="mt-4 max-w-xs leading-relaxed">{brand.tagline || t('footerAbout')}</p>
         </div>
 
         <FooterColumn title={t('shop')}>
@@ -56,42 +45,66 @@ export async function Footer({ brand, categories = [], note, supportEmail, faceb
 
         <FooterColumn title={t('customerService')}>
           <FooterLink href="/orders">{t('trackOrder')}</FooterLink>
-          <FooterLink href="/dashboard">{t('myAccount')}</FooterLink>
-          <FooterLink href="/wishlist">{t('wishlist')}</FooterLink>
-          <FooterLink href="/compare">{t('compare')}</FooterLink>
           <FooterLink href="/shipping-returns">{t('shippingReturns')}</FooterLink>
-        </FooterColumn>
-
-        <FooterColumn title={t('company')}>
-          <FooterLink href="/about">{t('about')}</FooterLink>
           <FooterLink href="/contact">{t('contact')}</FooterLink>
-          <FooterLink href="/terms">{t('termsOfService')}</FooterLink>
           <FooterLink href="/privacy">{t('privacyPolicy')}</FooterLink>
+          <FooterLink href="/terms">{t('termsOfService')}</FooterLink>
         </FooterColumn>
 
-        {(payments.bkash || payments.cod) && (
+        {hasContact && (
           <div>
-            <h2 className="text-white font-bold text-[15px] mb-4">{t('weAccept')}</h2>
-            <div className="flex flex-wrap gap-2">
-              {payments.bkash && (
-                <span className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-2 text-[13px] font-extrabold text-[#e2136e]">
-                  <Smartphone aria-hidden className="w-4 h-4" /> bKash
-                </span>
-              )}
-              {payments.cod && (
-                <span className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-2 text-[13px] font-bold text-[color:var(--color-ink)]">
-                  <Banknote aria-hidden className="w-4 h-4" /> {t('cashOnDelivery')}
-                </span>
-              )}
-            </div>
+            <h2 className="font-display font-semibold text-[color:var(--surface-solid)] text-[15px] mb-4">{t('contact')}</h2>
+            {supportEmail && (
+              <a
+                href={`mailto:${supportEmail}`}
+                className="inline-flex items-center gap-2 text-[color:var(--surface-solid)] hover:text-[color:var(--accent-2)] transition-colors"
+              >
+                <Mail aria-hidden className="w-4 h-4" /> {supportEmail}
+              </a>
+            )}
+            {(facebook || instagram) && (
+              <div className="mt-5 flex gap-2">
+                {facebook && (
+                  <SocialLink href={facebook} label="Facebook">
+                    <Facebook className="w-4 h-4" />
+                  </SocialLink>
+                )}
+                {instagram && (
+                  <SocialLink href={instagram} label="Instagram">
+                    <Instagram className="w-4 h-4" />
+                  </SocialLink>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
 
       <div className="border-t border-white/10">
-        <div className="shell py-5 flex flex-col sm:flex-row justify-between gap-2 text-xs text-white/50">
-          <span>© {new Date().getFullYear()} {brand.siteName}. {t('allRightsReserved')}</span>
-          {note && <span>{note}</span>}
+        <div className="shell py-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+          {(payments.bkash || payments.cod) && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="mr-1 text-[color:var(--border-strong)]">{t('weAccept')}</span>
+              {payments.bkash && (
+                <span className="inline-flex items-center gap-2 rounded-md bg-[color:var(--surface-solid)] px-3 py-1.5 text-[13px] font-extrabold text-[#e2136e]">
+                  <Smartphone aria-hidden className="w-4 h-4" /> bKash
+                </span>
+              )}
+              {payments.cod && (
+                <span className="inline-flex items-center gap-2 rounded-md bg-[color:var(--surface-solid)] px-3 py-1.5 text-[13px] font-bold text-[color:var(--color-ink)]">
+                  <Banknote aria-hidden className="w-4 h-4" /> {t('cashOnDelivery')}
+                </span>
+              )}
+            </div>
+          )}
+
+          <div className="flex items-center gap-4">
+            <LanguageSwitcher tone="dark" />
+            <span className="whitespace-nowrap">
+              © {new Date().getFullYear()} {brand.siteName}. {t('allRightsReserved')}
+            </span>
+            {note && <span className="whitespace-nowrap">{note}</span>}
+          </div>
         </div>
       </div>
     </footer>
@@ -101,7 +114,7 @@ export async function Footer({ brand, categories = [], note, supportEmail, faceb
 function FooterColumn({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h2 className="text-white font-bold text-[15px] mb-4">{title}</h2>
+      <h2 className="font-display font-semibold text-[color:var(--surface-solid)] text-[15px] mb-4">{title}</h2>
       <ul className="space-y-2.5">{children}</ul>
     </div>
   );
@@ -110,7 +123,7 @@ function FooterColumn({ title, children }: { title: string; children: React.Reac
 function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <li>
-      <Link href={href} className="hover:text-white hover:underline underline-offset-4 transition-colors">
+      <Link href={href} className="hover:text-[color:var(--surface-solid)] hover:underline underline-offset-4 transition-colors">
         {children}
       </Link>
     </li>
@@ -124,7 +137,7 @@ function SocialLink({ href, label, children }: { href: string; label: string; ch
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="w-9 h-9 rounded-full bg-white/10 hover:bg-[color:var(--accent)] text-white hover:text-[color:var(--accent-fg)] grid place-items-center transition-colors"
+      className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/15 text-[color:var(--surface-solid)] hover:text-[color:var(--accent-2)] grid place-items-center transition-colors"
     >
       {children}
     </a>

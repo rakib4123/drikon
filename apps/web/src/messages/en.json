@@ -33,7 +33,11 @@
     "customerService": "Customer service",
     "weAccept": "We accept",
     "cashOnDelivery": "Cash on delivery",
-    "footerAbout": "Genuine smartphones and accessories, delivered across Bangladesh."
+    "footerAbout": "Genuine smartphones and accessories, delivered across Bangladesh.",
+    "categories": "Categories",
+    "topBrands": "Top brands",
+    "deals": "Deals",
+    "new": "New"
   },
   "search": {
     "searchLabel": "Search",
@@ -87,7 +91,14 @@
     "claimed": "{percent}% claimed",
     "topBrands": "Top brands",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "shopTheCategory": "Shop the category",
+    "viewProduct": "View product",
+    "spotlightKicker": "Spotlight",
+    "trustDelivery": "Free delivery over ৳3,000",
+    "trustReturns": "14-day returns",
+    "trustGenuine": "Genuine devices",
+    "trustSupport": "Real support"
   },
   "product": {
     "soldOut": "SOLD OUT",

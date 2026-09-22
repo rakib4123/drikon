@@ -63,7 +63,7 @@ export default function CheckoutPage() {
   );
 
   const currency = quote?.currency ?? items[0]?.currency ?? 'BDT';
-  const hasIssues = (quote?.issues.length ?? 0) > 0;
+  const hasIssues = (quote?.issues?.length ?? 0) > 0;
   // Never let an order go in against a stale or missing quote: the bKash amount
   // shown to the customer must be the amount the order will record.
   const canPlace = !!quote && !quoting && !hasIssues && !!payment;
@@ -163,7 +163,7 @@ export default function CheckoutPage() {
 
           <ul className="space-y-3 max-h-72 overflow-y-auto -mr-2 pr-2 pt-2 -mt-2">
             {items.map((item) => {
-              const q = quote?.lines.find((l) => l.productId === item.productId && (l.variantId ?? undefined) === item.variantId);
+              const q = quote?.lines?.find((l) => l.productId === item.productId && (l.variantId ?? undefined) === item.variantId);
               const issue = issueFor(item.productId, item.variantId);
               return (
                 <li key={`${item.productId}-${item.variantId ?? ''}`} className="flex gap-3 text-sm">

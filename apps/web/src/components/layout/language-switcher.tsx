@@ -7,7 +7,7 @@ import { Globe } from 'lucide-react';
 import { setLocale } from '@/lib/set-locale';
 import type { Locale } from '@/i18n/request';
 
-/** `tone="dark"` for the navy utility bar; `light` for white surfaces like the mobile drawer. */
+/** `tone="dark"` for the ink footer; `light` for cream surfaces like the header and the mobile drawer. */
 export function LanguageSwitcher({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
   const locale = useLocale() as Locale;
   const router = useRouter();
@@ -27,9 +27,9 @@ export function LanguageSwitcher({ tone = 'light' }: { tone?: 'light' | 'dark' }
       onClick={toggle}
       disabled={isPending}
       aria-label={locale === 'en' ? 'বাংলায় দেখুন' : 'View in English'}
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold transition-colors disabled:opacity-50 ${
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-colors disabled:opacity-50 ${
         tone === 'dark'
-          ? 'text-white/80 hover:text-white hover:bg-white/10'
+          ? 'text-[color:var(--border-strong)] hover:text-[color:var(--surface-solid)] hover:bg-white/10'
           : 'text-[color:var(--fg-muted)] hover:bg-[color:var(--bg-soft)] hover:text-[color:var(--fg)]'
       }`}
     >

@@ -11,7 +11,16 @@ const spring = { stiffness: 300, damping: 30 };
  * CSS 3D tilt with a cursor-following glare. Off on touch/coarse pointers and
  * under reduced motion — then it renders a plain wrapper with no transform.
  */
-export function TiltCard({ className, children }: { className?: string; children: React.ReactNode }) {
+export function TiltCard({
+  className,
+  children,
+  max = 5,
+}: {
+  className?: string;
+  children: React.ReactNode;
+  /** Maximum tilt in degrees (spec: 5°). */
+  max?: number;
+}) {
   const reduced = useReducedMotion();
   const [canHover, setCanHover] = useState(false);
   const glare = useRef<HTMLDivElement>(null);
@@ -42,7 +51,7 @@ export function TiltCard({ className, children }: { className?: string; children
       onPointerMove={
         enabled
           ? (e) => {
-              const t = tiltFromPointer(e.clientX, e.clientY, e.currentTarget.getBoundingClientRect());
+              const t = tiltFromPointer(e.clientX, e.clientY, e.currentTarget.getBoundingClientRect(), max);
               rx.set(t.rotateX);
               ry.set(t.rotateY);
               glare.current?.style.setProperty('--gx', `${t.glareX}%`);

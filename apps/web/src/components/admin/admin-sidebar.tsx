@@ -100,7 +100,7 @@ export function AdminSidebar({ onNavigate }: { onNavigate?: () => void }) {
                       onClick={onNavigate}
                       aria-current={active ? 'page' : undefined}
                       className={`relative flex items-center gap-3 rounded-[var(--radius-ctl)] px-3 py-2 text-[13.5px] font-medium transition-colors ${
-                        active ? 'bg-[color:var(--accent)] text-white' : 'hover:bg-white/8 hover:text-white'
+                        active ? 'bg-[color:var(--accent)] text-[color:var(--accent-fg)]' : 'hover:bg-white/8 hover:text-white'
                       }`}
                     >
                       <Icon aria-hidden className="w-[18px] h-[18px] shrink-0" />

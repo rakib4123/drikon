@@ -17,6 +17,10 @@ describe('tiltFromPointer', () => {
     expect(tiltFromPointer(100, 300, rect, 8)).toEqual({ rotateX: -8, rotateY: -8, glareX: 0, glareY: 100 });
   });
 
+  it('caps at 5° for the default card tilt (spec: max 5°)', () => {
+    expect(tiltFromPointer(300, 200, rect, 5)).toEqual({ rotateX: 5, rotateY: 5, glareX: 100, glareY: 0 });
+  });
+
   it('clamps pointers outside the card', () => {
     expect(tiltFromPointer(-500, 9999, rect, 8)).toEqual({ rotateX: -8, rotateY: -8, glareX: 0, glareY: 100 });
   });

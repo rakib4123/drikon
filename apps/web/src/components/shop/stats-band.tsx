@@ -14,7 +14,7 @@ export async function StatsBand() {
 
   return (
     <section className="max-w-7xl mx-auto px-6 pb-4">
-      <div className="relative overflow-hidden rounded-3xl bg-drikon-gradient grain text-white">
+      <div className="relative overflow-hidden rounded-3xl bg-drikon-gradient text-white">
         <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-px bg-white/10">
           {STATS.map((s) => (
             <div key={s.label} className="bg-white/5 px-6 py-8 flex flex-col items-center text-center gap-2">
