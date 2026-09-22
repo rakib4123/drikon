@@ -36,7 +36,7 @@ export function MegaMenu({
     <NavigationMenu.Root className="relative flex">
       <NavigationMenu.List className="flex h-full list-none m-0 p-0 items-center">
         <NavigationMenu.Item className="flex">
-          <NavigationMenu.Trigger className="group flex items-center gap-1.5 rounded-full px-3 py-2 text-[14px] font-semibold text-[color:var(--fg)] hover:text-[color:var(--accent-2)] hover:bg-[color:var(--bg-soft)] data-[state=open]:text-[color:var(--accent-2)] data-[state=open]:bg-[color:var(--bg-soft)] transition-colors">
+          <NavigationMenu.Trigger className="group flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold text-[color:var(--fg)] hover:text-[color:var(--accent-2)] hover:bg-[color:var(--bg-soft)] data-[state=open]:text-[color:var(--accent-2)] data-[state=open]:bg-[color:var(--bg-soft)] transition-colors">
             {t('shop')}
             <ChevronDown aria-hidden className="w-4 h-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
           </NavigationMenu.Trigger>
@@ -49,7 +49,7 @@ export function MegaMenu({
             <div className="w-[min(90vw,600px)] rounded-[var(--radius-card)] bg-[color:var(--surface-solid)] border border-[color:var(--border)] shadow-[0_24px_48px_-20px_rgba(28,25,23,0.25)] overflow-hidden grid grid-cols-2">
               {/* Categories */}
               <div className="p-5 border-r border-[color:var(--border)]">
-                <h2 className="mb-3 text-[11px] font-bold uppercase tracking-wide text-[color:var(--fg-muted)]">
+                <h2 className="mb-3 text-2xs font-bold uppercase tracking-wide text-[color:var(--fg-muted)]">
                   {t('categories')}
                 </h2>
                 {topLevel.length === 0 ? (
@@ -79,7 +79,7 @@ export function MegaMenu({
 
               {/* Top brands */}
               <div className="p-5">
-                <h2 className="mb-3 text-[11px] font-bold uppercase tracking-wide text-[color:var(--fg-muted)]">
+                <h2 className="mb-3 text-2xs font-bold uppercase tracking-wide text-[color:var(--fg-muted)]">
                   {t('topBrands')}
                 </h2>
                 {brands.length === 0 ? (

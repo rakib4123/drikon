@@ -36,7 +36,7 @@ export function StarRating({
           ))}
         </span>
       </span>
-      {count !== undefined && <span className="text-[11.5px] text-[color:var(--fg-muted)]">({count})</span>}
+      {count !== undefined && <span className="text-2xs text-[color:var(--fg-muted)]">({count})</span>}
     </span>
   );
 }

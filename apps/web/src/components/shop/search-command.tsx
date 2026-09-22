@@ -254,7 +254,7 @@ export function SearchCommand() {
         <button
           type="button"
           aria-label={t('searchLabel')}
-          className="p-2 rounded-lg hover:bg-[color:var(--bg-soft)] transition-colors"
+          className="min-h-[45px] min-w-[45px] grid place-items-center rounded-lg hover:bg-[color:var(--bg-soft)] transition-colors"
         >
           <Search className="w-5 h-5" />
         </button>
@@ -281,7 +281,7 @@ export function SearchCommand() {
               setVoiceConfirm(null);
             }}
             placeholder={t('searchPlaceholder')}
-            className="flex-1 bg-transparent py-4 text-[15px] outline-none placeholder:text-[color:var(--fg-muted)]"
+            className="flex-1 bg-transparent py-4 text-sm outline-none placeholder:text-[color:var(--fg-muted)]"
           />
           {speechSupported && (
             <button
@@ -415,7 +415,7 @@ export function SearchCommand() {
           )}
         </div>
 
-        <div className="flex items-center justify-between px-4 py-2.5 border-t border-[color:var(--border)] text-[11px] text-[color:var(--fg-muted)]">
+        <div className="flex items-center justify-between px-4 py-2.5 border-t border-[color:var(--border)] text-2xs text-[color:var(--fg-muted)]">
           <span className="inline-flex items-center gap-1.5">
             <CornerDownLeft className="w-3 h-3" /> {t('seeAllResults')}
           </span>

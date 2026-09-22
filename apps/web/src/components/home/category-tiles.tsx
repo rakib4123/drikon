@@ -24,9 +24,9 @@ export async function CategoryTiles({ categories }: { categories: NavCategory[] 
   const tiles = top.slice(0, 3);
 
   return (
-    <section className="shell py-8" aria-labelledby="shop-by-category">
+    <section className="shell py-8 @container" aria-labelledby="shop-by-category">
       <SectionHeader id="shop-by-category" title={t('shopByCategory')} href="/products" linkLabel={t('viewAll')} />
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+      <div className="grid grid-cols-1 @[34rem]:grid-cols-2 @[52rem]:grid-cols-3 gap-4 sm:gap-5">
         {tiles.map((cat, i) => {
           const count = cat._count?.products;
           return (
@@ -80,7 +80,7 @@ export async function CategoryTiles({ categories }: { categories: NavCategory[] 
           <li key={cat.id}>
             <Link
               href={`/products?category=${cat.slug}`}
-              className="inline-flex items-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold transition-colors hover:border-[color:var(--accent-2)] hover:text-[color:var(--accent-2)]"
+              className="inline-flex items-center min-h-[45px] rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold transition-colors hover:border-[color:var(--accent-2)] hover:text-[color:var(--accent-2)]"
             >
               {localize(cat.name, cat.nameBn, locale)}
             </Link>

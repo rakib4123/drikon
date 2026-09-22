@@ -77,7 +77,7 @@ export function ProductMedia({
             aria-pressed={mode === m}
             onClick={() => choose(m)}
             className={cn(
-              'inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors',
+              'inline-flex items-center justify-center gap-1.5 min-h-[45px] rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors',
               mode === m ? 'bg-[color:var(--accent)] text-[color:var(--accent-fg)]' : 'text-[color:var(--fg-muted)] hover:text-[color:var(--fg)]',
             )}
           >

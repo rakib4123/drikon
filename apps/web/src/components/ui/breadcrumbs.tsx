@@ -13,7 +13,7 @@ export interface Crumb {
 export function Breadcrumbs({ items, homeLabel }: { items: Crumb[]; homeLabel: string }) {
   const all: Crumb[] = [{ label: homeLabel, href: '/' }, ...items];
   return (
-    <nav aria-label="Breadcrumb" className="text-[13px] text-[color:var(--fg-muted)]">
+    <nav aria-label="Breadcrumb" className="text-xs text-[color:var(--fg-muted)]">
       <ol className="flex flex-wrap items-center gap-1.5">
         {all.map((c, i) => {
           const last = i === all.length - 1;
@@ -25,7 +25,7 @@ export function Breadcrumbs({ items, homeLabel }: { items: Crumb[]; homeLabel: s
                   {c.label}
                 </span>
               ) : (
-                <Link href={c.href} className="inline-flex items-center gap-1 hover:text-[color:var(--accent)] transition-colors">
+                <Link href={c.href} className="inline-flex items-center gap-1 min-h-[45px] min-w-[45px] hover:text-[color:var(--accent)] transition-colors">
                   {i === 0 && <Home aria-hidden className="w-3.5 h-3.5" />}
                   {c.label}
                 </Link>

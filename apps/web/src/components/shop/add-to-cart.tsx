@@ -86,13 +86,16 @@ export function AddToCart({
   return (
     <div className={`flex flex-wrap gap-3 ${className ?? ''}`}>
       {/* Quantity stepper */}
-      <div className="inline-flex items-center border border-[color:var(--border-strong)] rounded-[var(--radius-ctl)] overflow-hidden shrink-0 h-12">
+      {/* Fixed 48px, not `h-12`: `--spacing-12` is a fluid token that shrinks below
+          44px near the mobile end of its clamp, which would clip the steppers
+          below their own 45px tap-target floor via this wrapper's `overflow-hidden`. */}
+      <div className="inline-flex items-center border border-[color:var(--border-strong)] rounded-[var(--radius-ctl)] overflow-hidden shrink-0 h-[48px]">
         <button
           type="button"
           aria-label={t('decreaseQuantity')}
           disabled={soldOut || qty <= 1}
           onClick={() => setQty((q) => Math.max(1, q - 1))}
-          className="h-full px-3.5 hover:bg-[color:var(--bg-soft)] transition-colors disabled:opacity-40"
+          className="h-full min-h-[45px] min-w-[45px] grid place-items-center px-3.5 hover:bg-[color:var(--bg-soft)] transition-colors disabled:opacity-40"
         >
           <Minus className="w-4 h-4" />
         </button>
@@ -102,7 +105,7 @@ export function AddToCart({
           aria-label={t('increaseQuantity')}
           disabled={soldOut || qty >= max}
           onClick={() => setQty((q) => Math.min(max, q + 1))}
-          className="h-full px-3.5 hover:bg-[color:var(--bg-soft)] transition-colors disabled:opacity-40"
+          className="h-full min-h-[45px] min-w-[45px] grid place-items-center px-3.5 hover:bg-[color:var(--bg-soft)] transition-colors disabled:opacity-40"
         >
           <Plus className="w-4 h-4" />
         </button>

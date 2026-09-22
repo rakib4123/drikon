@@ -91,7 +91,7 @@ export function FlashSaleSection() {
 
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+        <div className="grid-auto-products">
           {products.map((p, i) => {
             const it = sale.items[i];
             const claimed = it.inventoryCap ? Math.min(100, Math.round((it.soldCount / it.inventoryCap) * 100)) : null;
@@ -103,7 +103,7 @@ export function FlashSaleSection() {
                     <div className="h-1.5 rounded-full bg-white/15 overflow-hidden">
                       <div className="h-full rounded-full bg-[color:var(--accent-2)]" style={{ width: `${claimed}%` }} />
                     </div>
-                    <div className="mt-1 text-[11.5px] text-[color:var(--accent-fg)]/70">
+                    <div className="mt-1 text-2xs text-[color:var(--accent-fg)]/70">
                       {t('claimed', { percent: claimed })}
                     </div>
                   </div>
@@ -121,7 +121,7 @@ function TimeBox({ value, unit }: { value: number; unit: string }) {
   return (
     <span className="inline-flex items-baseline gap-0.5 rounded-md bg-white/10 text-[color:var(--accent-fg)] px-2 py-1 text-sm">
       {String(value).padStart(2, '0')}
-      <span className="text-[10px] font-semibold text-[color:var(--accent-fg)]/60">{unit}</span>
+      <span className="text-2xs font-semibold text-[color:var(--accent-fg)]/60">{unit}</span>
     </span>
   );
 }
