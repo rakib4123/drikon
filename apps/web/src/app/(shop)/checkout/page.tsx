@@ -171,7 +171,7 @@ export default function CheckoutPage() {
                     <div className="absolute inset-0 rounded-[var(--radius-ctl)] overflow-hidden border border-[color:var(--border)] [background:var(--image-well)]">
                       <ProductThumb src={q?.image ?? item.image} sizes="56px" />
                     </div>
-                    <span className="absolute -top-1.5 -right-1.5 min-w-5 h-5 px-1 rounded-full bg-[color:var(--fg)] text-[color:var(--accent-fg)] text-[10px] font-bold grid place-items-center">
+                    <span className="absolute -top-1.5 -right-1.5 min-w-5 h-5 px-1 rounded-full bg-[color:var(--fg)] text-[color:var(--accent-fg)] text-2xs font-bold grid place-items-center">
                       {item.quantity}
                     </span>
                   </div>
@@ -261,7 +261,7 @@ function Field({
 }) {
   return (
     <label className={`block ${className}`}>
-      <span className="block text-[13px] font-semibold mb-1.5">{label}</span>
+      <span className="block text-xs font-semibold mb-1.5">{label}</span>
       {children}
       {error && <span role="alert" className="block text-xs text-[color:var(--color-sale)] mt-1">{error}</span>}
     </label>

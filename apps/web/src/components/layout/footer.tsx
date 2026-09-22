@@ -53,7 +53,7 @@ export async function Footer({ brand, categories = [], note, supportEmail, faceb
 
         {hasContact && (
           <div>
-            <h2 className="font-display font-semibold text-[color:var(--surface-solid)] text-[15px] mb-4">{t('contact')}</h2>
+            <h2 className="font-display font-semibold text-[color:var(--surface-solid)] text-sm mb-4">{t('contact')}</h2>
             {supportEmail && (
               <a
                 href={`mailto:${supportEmail}`}
@@ -86,12 +86,12 @@ export async function Footer({ brand, categories = [], note, supportEmail, faceb
             <div className="flex flex-wrap items-center gap-2">
               <span className="mr-1 text-[color:var(--border-strong)]">{t('weAccept')}</span>
               {payments.bkash && (
-                <span className="inline-flex items-center gap-2 rounded-md bg-[color:var(--surface-solid)] px-3 py-1.5 text-[13px] font-extrabold text-[#e2136e]">
+                <span className="inline-flex items-center gap-2 rounded-md bg-[color:var(--surface-solid)] px-3 py-1.5 text-xs font-extrabold text-[#e2136e]">
                   <Smartphone aria-hidden className="w-4 h-4" /> bKash
                 </span>
               )}
               {payments.cod && (
-                <span className="inline-flex items-center gap-2 rounded-md bg-[color:var(--surface-solid)] px-3 py-1.5 text-[13px] font-bold text-[color:var(--color-ink)]">
+                <span className="inline-flex items-center gap-2 rounded-md bg-[color:var(--surface-solid)] px-3 py-1.5 text-xs font-bold text-[color:var(--color-ink)]">
                   <Banknote aria-hidden className="w-4 h-4" /> {t('cashOnDelivery')}
                 </span>
               )}
@@ -114,7 +114,7 @@ export async function Footer({ brand, categories = [], note, supportEmail, faceb
 function FooterColumn({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h2 className="font-display font-semibold text-[color:var(--surface-solid)] text-[15px] mb-4">{title}</h2>
+      <h2 className="font-display font-semibold text-[color:var(--surface-solid)] text-sm mb-4">{title}</h2>
       <ul className="space-y-2.5">{children}</ul>
     </div>
   );

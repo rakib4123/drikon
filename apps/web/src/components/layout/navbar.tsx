@@ -81,7 +81,7 @@ export function Navbar({
           {mounted && isAdmin && (
             <Link
               href="/admin"
-              className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-[color:var(--bg-soft)] hover:bg-[color:var(--border)] px-3 py-1.5 text-[13px] font-bold transition-colors"
+              className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-[color:var(--bg-soft)] hover:bg-[color:var(--border)] px-3 py-1.5 text-xs font-bold transition-colors"
             >
               <LayoutDashboard className="w-4 h-4" /> {t('admin')}
             </Link>
@@ -112,10 +112,10 @@ export function Navbar({
               <User className="w-5 h-5" />
             </span>
             <span className="hidden xl:inline leading-tight">
-              <span className="block text-[11px] text-[color:var(--fg-muted)]">
+              <span className="block text-2xs text-[color:var(--fg-muted)]">
                 {mounted && firstName ? t('hello', { name: firstName }) : t('helloSignIn')}
               </span>
-              <span className="block text-[13px] font-bold">{mounted && user ? t('myAccount') : t('accountAndOrders')}</span>
+              <span className="block text-xs font-bold">{mounted && user ? t('myAccount') : t('accountAndOrders')}</span>
             </span>
           </Link>
 
@@ -139,8 +139,8 @@ export function Navbar({
               {mounted && <CountBadge count={cartCount} />}
             </span>
             <span className="hidden xl:block leading-tight">
-              <span className="block text-[11px] text-[color:var(--fg-muted)]">{t('cart')}</span>
-              <span className="block text-[13px] font-bold">
+              <span className="block text-2xs text-[color:var(--fg-muted)]">{t('cart')}</span>
+              <span className="block text-xs font-bold">
                 {mounted ? formatPrice(cartTotal, cartCurrency) : formatPrice(0, 'BDT')}
               </span>
             </span>
@@ -180,7 +180,7 @@ function NavItem({ href, children }: { href: string; children: React.ReactNode }
   return (
     <Link
       href={href}
-      className="px-3 py-2 rounded-full text-[14px] font-semibold text-[color:var(--fg)] hover:text-[color:var(--accent-2)] hover:bg-[color:var(--bg-soft)] transition-colors"
+      className="px-3 py-2 rounded-full text-sm font-semibold text-[color:var(--fg)] hover:text-[color:var(--accent-2)] hover:bg-[color:var(--bg-soft)] transition-colors"
     >
       {children}
     </Link>

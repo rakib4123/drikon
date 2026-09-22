@@ -281,7 +281,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
             </div>
 
             {/* ─── Trust signals (admin-editable) ─── */}
-            <ul className="mt-5 grid sm:grid-cols-3 gap-3 text-[13px]">
+            <ul className="mt-5 grid sm:grid-cols-3 gap-3 text-xs">
               <TrustItem icon={<Truck className="w-5 h-5" />}>{content.shippingNote}</TrustItem>
               <TrustItem icon={<RefreshCw className="w-5 h-5" />}>{content.returnsNote}</TrustItem>
               <TrustItem icon={<ShieldCheck className="w-5 h-5" />}>{content.warrantyNote}</TrustItem>

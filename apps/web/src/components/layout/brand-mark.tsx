@@ -72,7 +72,7 @@ export function BrandMark({
       <span className="flex flex-col leading-none">
         <span className={`font-display text-[22px] font-extrabold tracking-tight ${inverted ? 'text-white' : ''}`}>{brand.siteName}</span>
         {showTagline && brand.tagline && (
-          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--accent-2)] mt-1">
+          <span className="text-2xs font-semibold uppercase tracking-[0.2em] text-[color:var(--accent-2)] mt-1">
             {brand.tagline}
           </span>
         )}

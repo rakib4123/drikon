@@ -175,7 +175,7 @@ export function HeaderSearch() {
                     </span>
                     <span className="text-right shrink-0">
                       <span className={`block text-sm price-now ${onSale ? 'is-sale' : ''}`}>{formatPrice(price, p.currency)}</span>
-                      {onSale && <span className="block text-[11px] price-was">{formatPrice(listPrice, p.currency)}</span>}
+                      {onSale && <span className="block text-2xs price-was">{formatPrice(listPrice, p.currency)}</span>}
                     </span>
                   </li>
                 );

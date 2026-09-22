@@ -121,7 +121,7 @@ function TimeBox({ value, unit }: { value: number; unit: string }) {
   return (
     <span className="inline-flex items-baseline gap-0.5 rounded-md bg-white/10 text-[color:var(--accent-fg)] px-2 py-1 text-sm">
       {String(value).padStart(2, '0')}
-      <span className="text-[10px] font-semibold text-[color:var(--accent-fg)]/60">{unit}</span>
+      <span className="text-2xs font-semibold text-[color:var(--accent-fg)]/60">{unit}</span>
     </span>
   );
 }
