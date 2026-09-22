@@ -68,9 +68,9 @@ export function FlashSaleSection() {
 
   return (
     <section className="shell py-8" aria-labelledby="deal-heading">
-      <div className="rounded-[var(--radius-card)] border-2 border-[color:var(--accent-2)] bg-[color:var(--surface)] p-4 sm:p-6">
+      <div className="rounded-[var(--radius-card)] bg-[color:var(--color-ink)] text-[color:var(--accent-fg)] p-4 sm:p-6 lg:p-8">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mb-5">
-          <h2 id="deal-heading" className="flex items-center gap-2.5 text-xl md:text-2xl font-extrabold">
+          <h2 id="deal-heading" className="font-display flex items-center gap-2.5 text-xl md:text-2xl">
             <span className="w-9 h-9 rounded-full bg-[color:var(--accent-2)] text-[color:var(--color-ink)] grid place-items-center">
               <Zap aria-hidden className="w-5 h-5 fill-current" />
             </span>
@@ -79,7 +79,7 @@ export function FlashSaleSection() {
 
           {left && (
             <div className="flex items-center gap-2" role="timer" aria-label={t('endsIn')}>
-              <span className="text-sm font-semibold text-[color:var(--fg-muted)]">{t('endsIn')}</span>
+              <span className="text-sm font-semibold text-[color:var(--accent-fg)]/70">{t('endsIn')}</span>
               <div className="flex items-center gap-1 font-extrabold tabular-nums">
                 {left.d > 0 && <TimeBox value={left.d} unit={t('daysShort')} />}
                 <TimeBox value={left.h} unit={t('hoursShort')} />
@@ -100,10 +100,10 @@ export function FlashSaleSection() {
                 <ProductCard product={p} />
                 {claimed !== null && (
                   <div>
-                    <div className="h-1.5 rounded-full bg-[color:var(--bg-soft)] overflow-hidden">
+                    <div className="h-1.5 rounded-full bg-white/15 overflow-hidden">
                       <div className="h-full rounded-full bg-[color:var(--accent-2)]" style={{ width: `${claimed}%` }} />
                     </div>
-                    <div className="mt-1 text-[11.5px] text-[color:var(--fg-muted)]">
+                    <div className="mt-1 text-[11.5px] text-[color:var(--accent-fg)]/70">
                       {t('claimed', { percent: claimed })}
                     </div>
                   </div>
@@ -119,9 +119,9 @@ export function FlashSaleSection() {
 
 function TimeBox({ value, unit }: { value: number; unit: string }) {
   return (
-    <span className="inline-flex items-baseline gap-0.5 rounded-md bg-[color:var(--color-ink)] text-white px-2 py-1 text-sm">
+    <span className="inline-flex items-baseline gap-0.5 rounded-md bg-white/10 text-[color:var(--accent-fg)] px-2 py-1 text-sm">
       {String(value).padStart(2, '0')}
-      <span className="text-[10px] font-semibold text-white/60">{unit}</span>
+      <span className="text-[10px] font-semibold text-[color:var(--accent-fg)]/60">{unit}</span>
     </span>
   );
 }

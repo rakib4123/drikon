@@ -57,7 +57,7 @@ export function HeroSlider({ slides }: { slides: Banner[] }) {
                   sizes="(min-width: 1280px) 780px, (min-width: 1024px) 70vw, 100vw"
                   className={`object-cover transition-transform ease-out duration-[6000ms] ${active && !reduce ? 'scale-110' : 'scale-100'}`}
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0b1424]/85 via-[#0b1424]/45 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[color:var(--color-ink)]/85 via-[color:var(--color-ink)]/45 to-transparent" />
               </>
             ) : (
               <div className="absolute inset-0 bg-drikon-gradient" />
@@ -71,7 +71,7 @@ export function HeroSlider({ slides }: { slides: Banner[] }) {
                 animate={active && !reduce ? { opacity: 1, y: 0 } : reduce ? {} : { opacity: 0, y: 24 }}
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: active ? 0.18 : 0 }}
               >
-                <h2 className="display text-2xl sm:text-4xl lg:text-5xl mb-3 text-glow">{localize(b.heading, b.headingBn, locale)}</h2>
+                <h2 className="display text-2xl sm:text-4xl lg:text-5xl mb-3">{localize(b.heading, b.headingBn, locale)}</h2>
                 {b.subheading && (
                   <p className="text-white/85 text-sm sm:text-base mb-5 sm:mb-7 max-w-md line-clamp-2 sm:line-clamp-none">
                     {localize(b.subheading, b.subheadingBn, locale)}
@@ -97,7 +97,7 @@ export function HeroSlider({ slides }: { slides: Banner[] }) {
             type="button"
             onClick={() => go(index - 1)}
             aria-label="Previous slide"
-            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white/90 hover:bg-white shadow grid place-items-center text-[color:var(--color-ink)] transition-colors"
+            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-[color:var(--surface)]/95 hover:bg-[color:var(--surface)] shadow grid place-items-center text-[color:var(--color-ink)] transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -105,7 +105,7 @@ export function HeroSlider({ slides }: { slides: Banner[] }) {
             type="button"
             onClick={() => go(index + 1)}
             aria-label="Next slide"
-            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white/90 hover:bg-white shadow grid place-items-center text-[color:var(--color-ink)] transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-[color:var(--surface)]/95 hover:bg-[color:var(--surface)] shadow grid place-items-center text-[color:var(--color-ink)] transition-colors"
           >
             <ChevronRight className="w-5 h-5" />
           </button>

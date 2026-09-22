@@ -5,11 +5,10 @@ import { FlashSaleSection } from '@/components/shop/flash-sale-section';
 import { HeroSlider } from '@/components/shop/hero-slider';
 import { BrandStrip } from '@/components/shop/brand-strip';
 import { RecommendedForYou } from '@/components/shop/recommended-for-you';
-import { CategorySidebar } from '@/components/home/category-sidebar';
-import { PromoTiles } from '@/components/home/promo-tiles';
 import { HeroStage } from '@/components/home/hero-stage';
-import { ServiceStrip } from '@/components/home/service-strip';
-import { CategoryGrid } from '@/components/home/category-grid';
+import { CategoryTiles } from '@/components/home/category-tiles';
+import { Spotlight } from '@/components/home/spotlight';
+import { TrustStrip } from '@/components/home/trust-strip';
 import { ProductRow } from '@/components/home/product-row';
 import { PromoBanner } from '@/components/home/promo-banner';
 import { apiGet } from '@/lib/api-client';
@@ -51,20 +50,19 @@ export default async function HomePage() {
   const t = await getTranslations('home');
   const c = resolveContent(settings);
 
+  // The hero gets featured[0]; the two spotlights get the next two featured
+  // products that actually have a photo — a product without one can't stand
+  // on the 3D showcase or its 2D fallback.
+  const withImage = featured.filter((p) => p.images?.[0]?.url);
+  const heroProduct = withImage[0] ?? null;
+  const spotlight1 = withImage[1] ?? null;
+  const spotlight2 = withImage[2] ?? null;
+
   return (
     <>
-      {/* ─── Opening row: category sidebar · hero · promo tiles ─── */}
-      <section className="shell pt-4 lg:pt-0">
-        <div className="grid gap-4 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)_280px]">
-          <CategorySidebar categories={categories} brands={brands} />
-          <div className="lg:pt-4">
-            <HeroStage c={c} products={featured} />
-          </div>
-          <div className="hidden xl:flex lg:pt-4">
-            <PromoTiles dealsTitle={c.dealsTitle} dealsBlurb={c.dealsBlurb} dealsImage={c.dealsImage} pick={featured[0]} />
-          </div>
-        </div>
-      </section>
+      <HeroStage c={c} product={heroProduct} />
+
+      <CategoryTiles categories={categories} />
 
       {banners.length > 0 && (
         <section className="shell mt-4">
@@ -72,20 +70,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      <ServiceStrip features={c.features} />
-
-      {/* Only renders while a flash sale is live. */}
-      <FlashSaleSection />
-
-      <CategoryGrid categories={categories} />
-
-      <ProductRow
-        id="featured-products"
-        title={t('featuredProducts')}
-        href="/products?featured=true"
-        linkLabel={t('viewAll')}
-        products={featured}
-      />
+      <Spotlight product={spotlight1} labels={{ kicker: 'Spotlight', viewProduct: t('viewProduct') }} />
 
       <PromoBanner
         heading={c.ctaHeading}
@@ -102,6 +87,11 @@ export default async function HomePage() {
         products={newest}
       />
 
+      {/* Only renders while a flash sale is live. */}
+      <FlashSaleSection />
+
+      <Spotlight product={spotlight2} flip labels={{ kicker: 'Spotlight', viewProduct: t('viewProduct') }} />
+
       <ProductRow
         id="best-sellers"
         title={t('bestSellers')}
@@ -114,6 +104,8 @@ export default async function HomePage() {
       <RecommendedForYou />
 
       <BrandStrip brands={brands} />
+
+      <TrustStrip />
     </>
   );
 }
