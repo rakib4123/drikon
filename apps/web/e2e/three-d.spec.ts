@@ -56,12 +56,13 @@ async function firstProductHref(page: Page): Promise<string | null> {
 }
 
 test.describe('3D storefront (WebGL on)', () => {
-  test('home has no canvases yet and exactly one h1', async () => {
+  test('home shows exactly one h1 and the hero showcase canvas', async () => {
     await withPage(WEBGL_ON_ARGS, async (page) => {
       const errors = collectErrors(page);
       await page.goto('/');
       await expect(page.locator('h1')).toHaveCount(1);
-      await expect(page.locator('canvas')).toHaveCount(0);
+      await expect(page.locator('[data-scene="hero"]')).toHaveCount(1);
+      await expect(page.locator('[data-scene="hero"] canvas')).toBeVisible({ timeout: 15_000 });
       expect(errors).toEqual([]);
     });
   });
