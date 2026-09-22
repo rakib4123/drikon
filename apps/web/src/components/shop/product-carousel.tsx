@@ -101,7 +101,7 @@ function CarouselButton({
       aria-label={label}
       // Centred on the image area (top ~40% of a card), not the whole card.
       className={`hidden md:grid absolute top-[38%] -translate-y-1/2 z-10 w-10 h-10 place-items-center rounded-full
-                  bg-[color:var(--surface-solid)] border border-[color:var(--border)] shadow-[0_6px_16px_-6px_rgba(16,24,40,0.3)]
+                  bg-[color:var(--surface-solid)] border border-[color:var(--border)] shadow-[0_6px_16px_-6px_rgba(28,25,23,0.3)]
                   hover:bg-[color:var(--accent)] hover:text-[color:var(--accent-fg)] hover:border-[color:var(--accent)] transition-colors
                   disabled:opacity-0 disabled:pointer-events-none ${side === 'left' ? '-left-4' : '-right-4'}`}
     >

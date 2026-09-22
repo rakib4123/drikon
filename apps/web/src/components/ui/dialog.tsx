@@ -28,7 +28,7 @@ export function DialogOverlay({ className, ...props }: React.ComponentProps<type
   return (
     <DialogPrimitive.Overlay
       className={cn(
-        'fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm',
+        'fixed inset-0 z-[60] bg-black/50',
         'data-[state=open]:animate-dk-fade-in data-[state=closed]:animate-dk-fade-out',
         className,
       )}

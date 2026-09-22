@@ -180,7 +180,7 @@ export function FilterPanel({
 function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="p-5">
-      <h2 className="text-sm font-extrabold mb-3.5">{title}</h2>
+      <h2 className="font-display text-base mb-3.5">{title}</h2>
       {children}
     </section>
   );

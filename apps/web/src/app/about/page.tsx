@@ -66,7 +66,7 @@ export default async function AboutPage() {
 
       {/* ─── CLOSING CTA ─── */}
       <section className="max-w-7xl mx-auto px-6 py-24">
-        <Reveal className="relative overflow-hidden rounded-3xl bg-drikon-gradient p-10 md:p-16 text-white grain">
+        <Reveal className="relative overflow-hidden rounded-3xl bg-drikon-gradient p-10 md:p-16 text-white">
           <div className="relative z-10 max-w-2xl">
             <h3 className="display text-3xl md:text-5xl">{t('ctaHeading')}</h3>
             <p className="mt-4 text-white/80 max-w-lg">{t('ctaBody')}</p>
