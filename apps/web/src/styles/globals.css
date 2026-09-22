@@ -293,6 +293,16 @@ html, body {
     justify-content: center;
     gap: 0.5rem;
     padding: 0.7rem 1.25rem;
+    /* 44px is the minimum mobile tap target; 46px gives it a couple of pixels
+       of headroom. That margin matters because some call sites also carry a
+       Tailwind `h-12` for visual alignment with an adjacent `.input`, and
+       `--spacing-12` is one of Task 1's fluid tokens — it shrinks below 44px
+       near the mobile end of its clamp. `min-height` still wins over a smaller
+       conflicting `height` per the CSS spec, but right at a ~44.0px boundary,
+       sub-pixel layout rounding in headless Chromium has flipped the measured
+       result by a fraction of a pixel between otherwise-identical runs. The
+       extra 2px makes that non-issue instead of a flaky test. */
+    min-height: 2.875rem;
     border-radius: var(--radius-ctl);
     font-weight: 700;
     font-size: 0.9rem;

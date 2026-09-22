@@ -208,7 +208,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
             {product.brand && (
               <Link
                 href={`/products?brand=${product.brand.slug}`}
-                className="self-start text-xs font-bold uppercase tracking-wide text-[color:var(--accent)] hover:underline underline-offset-4 mb-1.5"
+                className="self-start inline-flex items-center min-h-[45px] text-xs font-bold uppercase tracking-wide text-[color:var(--accent)] hover:underline underline-offset-4 mb-1.5"
               >
                 {product.brand.name}
               </Link>
@@ -218,7 +218,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
             <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm">
               {product.reviewCount > 0 ? (
-                <a href="#product-tabs" className="inline-flex items-center gap-2 hover:text-[color:var(--accent)]">
+                <a href="#product-tabs" className="inline-flex items-center gap-2 min-h-[45px] hover:text-[color:var(--accent)]">
                   <StarRating value={product.averageRating} size={15} />
                   <span className="font-semibold">{product.averageRating.toFixed(1)}</span>
                   <span className="text-[color:var(--fg-muted)]">{t('reviewsCount', { count: product.reviewCount })}</span>

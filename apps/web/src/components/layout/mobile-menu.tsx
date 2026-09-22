@@ -45,7 +45,7 @@ export function MobileMenu({ brand, categories }: { brand: BrandInfo; categories
         <button
           type="button"
           aria-label="Open menu"
-          className="lg:hidden p-2 rounded-full text-[color:var(--fg)] hover:bg-[color:var(--bg-soft)] hover:text-[color:var(--accent-2)] transition-colors"
+          className="lg:hidden min-h-[45px] min-w-[45px] grid place-items-center rounded-full text-[color:var(--fg)] hover:bg-[color:var(--bg-soft)] hover:text-[color:var(--accent-2)] transition-colors"
         >
           <Menu className="w-5 h-5" />
         </button>

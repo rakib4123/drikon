@@ -21,7 +21,7 @@ export function SelectTrigger({ className, children, ...props }: React.Component
   return (
     <SelectPrimitive.Trigger
       className={cn(
-        'inline-flex items-center justify-between gap-2 rounded-[10px] px-3.5 py-2.5',
+        'inline-flex items-center justify-between gap-2 min-h-[45px] rounded-[10px] px-3.5 py-2.5',
         'border border-[color:var(--border)] bg-[color:var(--bg-soft)] text-[color:var(--fg)]',
         'text-sm transition-colors outline-none cursor-pointer',
         'data-[state=open]:border-[color:var(--accent)]',

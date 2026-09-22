@@ -67,8 +67,14 @@ export function WishlistButton({
       className={cn(
         'grid place-items-center transition-colors',
         variant === 'overlay'
-          ? 'w-9 h-9 rounded-full bg-[color:var(--bg)]/95 border border-[color:var(--border)] hover:bg-[color:var(--bg)] shadow-sm'
-          : 'w-12 h-12 rounded-xl border border-[color:var(--border)] hover:bg-[color:var(--bg-soft)]',
+          // 44px minimum tap target below the `md` breakpoint (where the responsive
+          // matrix requires it for touch); back to the tighter chip from `md` up,
+          // where a mouse pointer doesn't need the extra hit area.
+          ? 'w-[45px] h-[45px] md:w-9 md:h-9 rounded-full bg-[color:var(--bg)]/95 border border-[color:var(--border)] hover:bg-[color:var(--bg)] shadow-sm'
+          // Fixed 48px, not `w-12 h-12`: `--spacing-12` is one of the fluid tokens
+          // (Task 1), which shrinks to ~38px near the mobile end of its clamp —
+          // under the 44px tap-target floor on exactly the phones that need it most.
+          : 'w-[48px] h-[48px] rounded-xl border border-[color:var(--border)] hover:bg-[color:var(--bg-soft)]',
         className,
       )}
     >

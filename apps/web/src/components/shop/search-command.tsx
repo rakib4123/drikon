@@ -254,7 +254,7 @@ export function SearchCommand() {
         <button
           type="button"
           aria-label={t('searchLabel')}
-          className="p-2 rounded-lg hover:bg-[color:var(--bg-soft)] transition-colors"
+          className="min-h-[45px] min-w-[45px] grid place-items-center rounded-lg hover:bg-[color:var(--bg-soft)] transition-colors"
         >
           <Search className="w-5 h-5" />
         </button>

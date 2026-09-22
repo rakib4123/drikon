@@ -46,8 +46,10 @@ export function CompareButton({ product, variant = 'overlay', className }: Compa
       className={cn(
         'grid place-items-center transition-colors',
         variant === 'overlay'
-          ? 'w-9 h-9 rounded-full bg-[color:var(--bg)]/95 border border-[color:var(--border)] hover:bg-[color:var(--bg)] shadow-sm'
-          : 'w-12 h-12 rounded-xl border border-[color:var(--border)] hover:bg-[color:var(--bg-soft)]',
+          // See WishlistButton's overlay variant for why this grows below `md`.
+          ? 'w-[45px] h-[45px] md:w-9 md:h-9 rounded-full bg-[color:var(--bg)]/95 border border-[color:var(--border)] hover:bg-[color:var(--bg)] shadow-sm'
+          // See WishlistButton's inline variant for why this is a fixed px size.
+          : 'w-[48px] h-[48px] rounded-xl border border-[color:var(--border)] hover:bg-[color:var(--bg-soft)]',
         className,
       )}
     >
