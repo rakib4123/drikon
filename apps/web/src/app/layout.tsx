@@ -71,7 +71,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  // Matches the dark storefront background.
+  // Matches the cream storefront background.
   themeColor: '#f5f1ea',
   width: 'device-width',
   initialScale: 1,
@@ -83,23 +83,40 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const content = resolveContent(s);
   const brand = { siteName: s.siteName, logoUrl: s.logoUrl ?? null, tagline: s.tagline ?? null };
 
-  // Runtime accent override from admin branding — applies to both the
-  // storefront (:root) and the admin surface (.theme-classic), so admin
-  // previews the brand accent too instead of staying pinned to its hardcoded
-  // #0b57d0. Sets the --color-* theme tokens (not the aliases), so both the
-  // hand-written `var(--accent)` call sites AND the Tailwind-generated
+  // Runtime accent override from admin branding. The storefront's own accent
+  // is fixed black (buttons/headings), so on :root the admin-picked brand
+  // colour instead drives the bronze highlight and focus ring (--color-accent-2
+  // / --color-ring) — it never touches --color-accent there. Admin
+  // (.theme-classic) keeps the full override, including --color-accent, so it
+  // still previews the brand accent instead of staying pinned to its
+  // hardcoded #0b57d0; --color-accent-fg is recomputed from the accent's WCAG
+  // relative luminance there too, since an arbitrary admin-picked accent can
+  // be light or dark and the fixed #03121a default only reads well against
+  // light ones. Sets the --color-* theme tokens (not the aliases), so both
+  // the hand-written `var(--accent)` call sites AND the Tailwind-generated
   // utilities that read --color-accent pick the brand colour up without a
-  // redeploy. --color-accent-fg is recomputed from the accent's WCAG relative
-  // luminance too — an arbitrary admin-picked accent can be light or dark, and
-  // the fixed #03121a default only reads well against light ones.
-  const accentCss =
-    s.accentColor || s.accentColor2
-      ? `:root,.theme-classic{${
-          s.accentColor
-            ? `--color-accent:${s.accentColor};--color-ring:${s.accentColor};--color-accent-fg:${accentForeground(s.accentColor)};`
+  // redeploy.
+  //
+  // These values are interpolated directly into a <style> tag below, so
+  // they're re-validated as strict 6-digit hex here — anything else
+  // (including a malicious `}color:red;` breakout attempt) is treated as
+  // unset rather than trusted from the admin-settings payload.
+  const HEX = /^#[0-9a-fA-F]{6}$/;
+  const safeAccent = s.accentColor && HEX.test(s.accentColor) ? s.accentColor : undefined;
+  const safeAccent2 = s.accentColor2 && HEX.test(s.accentColor2) ? s.accentColor2 : undefined;
+
+  const storefrontAccent = safeAccent
+    ? `:root{--color-accent-2:${safeAccent};--color-ring:${safeAccent};}`
+    : '';
+  const adminAccent =
+    safeAccent || safeAccent2
+      ? `.theme-classic{${
+          safeAccent
+            ? `--color-accent:${safeAccent};--color-ring:${safeAccent};--color-accent-fg:${accentForeground(safeAccent)};`
             : ''
-        }${s.accentColor2 ? `--color-accent-2:${s.accentColor2};` : ''}}`
-      : null;
+        }${safeAccent2 ? `--color-accent-2:${safeAccent2};` : ''}}`
+      : '';
+  const accentCss = storefrontAccent + adminAccent || null;
 
   return (
     <html

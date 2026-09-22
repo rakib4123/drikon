@@ -69,7 +69,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               View store <ExternalLink aria-hidden className="w-3.5 h-3.5" />
             </Link>
             <div className="flex items-center gap-2.5 pl-2 sm:pl-3 sm:border-l border-[color:var(--border)]">
-              <span className="w-9 h-9 rounded-full bg-[color:var(--accent)] text-white grid place-items-center text-sm font-extrabold">
+              <span className="w-9 h-9 rounded-full bg-[color:var(--accent)] text-[color:var(--accent-fg)] grid place-items-center text-sm font-extrabold">
                 {user.name?.charAt(0)?.toUpperCase() ?? '•'}
               </span>
               <span className="hidden md:block leading-tight">

@@ -50,3 +50,11 @@ export function accentForeground(hex: string): typeof DARK_FG | typeof LIGHT_FG 
   const withLight = contrastRatio(bgLuminance, LIGHT_FG_LUM);
   return withDark >= withLight ? DARK_FG : LIGHT_FG;
 }
+
+/** WCAG contrast ratio (1–21) between two hex colours. Invalid input → 1. */
+export function contrastRatioHex(a: string, b: string): number {
+  const ra = parseHex(a);
+  const rb = parseHex(b);
+  if (!ra || !rb) return 1;
+  return contrastRatio(relativeLuminance(...ra), relativeLuminance(...rb));
+}

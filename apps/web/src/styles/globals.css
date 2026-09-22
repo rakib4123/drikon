@@ -1,15 +1,18 @@
 @import 'tailwindcss';
 
 /* ═══════════════════════════════════════════════════════════════
-   Design tokens — dark neon cyber
+   Design tokens — Warm Premium (editorial storefront)
    Declared in @theme so Tailwind generates utilities (bg-bg,
    text-fg-muted, bg-ink, text-sale, …). Tailwind emits each as a
    real custom property on :root, so the admin brand settings can
    still override --color-accent at runtime (see layout.tsx) and
    every utility follows.
 
-   Warm premium: cream page, solid cards, black buttons, bronze highlights. Text on accent fills uses --color-accent-fg (cream), not
-   white — the accent is a bright cyan.
+   Cream page (bg), solid off-white cards (surface), near-black
+   buttons/headings (accent/ink) and a bronze highlight (accent-2)
+   for links, focus rings and the brand accent. Text on accent
+   fills uses --color-accent-fg (cream), not white — the button
+   fill is near-black, not pure black.
    ═══════════════════════════════════════════════════════════════ */
 @theme {
   --color-bg:        #f5f1ea;
@@ -84,8 +87,8 @@
   --glass:         #fffdf9;
   --grid-line:     transparent;
   --shadow:        rgba(28, 25, 23, 0.08);
-  /* Skeleton shimmer highlight — dim on the storefront's dark surfaces, bright
-     on admin's light ones (see .theme-classic below). */
+  /* Skeleton shimmer highlight — cream on the storefront's warm surfaces,
+     white on admin's cooler ones (see .theme-classic below). */
   --skeleton-shine: rgba(255, 253, 249, 0.7);
   color-scheme: light;
 }
@@ -145,7 +148,7 @@ html, body {
   border-radius: 4px;
 }
 
-::selection { background: var(--accent); color: var(--accent-fg); }
+::selection { background: #b45309; color: #fffdf9; }
 
 /* ─── Scrollbar ─── */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
@@ -175,19 +178,19 @@ html, body {
   /* ─── Headings ─── */
   .display {
     font-family: var(--font-display);
-    font-weight: 800;
-    letter-spacing: -0.02em;
+    font-weight: 600;
+    letter-spacing: -0.015em;
     line-height: 1.15;
   }
 
-  /* Section header: bold title with an accent underline block — the megastore
-     signature, used on every homepage row. */
+  /* Section header: serif title with an accent underline block — used on
+     every homepage row. */
   .section-title {
     position: relative;
     font-family: var(--font-display);
     font-size: 1.25rem;
-    font-weight: 800;
-    letter-spacing: -0.01em;
+    font-weight: 600;
+    letter-spacing: -0.015em;
     line-height: 1.3;
     padding-bottom: 0.625rem;
   }
@@ -264,19 +267,19 @@ html, body {
     background: var(--accent);
     color: var(--accent-fg);
     border: 1px solid var(--accent);
-    box-shadow: 0 0 0 1px var(--accent), 0 8px 24px -10px var(--glow-edge);
+    box-shadow: 0 1px 2px var(--shadow), 0 8px 20px -12px var(--shadow);
   }
   .btn-primary:hover {
-    background: color-mix(in srgb, var(--accent) 88%, #fff);
-    border-color: color-mix(in srgb, var(--accent) 86%, #000);
-    box-shadow: 0 0 0 1px var(--accent), 0 10px 32px -8px var(--glow-edge);
+    background: #292524;
+    border-color: #292524;
+    box-shadow: 0 1px 2px var(--shadow), 0 10px 24px -10px var(--shadow);
   }
   .btn-ghost {
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-strong);
     background: var(--surface);
     color: var(--fg);
   }
-  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-ghost:hover { border-color: var(--fg); color: var(--accent); }
   .btn-dark {
     background: var(--color-ink);
     color: #ffffff;
@@ -295,30 +298,26 @@ html, body {
     border: 1px solid var(--border);
     border-radius: var(--radius-card);
     padding: 1.5rem;
-    box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 10px 30px -18px var(--shadow);
+    box-shadow: 0 1px 2px var(--shadow), 0 8px 24px -16px var(--shadow);
   }
   .card-hover {
     transition: box-shadow 0.2s ease, border-color 0.2s ease;
   }
   .card-hover:hover {
-    border-color: var(--glow-edge);
-    box-shadow: 0 0 0 1px var(--glow-edge), 0 18px 40px -18px var(--glow);
+    border-color: var(--border-strong);
+    box-shadow: 0 14px 32px -18px rgba(28,25,23,0.25);
   }
 
   /* ─── Commerce ─── */
-  /* Dark text, not white: white on the storefront's magenta --color-sale is
-     ~3.5:1 and fails WCAG AA for text this size. `var(--bg)` resolves to the
-     near-black storefront background (#05060d → ~5.8:1 on the magenta fill)
-     and, inside .theme-classic, to admin's white background — so this keeps
-     admin's original white-on-red badge (#ffffff on #e0302f, ~4.5:1)
-     unchanged without a separate override. */
+  /* White text on the sale-red fill: #ffffff on #b91c1c is ~5.9:1, comfortably
+     over WCAG AA, and matches admin's original white-on-red badge. */
   .badge-sale {
     display: inline-flex;
     align-items: center;
     padding: 0.2rem 0.45rem;
     border-radius: 5px;
     background: var(--color-sale);
-    color: var(--bg);
+    color: #ffffff;
     font-size: 0.7rem;
     font-weight: 800;
     line-height: 1;
@@ -334,15 +333,15 @@ html, body {
     font-weight: 800;
     line-height: 1;
   }
-  /* Orange deal badge. Navy text, not white: white on #ff7a00 is ~2.9:1 and fails
-     WCAG AA for text this size; navy on orange is ~7:1. */
+  /* Bronze deal badge. Cream text, not white: #fffdf9 on #b45309 is the same
+     accent-fg pairing used everywhere else the bronze accent is a fill. */
   .badge-deal {
     display: inline-flex;
     align-items: center;
     padding: 0.2rem 0.45rem;
     border-radius: 5px;
-    background: var(--accent-2);
-    color: var(--color-ink);
+    background: var(--color-accent-2);
+    color: #fffdf9;
     font-size: 0.7rem;
     font-weight: 800;
     line-height: 1;
@@ -422,7 +421,7 @@ html, body {
   @keyframes glow-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
   .animate-glow-pulse { animation: glow-pulse 2.4s ease-in-out infinite; }
 
-  .font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
+  .font-display { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.015em; }
   .neon-edge { transition: box-shadow 0.2s ease, border-color 0.2s ease; }
   .neon-edge:hover { border-color: var(--glow-edge); box-shadow: 0 0 0 1px var(--glow-edge), 0 0 28px -6px var(--glow); }
   .grid-texture {
@@ -442,7 +441,7 @@ html, body {
   }
 
   /* Admin (.theme-classic) keeps the pre-neon component look — spec §1. */
-  .theme-classic .btn-primary { color: #ffffff; box-shadow: 0 1px 2px var(--shadow); }
+  .theme-classic .btn-primary { color: var(--accent-fg); box-shadow: 0 1px 2px var(--shadow); }
   .theme-classic .btn-primary:hover {
     background: color-mix(in srgb, var(--accent) 86%, #000);
     border-color: color-mix(in srgb, var(--accent) 86%, #000);
