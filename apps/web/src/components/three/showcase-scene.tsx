@@ -11,8 +11,10 @@ import { useSafeTexture } from '@/lib/three/use-safe-texture';
 const CREAM = '#f3ece1';
 const BRONZE = '#b45309';
 
-/** Cream stand with a thin bronze ring — the constant base of every showcase. */
-function Stand() {
+/** Cream stand with a thin bronze ring — the constant base of every showcase.
+ * Exported so the product viewer (product-viewer-3d.tsx) reuses the same
+ * look instead of styling its own plinth. */
+export function Stand() {
   return (
     <group position={[0, -0.95, 0]}>
       <mesh receiveShadow>
@@ -27,7 +29,8 @@ function Stand() {
   );
 }
 
-function Turntable({ spin, full, children }: { spin: boolean; full: boolean; children: React.ReactNode }) {
+/** Exported for reuse by the product viewer's coarse-pointer, pre-tap state. */
+export function Turntable({ spin, full, children }: { spin: boolean; full: boolean; children: React.ReactNode }) {
   const g = useRef<Group>(null);
   useFrame(({ clock }, d) => {
     if (!spin || !g.current) return;

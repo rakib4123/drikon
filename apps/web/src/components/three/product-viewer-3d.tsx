@@ -1,12 +1,13 @@
 'use client';
 
 import { Suspense, useEffect, useRef, useState } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { Bounds, Center, ContactShadows, Image as DreiImage, OrbitControls, useGLTF } from '@react-three/drei';
 import { useReducedMotion } from 'motion/react';
 import type { Group } from 'three';
 import { useSafeTexture } from '@/lib/three/use-safe-texture';
 import { SceneBoundary, SceneCanvas } from './scene-canvas';
+import { Stand, Turntable } from './showcase-scene';
 
 function Model({ url }: { url: string }) {
   // Draco/Meshopt decoding needs worker-src blob:, gstatic, and 'wasm-unsafe-eval'
@@ -22,10 +23,11 @@ function Model({ url }: { url: string }) {
 }
 
 /**
- * Photo on a glass panel above a lit plinth; sways instead of spinning so the
- * back never shows. Sized and positioned to fit inside the shared camera's
- * frame with margin — the camera itself stays untouched so Model/Bounds
- * framing in the glTF path is unaffected.
+ * Photo on a glass panel above the shared warm Stand (same cream cylinder +
+ * bronze ring as ShowcaseScene); sways instead of spinning so the back never
+ * shows. Sized and positioned to fit inside the shared camera's frame with
+ * margin — the camera itself stays untouched so Model/Bounds framing in the
+ * glTF path is unaffected.
  *
  * The photo loads through useSafeTexture instead of drei's <Image url=…>, so a
  * broken or CORS-blocked photo degrades to onFail (2D gallery) instead of
@@ -56,14 +58,7 @@ function PhotoPlinth({ url, sway, onFail, onReady }: { url: string; sway: boolea
           </group>
         )
       )}
-      <mesh position={[0, -1.01, 0]}>
-        <cylinderGeometry args={[1.0, 1.1, 0.18, 64]} />
-        <meshStandardMaterial color="#0d1122" metalness={0.8} roughness={0.25} />
-      </mesh>
-      <mesh position={[0, -0.9, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[1.0, 0.02, 12, 96]} />
-        <meshStandardMaterial color="#22e5ff" emissive="#22e5ff" emissiveIntensity={2.4} />
-      </mesh>
+      <Stand />
     </group>
   );
 }
@@ -79,22 +74,6 @@ function FailSignal({ onFail }: { onFail: () => void }) {
  * so this fires exactly when the model is actually on screen, not before. */
 function ReadySignal({ onReady }: { onReady: () => void }) {
   useEffect(() => onReady(), [onReady]);
-  return null;
-}
-
-/**
- * Mounted only while drag-rotate is off on a coarse pointer. three-stdlib's
- * OrbitControls.connect() unconditionally sets `domElement.style.touchAction
- * = 'none'` on mount, regardless of `.enabled` — that's what was stealing
- * vertical swipes from the page. This restores `pan-y` while controls are
- * disabled, and puts it back to `none` the moment the visitor taps to enable
- * rotation (see the effect's dependency on `allowPageScroll`).
- */
-function TouchActionSync({ allowPageScroll }: { allowPageScroll: boolean }) {
-  const gl = useThree((s) => s.gl);
-  useEffect(() => {
-    gl.domElement.style.touchAction = allowPageScroll ? 'pan-y' : 'none';
-  }, [allowPageScroll, gl]);
   return null;
 }
 
@@ -139,7 +118,13 @@ export default function ProductViewer3D({
   // Photo-plinth mode never gets OrbitControls at all — it only sways, so
   // there's nothing to hijack scroll/zoom in the first place.
   const hasModel = !!modelUrl;
-  const dragEnabled = hasModel && (!coarse || tapEnabled);
+  // On a coarse pointer, <OrbitControls> is not mounted at all until the
+  // visitor taps "Tap to rotate" — three-stdlib's OrbitControls.connect() sets
+  // `touchAction: 'none'` on R3F's shared events.connected div unconditionally
+  // on mount (regardless of `enabled`), which is what was stealing vertical
+  // swipes from the page. Not mounting it is the fix; there is nothing to
+  // "re-allow" scroll on afterwards.
+  const controlsMounted = hasModel && (!coarse || tapEnabled);
   const showTapButton = hasModel && coarse && !tapEnabled;
   const showDragHint = hasModel && !showTapButton;
 
@@ -152,48 +137,46 @@ export default function ProductViewer3D({
         className="h-full w-full"
         camera={{ position: [0, 0.4, 4.2], fov: 40 }}
       >
-        <color attach="background" args={['#070914']} />
-        <ambientLight intensity={0.6} />
-        <directionalLight position={[3, 4, 2]} intensity={2.2} />
-        <pointLight position={[-3, 1, -2]} intensity={25} color="#8b5cf6" />
-        <pointLight position={[3, 0.5, -2]} intensity={25} color="#22e5ff" />
+        <color attach="background" args={['#efe9df']} />
+        <hemisphereLight args={['#fff7ed', '#e7dfd3', 0.9]} />
+        <directionalLight position={[2.5, 4, 3]} intensity={1.6} color="#fff1dc" />
+        <directionalLight position={[-3, 1.5, -2]} intensity={0.6} color="#fde7c7" />
         <SceneBoundary fallback={<FailSignal onFail={onFail} />}>
           <Suspense fallback={null}>
             {modelUrl ? (
-              <>
+              // Turntable spins the whole (already camera-fitted) model while
+              // OrbitControls isn't mounted — the coarse-pointer, pre-tap
+              // state — so the object still turns instead of sitting static.
+              <Turntable spin={!controlsMounted && !reduced} full>
                 <Model url={modelUrl} />
                 <ReadySignal onReady={onReady} />
-              </>
+              </Turntable>
             ) : imageUrl ? (
               <PhotoPlinth url={imageUrl} sway={!reduced} onFail={onFail} onReady={onReady} />
             ) : null}
           </Suspense>
         </SceneBoundary>
-        <ContactShadows position={[0, -1.1, 0]} opacity={0.55} scale={6} blur={2.4} far={2} color="#22e5ff" />
-        {hasModel && (
-          <>
-            {/* enableZoom is always off: three-stdlib's wheel handler only calls
-                preventDefault() once it's past the enableZoom check, so this is
-                what actually lets the page scroll under the cursor on desktop. */}
-            <OrbitControls
-              makeDefault
-              enabled={dragEnabled}
-              enableZoom={false}
-              enablePan={false}
-              autoRotate={!reduced}
-              autoRotateSpeed={1.2}
-              minDistance={2.5}
-              maxDistance={7}
-            />
-            <TouchActionSync allowPageScroll={!dragEnabled} />
-          </>
+        <ContactShadows position={[0, -1.1, 0]} opacity={0.55} scale={6} blur={2.4} far={2} color="#57534e" />
+        {controlsMounted && (
+          // enableZoom is always off: three-stdlib's wheel handler only calls
+          // preventDefault() once it's past the enableZoom check, so this is
+          // what actually lets the page scroll under the cursor on desktop.
+          <OrbitControls
+            makeDefault
+            enableZoom={false}
+            enablePan={false}
+            autoRotate={!reduced}
+            autoRotateSpeed={1.2}
+            minDistance={2.5}
+            maxDistance={7}
+          />
         )}
       </SceneCanvas>
       {showTapButton && (
         <button
           type="button"
           onClick={() => setTapEnabled(true)}
-          className="pointer-events-auto absolute bottom-3 inset-x-0 mx-auto w-fit rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-[color:var(--fg)] backdrop-blur"
+          className="pointer-events-auto absolute bottom-3 inset-x-0 mx-auto w-fit rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-[color:var(--fg)]"
         >
           {labels.tapHint}
         </button>
