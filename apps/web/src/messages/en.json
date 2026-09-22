@@ -33,7 +33,11 @@
     "customerService": "Customer service",
     "weAccept": "We accept",
     "cashOnDelivery": "Cash on delivery",
-    "footerAbout": "Genuine smartphones and accessories, delivered across Bangladesh."
+    "footerAbout": "Genuine smartphones and accessories, delivered across Bangladesh.",
+    "categories": "Categories",
+    "topBrands": "Top brands",
+    "deals": "Deals",
+    "new": "New"
   },
   "search": {
     "searchLabel": "Search",

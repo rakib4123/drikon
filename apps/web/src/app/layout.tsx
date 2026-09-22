@@ -4,13 +4,12 @@ import '../styles/globals.css';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import { Providers } from '@/components/layout/providers';
-import { TopBar } from '@/components/layout/top-bar';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { CompareTray } from '@/components/shop/compare-tray';
 import { SiteChrome } from '@/components/layout/site-chrome';
 import { getSettings, resolveContent } from '@/lib/settings';
-import { getCategories } from '@/lib/catalog';
+import { getCategories, getTopBrands } from '@/lib/catalog';
 import { SITE_URL } from '@/lib/site';
 import { accentForeground } from '@/lib/contrast';
 
@@ -78,7 +77,7 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [s, categories] = await Promise.all([getSettings(), getCategories()]);
+  const [s, categories, brands] = await Promise.all([getSettings(), getCategories(), getTopBrands()]);
   const [locale, messages, t] = await Promise.all([getLocale(), getMessages(), getTranslations('common')]);
   const content = resolveContent(s);
   const brand = { siteName: s.siteName, logoUrl: s.logoUrl ?? null, tagline: s.tagline ?? null };
@@ -136,12 +135,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <NextIntlClientProvider locale={locale} messages={messages}>
             <Providers settings={s}>
               <SiteChrome
-                header={
-                  <>
-                    <TopBar supportEmail={s.supportEmail} facebook={s.socialFacebook} instagram={s.socialInstagram} promo={content.topbarPromo} />
-                    <Navbar brand={brand} categories={categories} />
-                  </>
-                }
+                header={<Navbar brand={brand} categories={categories} brands={brands} />}
                 footer={
                   <Footer
                     brand={brand}
