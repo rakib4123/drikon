@@ -27,7 +27,7 @@ export async function Footer({ brand, categories = [], note, supportEmail, faceb
   const hasContact = !!(supportEmail || facebook || instagram);
 
   return (
-    <footer className="mt-16 bg-[color:var(--color-ink)] text-[color:var(--border-strong)] text-sm">
+    <footer className="mt-16 bg-[color:var(--color-ink)] text-[color:var(--border-strong)] text-sm pb-[max(2rem,env(safe-area-inset-bottom))]">
       <div className={`shell py-14 grid gap-10 sm:grid-cols-2 ${hasContact ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
         <div>
           <BrandMark brand={brand} href={null} showTagline inverted />
@@ -98,7 +98,11 @@ export async function Footer({ brand, categories = [], note, supportEmail, faceb
             </div>
           )}
 
-          <div className="flex items-center gap-4">
+          {/* flex-wrap: on a 320px viewport the language switch + copyright +
+              note don't fit on one unbroken line — without wrapping this row
+              forces the whole page wider than the viewport (each span keeps
+              whitespace-nowrap so a single phrase never breaks mid-word). */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
             <LanguageSwitcher tone="dark" />
             <span className="whitespace-nowrap">
               © {new Date().getFullYear()} {brand.siteName}. {t('allRightsReserved')}

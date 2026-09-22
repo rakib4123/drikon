@@ -24,9 +24,9 @@ export async function CategoryTiles({ categories }: { categories: NavCategory[] 
   const tiles = top.slice(0, 3);
 
   return (
-    <section className="shell py-8" aria-labelledby="shop-by-category">
+    <section className="shell py-8 @container" aria-labelledby="shop-by-category">
       <SectionHeader id="shop-by-category" title={t('shopByCategory')} href="/products" linkLabel={t('viewAll')} />
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+      <div className="grid grid-cols-1 @[34rem]:grid-cols-2 @[52rem]:grid-cols-3 gap-4 sm:gap-5">
         {tiles.map((cat, i) => {
           const count = cat._count?.products;
           return (

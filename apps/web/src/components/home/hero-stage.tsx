@@ -26,11 +26,15 @@ export async function HeroStage({ c, product }: { c: ResolvedContent; product: P
   const heroImage = product?.images?.[0]?.url ?? null;
   const heroName = product ? localize(product.name, product.nameBn, locale) : null;
   const heroAlt = heroName ?? c.heroBadge;
-  const showcase = <ShowcaseLoader name="hero" imageUrl={heroImage} alt={heroAlt} className="h-[280px] sm:h-[380px] lg:h-[460px]" />;
+  const showcase = <ShowcaseLoader name="hero" imageUrl={heroImage} alt={heroAlt} className="aspect-[4/3] min-h-[16rem] max-h-[70dvh] w-full" />;
 
   return (
-    <section className="shell pt-4 lg:pt-6">
-      <div className="grid gap-8 lg:grid-cols-2 items-center rounded-[var(--radius-card)] border border-[color:var(--border)] bg-[color:var(--surface)] px-6 py-10 sm:px-10 sm:py-12 lg:px-14 lg:py-14">
+    <section className="shell pt-4 lg:pt-6 @container">
+      {/* [&>*]:min-w-0: a grid item's automatic minimum width is its content's
+          min-content size, which can force the single mobile column (and the
+          showcase inside it) wider than the viewport before `@[48rem]` ever
+          splits it into two — min-w-0 lets each column actually shrink to fit. */}
+      <div className="grid gap-8 @[48rem]:grid-cols-2 items-center [&>*]:min-w-0 rounded-[var(--radius-card)] border border-[color:var(--border)] bg-[color:var(--surface)] px-6 py-10 sm:px-10 sm:py-12 lg:px-14 lg:py-14">
         <div className="animate-fade-up max-w-xl">
           <span className="badge-deal">{c.heroBadge}</span>
           <h1 className="font-display mt-4 text-4xl sm:text-5xl lg:text-6xl leading-[1.05]">

@@ -73,7 +73,7 @@ export default function WishlistPage() {
       </p>
 
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid-auto-products">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="card !p-0 aspect-[3/4] animate-pulse bg-[color:var(--bg-soft)]" />
           ))}
@@ -94,7 +94,7 @@ export default function WishlistPage() {
       ) : (
         <ProductGrid
           products={visible.map((e) => e.product)}
-          className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+          className="grid-auto-products"
         />
       )}
     </div>
