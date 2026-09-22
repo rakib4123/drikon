@@ -4,8 +4,10 @@ import { AnimatePresence, motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 
 /**
- * Cart / wishlist count badge that springs in and re-pops whenever the number
- * changes (keyed on `count`), for a satisfying "added!" beat. Hidden at zero.
+ * Cart / wishlist / compare count badge that springs in and re-pops whenever
+ * the number changes (keyed on `count`), for a satisfying "added!" beat.
+ * Hidden at zero. Always bronze with cream text — a single, consistent
+ * "something's in here" signal regardless of which icon it sits on.
  */
 export function CountBadge({ count, className }: { count: number; className?: string }) {
   return (
@@ -18,7 +20,8 @@ export function CountBadge({ count, className }: { count: number; className?: st
           exit={{ scale: 0, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 520, damping: 17 }}
           className={cn(
-            'absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full text-[10px] font-bold text-white grid place-items-center shadow-[0_0_10px_-2px_var(--glow)]',
+            'absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full text-[10px] font-bold grid place-items-center',
+            'bg-[color:var(--accent-2)] text-[color:var(--accent-fg)] shadow-[0_2px_5px_-1px_rgba(28,25,23,0.35)]',
             className,
           )}
         >

@@ -14,19 +14,30 @@ import { MegaMenu } from '@/components/layout/mega-menu';
 import { MobileMenu } from '@/components/layout/mobile-menu';
 import { CountBadge } from '@/components/layout/count-badge';
 import { HeaderSearch } from '@/components/layout/header-search';
+import { LanguageSwitcher } from '@/components/layout/language-switcher';
 import { formatPrice } from '@/lib/utils';
 import type { BrandInfo } from '@/lib/settings';
-import type { NavCategory } from '@/lib/catalog';
+import type { NavCategory, NavBrand } from '@/lib/catalog';
 
 /**
- * Megastore header: a white main row (brand · search · account/wishlist/
- * compare/cart) above a category bar. Both rows stick together, so search and
- * the category menu stay reachable while scrolling a long catalogue.
+ * Floating cream header: a single rounded pill, sticky with a 12px inset from
+ * the top. It replaces the old white main row + full-width accent category
+ * bar — the "Shop ▾" mega menu now carries the category tree, so there's no
+ * second row at all.
  *
  * Counts read from persisted client stores, so they render only after mount to
  * avoid a server/client hydration mismatch.
  */
-export function Navbar({ brand, categories }: { brand: BrandInfo; categories: NavCategory[] }) {
+export function Navbar({
+  brand,
+  categories,
+  brands = [],
+}: {
+  brand: BrandInfo;
+  categories: NavCategory[];
+  /** Top brands shown in the Shop ▾ panel's second column. */
+  brands?: NavBrand[];
+}) {
   const [mounted, setMounted] = useState(false);
   const t = useTranslations('nav');
   const user = useAuthStore((s) => s.user);
@@ -54,33 +65,53 @@ export function Navbar({ brand, categories }: { brand: BrandInfo; categories: Na
   const firstName = user?.name?.split(' ')[0];
 
   return (
-    <header className="sticky top-0 z-40 bg-[color:var(--surface-solid)]/90 backdrop-blur-md shadow-[0_1px_0_var(--border)]">
-      {/* ─── Main row ─── */}
-      <div className="shell h-16 md:h-[76px] flex items-center gap-3 md:gap-6">
+    <header className="sticky top-3 z-40 px-3 sm:px-4">
+      <div className="mx-auto flex h-16 max-w-[1320px] items-center gap-3 rounded-full border border-[color:var(--border)] bg-[color:var(--surface-solid)] px-4 shadow-[0_8px_30px_-12px_rgba(28,25,23,0.18)] sm:px-6">
         <div className="flex items-center gap-1 shrink-0">
-          <MobileMenu brand={brand} categories={categories} />
           <BrandMark brand={brand} />
         </div>
 
-        <div className="hidden md:block flex-1 max-w-2xl mx-auto">
+        {/* Desktop nav: Shop ▾ panel, Deals, New, Track order. Below `lg` this
+            collapses into the drawer MobileMenu opens. */}
+        <nav aria-label={t('mainNavigation')} className="hidden lg:flex items-center gap-1 shrink-0">
+          <MegaMenu categories={categories} brands={brands} />
+          <NavItem href="/products?featured=true">{t('deals')}</NavItem>
+          <NavItem href="/products?sort=newest">{t('new')}</NavItem>
+          <NavItem href="/orders">{t('trackOrder')}</NavItem>
+          {mounted && isAdmin && (
+            <Link
+              href="/admin"
+              className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-[color:var(--bg-soft)] hover:bg-[color:var(--border)] px-3 py-1.5 text-[13px] font-bold transition-colors"
+            >
+              <LayoutDashboard className="w-4 h-4" /> {t('admin')}
+            </Link>
+          )}
+        </nav>
+
+        <div className="hidden lg:block flex-1 min-w-0">
           <HeaderSearch />
         </div>
 
-        <div className="ml-auto md:ml-0 flex items-center gap-1 sm:gap-2 shrink-0">
-          {/* Always mounted for ⌘K and voice search; its own trigger stays hidden
-              because every width now shows a real search field. */}
-          <div className="hidden">
-            <SearchCommand />
-          </div>
+        {/* Always mounted for ⌘K and voice search; on `lg`+ its own trigger
+            stays hidden because the pill search field is visible instead. On
+            phones and tablets it IS the visible search entry point. */}
+        <div className="lg:hidden">
+          <SearchCommand />
+        </div>
+
+        <div className="ml-auto flex items-center gap-1 sm:gap-2 shrink-0">
+          <span className="hidden lg:inline-flex">
+            <LanguageSwitcher />
+          </span>
 
           <Link
             href={user ? '/dashboard' : '/login'}
-            className="hidden lg:flex items-center gap-2.5 pl-1 pr-2 py-1.5 rounded-lg hover:bg-[color:var(--bg-soft)] transition-colors"
+            className="hidden lg:flex items-center gap-2.5 pl-1 pr-2 py-1.5 rounded-full hover:bg-[color:var(--bg-soft)] transition-colors"
           >
             <span className="w-9 h-9 rounded-full border border-[color:var(--border)] grid place-items-center">
-              <User className="w-[18px] h-[18px]" />
+              <User className="w-5 h-5" />
             </span>
-            <span className="leading-tight">
+            <span className="hidden xl:inline leading-tight">
               <span className="block text-[11px] text-[color:var(--fg-muted)]">
                 {mounted && firstName ? t('hello', { name: firstName }) : t('helloSignIn')}
               </span>
@@ -88,20 +119,24 @@ export function Navbar({ brand, categories }: { brand: BrandInfo; categories: Na
             </span>
           </Link>
 
-          <HeaderIcon href="/compare" label={t('compare')} className="hidden md:inline-flex">
-            <GitCompare className="w-[21px] h-[21px]" />
-            {mounted && <CountBadge count={compareCount} className="bg-[color:var(--fg)] text-[color:var(--accent-fg)]" />}
+          <HeaderIcon href="/compare" label={t('compare')} className="hidden lg:inline-flex">
+            <GitCompare className="w-5 h-5 text-[color:var(--fg)] group-hover:text-[color:var(--accent-2)] transition-colors" />
+            {mounted && <CountBadge count={compareCount} />}
           </HeaderIcon>
 
-          <HeaderIcon href="/wishlist" label={t('wishlist')} className="hidden sm:inline-flex">
-            <Heart className="w-[21px] h-[21px]" />
-            {mounted && <CountBadge count={wishlistCount} className="bg-[color:var(--color-sale)]" />}
+          <HeaderIcon href="/wishlist" label={t('wishlist')} className="hidden lg:inline-flex">
+            <Heart className="w-5 h-5 text-[color:var(--fg)] group-hover:text-[color:var(--accent-2)] transition-colors" />
+            {mounted && <CountBadge count={wishlistCount} />}
           </HeaderIcon>
 
-          <Link href="/cart" aria-label={t('cart')} className="flex items-center gap-2.5 pl-2 pr-1 py-1.5 rounded-lg hover:bg-[color:var(--bg-soft)] transition-colors">
+          <Link
+            href="/cart"
+            aria-label={t('cart')}
+            className="group flex items-center gap-2.5 pl-2 pr-1 py-1.5 rounded-full hover:bg-[color:var(--bg-soft)] transition-colors"
+          >
             <span className="relative">
-              <ShoppingCart className="w-6 h-6" />
-              {mounted && <CountBadge count={cartCount} className="bg-[color:var(--accent)] text-[color:var(--accent-fg)]" />}
+              <ShoppingCart className="w-5 h-5 text-[color:var(--fg)] group-hover:text-[color:var(--accent-2)] transition-colors" />
+              {mounted && <CountBadge count={cartCount} />}
             </span>
             <span className="hidden xl:block leading-tight">
               <span className="block text-[11px] text-[color:var(--fg-muted)]">{t('cart')}</span>
@@ -110,36 +145,10 @@ export function Navbar({ brand, categories }: { brand: BrandInfo; categories: Na
               </span>
             </span>
           </Link>
+
+          <MobileMenu brand={brand} categories={categories} />
         </div>
       </div>
-
-      {/* ─── Phone search row: megastores keep search visible on mobile too ─── */}
-      <div className="md:hidden shell pb-3">
-        <HeaderSearch />
-      </div>
-
-      {/* ─── Category bar ─── */}
-      <nav aria-label={t('mainNavigation')} className="hidden lg:block bg-[color:var(--accent)] text-[color:var(--accent-fg)]">
-        <div className="shell h-12 flex items-stretch gap-6">
-          <MegaMenu categories={categories} />
-          <ul className="flex items-center gap-1 text-[13.5px] font-semibold">
-            <NavItem href="/">{t('home')}</NavItem>
-            <NavItem href="/products">{t('allProducts')}</NavItem>
-            <NavItem href="/showcase">{t('featured')}</NavItem>
-            <NavItem href="/products?sort=popular">{t('bestSellers')}</NavItem>
-            <NavItem href="/products?sort=newest">{t('newArrivals')}</NavItem>
-            <NavItem href="/orders">{t('trackOrder')}</NavItem>
-          </ul>
-          {mounted && isAdmin && (
-            <Link
-              href="/admin"
-              className="ml-auto self-center inline-flex items-center gap-1.5 rounded-md bg-white/15 hover:bg-white/25 px-3 py-1.5 text-[13px] font-bold transition-colors"
-            >
-              <LayoutDashboard className="w-4 h-4" /> {t('admin')}
-            </Link>
-          )}
-        </div>
-      </nav>
     </header>
   );
 }
@@ -160,7 +169,7 @@ function HeaderIcon({
       href={href}
       aria-label={label}
       title={label}
-      className={`relative items-center justify-center w-11 h-11 rounded-lg hover:bg-[color:var(--bg-soft)] transition-colors ${className}`}
+      className={`group relative items-center justify-center w-11 h-11 rounded-full hover:bg-[color:var(--bg-soft)] transition-colors ${className}`}
     >
       {children}
     </Link>
@@ -169,10 +178,11 @@ function HeaderIcon({
 
 function NavItem({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <li>
-      <Link href={href} className="px-3 py-2 rounded-md hover:bg-white/15 transition-colors">
-        {children}
-      </Link>
-    </li>
+    <Link
+      href={href}
+      className="px-3 py-2 rounded-full text-[14px] font-semibold text-[color:var(--fg)] hover:text-[color:var(--accent-2)] hover:bg-[color:var(--bg-soft)] transition-colors"
+    >
+      {children}
+    </Link>
   );
 }
