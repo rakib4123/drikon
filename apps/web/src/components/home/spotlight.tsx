@@ -33,9 +33,12 @@ export async function Spotlight({
   const { price } = effectivePrice(product);
 
   return (
-    <section className="shell py-10 lg:py-14">
-      <div className="grid gap-8 lg:grid-cols-2 items-center">
-        <Reveal className={flip ? 'lg:order-2' : undefined}>
+    <section className="shell py-10 lg:py-14 @container">
+      {/* [&>*]:min-w-0: see the matching comment in hero-stage.tsx — without
+          it the mobile single column refuses to shrink below its content's
+          min-content width and overflows the viewport. */}
+      <div className="grid gap-8 @[48rem]:grid-cols-2 items-center [&>*]:min-w-0">
+        <Reveal className={flip ? '@[48rem]:order-2' : undefined}>
           <div className="max-w-lg">
             <span className="text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--accent-2)]">
               {labels.kicker}
@@ -48,8 +51,8 @@ export async function Spotlight({
             </Link>
           </div>
         </Reveal>
-        <Reveal delay={0.1} className={flip ? 'lg:order-1' : undefined}>
-          <ShowcaseLoader name="spotlight" imageUrl={img} alt={name} className="h-[320px] sm:h-[380px] lg:h-[440px]" />
+        <Reveal delay={0.1} className={flip ? '@[48rem]:order-1' : undefined}>
+          <ShowcaseLoader name="spotlight" imageUrl={img} alt={name} className="aspect-[4/3] min-h-[16rem] max-h-[70dvh] w-full" />
         </Reveal>
       </div>
     </section>

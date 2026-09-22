@@ -65,8 +65,8 @@ export function Navbar({
   const firstName = user?.name?.split(' ')[0];
 
   return (
-    <header className="sticky top-3 z-40 px-3 sm:px-4">
-      <div className="mx-auto flex h-16 max-w-[1320px] items-center gap-3 rounded-full border border-[color:var(--border)] bg-[color:var(--surface-solid)] px-4 shadow-[0_8px_30px_-12px_rgba(28,25,23,0.18)] sm:px-6">
+    <header className="site-header sticky top-[max(0.75rem,env(safe-area-inset-top))] z-40 px-3 sm:px-4">
+      <div className="site-header-bar mx-auto flex h-16 max-w-[1320px] items-center gap-3 rounded-full border border-[color:var(--border)] bg-[color:var(--surface-solid)] px-4 shadow-[0_8px_30px_-12px_rgba(28,25,23,0.18)] sm:px-6">
         <div className="flex items-center gap-1 shrink-0">
           <BrandMark brand={brand} />
         </div>

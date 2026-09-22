@@ -91,7 +91,7 @@ export function FlashSaleSection() {
 
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+        <div className="grid-auto-products">
           {products.map((p, i) => {
             const it = sale.items[i];
             const claimed = it.inventoryCap ? Math.min(100, Math.round((it.soldCount / it.inventoryCap) * 100)) : null;

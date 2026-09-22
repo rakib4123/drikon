@@ -159,6 +159,19 @@
    any other component that needs a stronger border than the page default. */
 .input { border-color: var(--border-strong); }
 
+/* Landscape phones: the floating header must not eat the viewport. Unlayered
+   for the same reason as `.input` above — `.site-header-bar` also carries
+   the `h-16` utility (a fixed height), which lives in `@layer utilities` and
+   would otherwise always beat a `height` declared inside `@layer components`,
+   media query or not: cascade layers rank by layer order first, so a
+   components-layer rule can never win against a later utilities-layer rule
+   regardless of specificity. Declaring it unlayered puts it above every
+   layer, components and utilities alike. */
+@media (max-height: 500px) {
+  .site-header { padding-block: 0.25rem; }
+  .site-header .site-header-bar { height: 3rem; }
+}
+
 html, body {
   background: var(--bg);
   color: var(--fg);
@@ -203,6 +216,16 @@ html, body {
 
   /* Readable line length for prose blocks on wide screens. */
   .measure { max-width: 68ch; }
+
+  /* Product grids: the column floor is itself fluid, so the column count
+     follows the available width — 2 up on a phone, 5 on a laptop, 7 at 1920+
+     — and adapts inside narrower containers without extra classes. */
+  .grid-auto-products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(clamp(9.5rem, 22vw, 15rem), 1fr));
+    gap: clamp(0.75rem, 0.6rem + 0.5vw, 1.5rem);
+  }
+
 
   /* ─── Headings ─── */
   .display {
