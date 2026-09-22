@@ -41,7 +41,7 @@ export function Pagination({
     return qs ? `${basePath}?${qs}` : basePath;
   };
 
-  const cell = 'min-w-10 h-10 px-2 grid place-items-center rounded-[var(--radius-ctl)] text-sm font-semibold transition-colors';
+  const cell = 'min-w-[45px] h-[45px] px-2 grid place-items-center rounded-[var(--radius-ctl)] text-sm font-semibold transition-colors';
 
   return (
     <nav aria-label="Pagination" className="flex items-center justify-center gap-1.5 flex-wrap">

@@ -1,15 +1,35 @@
 'use client';
 
-import { Suspense, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { Suspense, useEffect, useRef } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
 import { Center, ContactShadows, Image as DreiImage, useGLTF } from '@react-three/drei';
 import { useReducedMotion } from 'motion/react';
-import type { Group } from 'three';
+import type { Group, PerspectiveCamera } from 'three';
 import { SceneCanvas, type SceneName } from './scene-canvas';
 import { useSafeTexture } from '@/lib/three/use-safe-texture';
 
 const CREAM = '#f3ece1';
 const BRONZE = '#b45309';
+
+/**
+ * Keeps the subject fully framed in any container shape. A portrait or narrow
+ * box needs the camera further back than a wide one, because the horizontal
+ * field of view shrinks with the aspect ratio.
+ */
+export function FitCamera({ radius }: { radius: number }) {
+  const camera = useThree((s) => s.camera) as PerspectiveCamera;
+  const size = useThree((s) => s.size);
+  useEffect(() => {
+    const aspect = size.width / Math.max(size.height, 1);
+    const vFov = (camera.fov * Math.PI) / 180;
+    const fitH = radius / Math.sin(vFov / 2);
+    const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect);
+    const fitW = radius / Math.sin(hFov / 2);
+    camera.position.setZ(Math.max(fitH, fitW) * 1.12);
+    camera.updateProjectionMatrix();
+  }, [camera, radius, size.width, size.height]);
+  return null;
+}
 
 /** Cream stand with a thin bronze ring — the constant base of every showcase.
  * Exported so the product viewer (product-viewer-3d.tsx) reuses the same
@@ -72,6 +92,7 @@ export default function ShowcaseScene({
   const spin = !useReducedMotion();
   return (
     <SceneCanvas name={name} tier={tier} fallback={fallback} className="h-full w-full" camera={{ position: [0, 0.35, 4.4], fov: 38 }}>
+      <FitCamera radius={1.35} />
       <hemisphereLight args={['#fff7ed', '#e7dfd3', 0.9]} />
       <directionalLight position={[2.5, 4, 3]} intensity={1.6} color="#fff1dc" />
       <directionalLight position={[-3, 1.5, -2]} intensity={0.6} color="#fde7c7" />

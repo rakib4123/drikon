@@ -247,14 +247,14 @@ export function ProductReviews({
                           {r.user.name}
                           {r.isVerified && (
                             <span
-                              className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-emerald-600"
+                              className="inline-flex items-center gap-0.5 text-2xs font-semibold text-emerald-600"
                               title="Verified purchase"
                             >
                               <BadgeCheck className="w-3.5 h-3.5" /> Verified
                             </span>
                           )}
                         </div>
-                        <div className="text-[11px] text-[color:var(--fg-muted)]">
+                        <div className="text-2xs text-[color:var(--fg-muted)]">
                           {dateFmt.format(new Date(r.createdAt))}
                         </div>
                       </div>

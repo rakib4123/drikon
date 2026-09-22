@@ -27,7 +27,7 @@ export async function Footer({ brand, categories = [], note, supportEmail, faceb
   const hasContact = !!(supportEmail || facebook || instagram);
 
   return (
-    <footer className="mt-16 bg-[color:var(--color-ink)] text-[color:var(--border-strong)] text-sm">
+    <footer className="mt-16 bg-[color:var(--color-ink)] text-[color:var(--border-strong)] text-sm pb-[max(2rem,env(safe-area-inset-bottom))]">
       <div className={`shell py-14 grid gap-10 sm:grid-cols-2 ${hasContact ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
         <div>
           <BrandMark brand={brand} href={null} showTagline inverted />
@@ -53,7 +53,7 @@ export async function Footer({ brand, categories = [], note, supportEmail, faceb
 
         {hasContact && (
           <div>
-            <h2 className="font-display font-semibold text-[color:var(--surface-solid)] text-[15px] mb-4">{t('contact')}</h2>
+            <h2 className="font-display font-semibold text-[color:var(--surface-solid)] text-sm mb-4">{t('contact')}</h2>
             {supportEmail && (
               <a
                 href={`mailto:${supportEmail}`}
@@ -86,19 +86,23 @@ export async function Footer({ brand, categories = [], note, supportEmail, faceb
             <div className="flex flex-wrap items-center gap-2">
               <span className="mr-1 text-[color:var(--border-strong)]">{t('weAccept')}</span>
               {payments.bkash && (
-                <span className="inline-flex items-center gap-2 rounded-md bg-[color:var(--surface-solid)] px-3 py-1.5 text-[13px] font-extrabold text-[#e2136e]">
+                <span className="inline-flex items-center gap-2 rounded-md bg-[color:var(--surface-solid)] px-3 py-1.5 text-xs font-extrabold text-[#e2136e]">
                   <Smartphone aria-hidden className="w-4 h-4" /> bKash
                 </span>
               )}
               {payments.cod && (
-                <span className="inline-flex items-center gap-2 rounded-md bg-[color:var(--surface-solid)] px-3 py-1.5 text-[13px] font-bold text-[color:var(--color-ink)]">
+                <span className="inline-flex items-center gap-2 rounded-md bg-[color:var(--surface-solid)] px-3 py-1.5 text-xs font-bold text-[color:var(--color-ink)]">
                   <Banknote aria-hidden className="w-4 h-4" /> {t('cashOnDelivery')}
                 </span>
               )}
             </div>
           )}
 
-          <div className="flex items-center gap-4">
+          {/* flex-wrap: on a 320px viewport the language switch + copyright +
+              note don't fit on one unbroken line — without wrapping this row
+              forces the whole page wider than the viewport (each span keeps
+              whitespace-nowrap so a single phrase never breaks mid-word). */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
             <LanguageSwitcher tone="dark" />
             <span className="whitespace-nowrap">
               © {new Date().getFullYear()} {brand.siteName}. {t('allRightsReserved')}
@@ -114,7 +118,7 @@ export async function Footer({ brand, categories = [], note, supportEmail, faceb
 function FooterColumn({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h2 className="font-display font-semibold text-[color:var(--surface-solid)] text-[15px] mb-4">{title}</h2>
+      <h2 className="font-display font-semibold text-[color:var(--surface-solid)] text-sm mb-4">{title}</h2>
       <ul className="space-y-2.5">{children}</ul>
     </div>
   );

@@ -132,7 +132,7 @@ function LoginForm() {
               label={t('password')}
               error={errors.password?.message}
               aside={
-                <Link href="/forgot-password" className="text-xs font-bold text-[color:var(--accent)] hover:underline underline-offset-4">
+                <Link href="/forgot-password" className="inline-flex items-center min-h-[45px] text-xs font-bold text-[color:var(--accent)] hover:underline underline-offset-4">
                   {t('forgotPassword')}
                 </Link>
               }

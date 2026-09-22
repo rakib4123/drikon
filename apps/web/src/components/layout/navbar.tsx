@@ -65,8 +65,8 @@ export function Navbar({
   const firstName = user?.name?.split(' ')[0];
 
   return (
-    <header className="sticky top-3 z-40 px-3 sm:px-4">
-      <div className="mx-auto flex h-16 max-w-[1320px] items-center gap-3 rounded-full border border-[color:var(--border)] bg-[color:var(--surface-solid)] px-4 shadow-[0_8px_30px_-12px_rgba(28,25,23,0.18)] sm:px-6">
+    <header className="site-header sticky top-[max(0.75rem,env(safe-area-inset-top))] z-40 px-3 sm:px-4">
+      <div className="site-header-bar mx-auto flex h-16 max-w-[1320px] items-center gap-3 rounded-full border border-[color:var(--border)] bg-[color:var(--surface-solid)] px-4 shadow-[0_8px_30px_-12px_rgba(28,25,23,0.18)] sm:px-6">
         <div className="flex items-center gap-1 shrink-0">
           <BrandMark brand={brand} />
         </div>
@@ -81,7 +81,7 @@ export function Navbar({
           {mounted && isAdmin && (
             <Link
               href="/admin"
-              className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-[color:var(--bg-soft)] hover:bg-[color:var(--border)] px-3 py-1.5 text-[13px] font-bold transition-colors"
+              className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-[color:var(--bg-soft)] hover:bg-[color:var(--border)] px-3 py-1.5 text-xs font-bold transition-colors"
             >
               <LayoutDashboard className="w-4 h-4" /> {t('admin')}
             </Link>
@@ -112,10 +112,10 @@ export function Navbar({
               <User className="w-5 h-5" />
             </span>
             <span className="hidden xl:inline leading-tight">
-              <span className="block text-[11px] text-[color:var(--fg-muted)]">
+              <span className="block text-2xs text-[color:var(--fg-muted)]">
                 {mounted && firstName ? t('hello', { name: firstName }) : t('helloSignIn')}
               </span>
-              <span className="block text-[13px] font-bold">{mounted && user ? t('myAccount') : t('accountAndOrders')}</span>
+              <span className="block text-xs font-bold">{mounted && user ? t('myAccount') : t('accountAndOrders')}</span>
             </span>
           </Link>
 
@@ -132,15 +132,15 @@ export function Navbar({
           <Link
             href="/cart"
             aria-label={t('cart')}
-            className="group flex items-center gap-2.5 pl-2 pr-1 py-1.5 rounded-full hover:bg-[color:var(--bg-soft)] transition-colors"
+            className="group flex items-center gap-2.5 pl-2 pr-1 py-1.5 min-h-[45px] min-w-[45px] rounded-full hover:bg-[color:var(--bg-soft)] transition-colors"
           >
             <span className="relative">
               <ShoppingCart className="w-5 h-5 text-[color:var(--fg)] group-hover:text-[color:var(--accent-2)] transition-colors" />
               {mounted && <CountBadge count={cartCount} />}
             </span>
             <span className="hidden xl:block leading-tight">
-              <span className="block text-[11px] text-[color:var(--fg-muted)]">{t('cart')}</span>
-              <span className="block text-[13px] font-bold">
+              <span className="block text-2xs text-[color:var(--fg-muted)]">{t('cart')}</span>
+              <span className="block text-xs font-bold">
                 {mounted ? formatPrice(cartTotal, cartCurrency) : formatPrice(0, 'BDT')}
               </span>
             </span>
@@ -180,7 +180,7 @@ function NavItem({ href, children }: { href: string; children: React.ReactNode }
   return (
     <Link
       href={href}
-      className="px-3 py-2 rounded-full text-[14px] font-semibold text-[color:var(--fg)] hover:text-[color:var(--accent-2)] hover:bg-[color:var(--bg-soft)] transition-colors"
+      className="px-3 py-2 rounded-full text-sm font-semibold text-[color:var(--fg)] hover:text-[color:var(--accent-2)] hover:bg-[color:var(--bg-soft)] transition-colors"
     >
       {children}
     </Link>

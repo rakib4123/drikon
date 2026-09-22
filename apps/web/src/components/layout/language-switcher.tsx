@@ -27,7 +27,7 @@ export function LanguageSwitcher({ tone = 'light' }: { tone?: 'light' | 'dark' }
       onClick={toggle}
       disabled={isPending}
       aria-label={locale === 'en' ? 'বাংলায় দেখুন' : 'View in English'}
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-colors disabled:opacity-50 ${
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 min-h-[45px] rounded-full text-xs font-semibold transition-colors disabled:opacity-50 ${
         tone === 'dark'
           ? 'text-[color:var(--border-strong)] hover:text-[color:var(--surface-solid)] hover:bg-white/10'
           : 'text-[color:var(--fg-muted)] hover:bg-[color:var(--bg-soft)] hover:text-[color:var(--fg)]'

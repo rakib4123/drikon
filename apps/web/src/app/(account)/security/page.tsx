@@ -138,7 +138,7 @@ export default function SecurityPage() {
                   className="flex flex-wrap items-end gap-3"
                 >
                   <label className="block">
-                    <span className="block text-[13px] font-semibold mb-1.5">{t('enterCode')}</span>
+                    <span className="block text-xs font-semibold mb-1.5">{t('enterCode')}</span>
                     <input
                       value={code}
                       onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
@@ -206,7 +206,7 @@ export default function SecurityPage() {
               className="flex flex-wrap items-end gap-3"
             >
               <label className="block">
-                <span className="block text-[13px] font-semibold mb-1.5">{t('disableLabel')}</span>
+                <span className="block text-xs font-semibold mb-1.5">{t('disableLabel')}</span>
                 <input
                   value={code}
                   onChange={(e) => setCode(e.target.value.trim().slice(0, 10))}

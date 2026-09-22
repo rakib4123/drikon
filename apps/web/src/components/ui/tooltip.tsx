@@ -39,7 +39,7 @@ export function IconTooltip({
       <span
         aria-hidden
         className="pointer-events-none absolute top-full left-1/2 z-30 mt-1.5 -translate-x-1/2
-                   whitespace-nowrap rounded-lg px-2 py-1 text-[11px] font-medium
+                   whitespace-nowrap rounded-lg px-2 py-1 text-2xs font-medium
                    bg-[color:var(--fg)] text-[color:var(--bg)] shadow-lg
                    opacity-0 scale-95 transition-[opacity,transform] duration-150
                    group-hover/tip:opacity-100 group-hover/tip:scale-100

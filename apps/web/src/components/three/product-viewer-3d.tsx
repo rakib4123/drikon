@@ -7,7 +7,7 @@ import { useReducedMotion } from 'motion/react';
 import type { Group } from 'three';
 import { useSafeTexture } from '@/lib/three/use-safe-texture';
 import { SceneBoundary, SceneCanvas } from './scene-canvas';
-import { Stand, Turntable } from './showcase-scene';
+import { FitCamera, Stand, Turntable } from './showcase-scene';
 
 function Model({ url }: { url: string }) {
   // Draco/Meshopt decoding needs worker-src blob:, gstatic, and 'wasm-unsafe-eval'
@@ -152,7 +152,10 @@ export default function ProductViewer3D({
                 <ReadySignal onReady={onReady} />
               </Turntable>
             ) : imageUrl ? (
-              <PhotoPlinth url={imageUrl} sway={!reduced} onFail={onFail} onReady={onReady} />
+              <>
+                <FitCamera radius={1.6} />
+                <PhotoPlinth url={imageUrl} sway={!reduced} onFail={onFail} onReady={onReady} />
+              </>
             ) : null}
           </Suspense>
         </SceneBoundary>
@@ -176,13 +179,13 @@ export default function ProductViewer3D({
         <button
           type="button"
           onClick={() => setTapEnabled(true)}
-          className="pointer-events-auto absolute bottom-3 inset-x-0 mx-auto w-fit rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-[color:var(--fg)]"
+          className="pointer-events-auto absolute bottom-3 inset-x-0 mx-auto w-fit rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3.5 py-1.5 font-mono text-2xs uppercase tracking-[0.2em] text-[color:var(--fg)]"
         >
           {labels.tapHint}
         </button>
       )}
       {showDragHint && (
-        <p className="pointer-events-none absolute bottom-3 inset-x-0 text-center font-mono text-[11px] uppercase tracking-[0.2em] text-[color:var(--fg-muted)]">
+        <p className="pointer-events-none absolute bottom-3 inset-x-0 text-center font-mono text-2xs uppercase tracking-[0.2em] text-[color:var(--fg-muted)]">
           {labels.dragHint}
         </p>
       )}
