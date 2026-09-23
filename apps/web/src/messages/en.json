@@ -37,7 +37,8 @@
     "categories": "Categories",
     "topBrands": "Top brands",
     "deals": "Deals",
-    "new": "New"
+    "new": "New",
+    "promoFallback": "Free delivery over ৳3,000 · Authentic devices"
   },
   "search": {
     "searchLabel": "Search",
