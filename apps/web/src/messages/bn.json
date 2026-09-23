@@ -37,7 +37,8 @@
     "categories": "ক্যাটাগরি",
     "topBrands": "শীর্ষ ব্র্যান্ড",
     "deals": "ডিল",
-    "new": "নতুন"
+    "new": "নতুন",
+    "promoFallback": "৳৩,০০০-এর বেশি অর্ডারে ফ্রি ডেলিভারি · আসল ডিভাইস"
   },
   "search": {
     "searchLabel": "সার্চ",
@@ -98,7 +99,9 @@
     "trustDelivery": "৳৩,০০০-এর বেশি অর্ডারে ফ্রি ডেলিভারি",
     "trustReturns": "১৪ দিনে রিটার্ন",
     "trustGenuine": "আসল ডিভাইস",
-    "trustSupport": "সত্যিকারের সাপোর্ট"
+    "trustSupport": "সত্যিকারের সাপোর্ট",
+    "allCategories": "সব ক্যাটাগরি",
+    "dealOfTheDay": "আজকের সেরা ডিল"
   },
   "product": {
     "soldOut": "স্টক শেষ",

@@ -27,7 +27,7 @@ export async function Footer({ brand, categories = [], note, supportEmail, faceb
   const hasContact = !!(supportEmail || facebook || instagram);
 
   return (
-    <footer className="mt-16 bg-[color:var(--color-ink)] text-[color:var(--border-strong)] text-sm pb-[max(2rem,env(safe-area-inset-bottom))]">
+    <footer className="mt-16 bg-[color:var(--color-ink)] carbon text-[color:#c9ced8] text-sm pb-[max(2rem,env(safe-area-inset-bottom))]">
       <div className={`shell py-14 grid gap-10 sm:grid-cols-2 ${hasContact ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
         <div>
           <BrandMark brand={brand} href={null} showTagline inverted />

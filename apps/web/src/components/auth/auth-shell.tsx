@@ -25,27 +25,29 @@ export function AuthShell({
   ];
 
   return (
-    <div className="shell py-8 sm:py-12">
-      <div className="mx-auto max-w-4xl grid md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] rounded-[var(--radius-card)] border border-[color:var(--border)] bg-[color:var(--surface)] shadow-[0_24px_60px_-30px_rgba(28,25,23,0.35)] overflow-hidden">
-        <div className="p-6 sm:p-10">
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{title}</h1>
-          {subtitle && <p className="mt-1.5 text-sm text-[color:var(--fg-muted)]">{subtitle}</p>}
-          <div className="mt-7">{children}</div>
-        </div>
+    <div className="min-h-full bg-[color:var(--bg-soft)]">
+      <div className="shell py-8 sm:py-12">
+        <div className="mx-auto max-w-4xl grid md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] rounded-[var(--radius-card)] border border-[color:var(--border)] bg-[color:var(--surface)] shadow-[0_24px_60px_-30px_rgba(28,25,23,0.35)] overflow-hidden">
+          <div className="p-6 sm:p-10">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{title}</h1>
+            {subtitle && <p className="mt-1.5 text-sm text-[color:var(--fg-muted)]">{subtitle}</p>}
+            <div className="mt-7">{children}</div>
+          </div>
 
-        <aside className="hidden md:flex flex-col justify-center gap-6 bg-drikon-gradient text-white p-10">
-          <p className="text-xl font-extrabold leading-snug">{t('panelTitle')}</p>
-          <ul className="space-y-4">
-            {perks.map(({ icon: Icon, label }) => (
-              <li key={label} className="flex items-center gap-3 text-sm text-white/85">
-                <span className="w-9 h-9 rounded-full bg-white/10 grid place-items-center shrink-0">
-                  <Icon aria-hidden className="w-[18px] h-[18px] text-[color:var(--accent-2)]" />
-                </span>
-                {label}
-              </li>
-            ))}
-          </ul>
-        </aside>
+          <aside className="hidden md:flex flex-col justify-center gap-6 bg-drikon-gradient text-white p-10">
+            <p className="text-xl font-extrabold leading-snug">{t('panelTitle')}</p>
+            <ul className="space-y-4">
+              {perks.map(({ icon: Icon, label }) => (
+                <li key={label} className="flex items-center gap-3 text-sm text-white/85">
+                  <span className="w-9 h-9 rounded-full bg-white/10 grid place-items-center shrink-0">
+                    <Icon aria-hidden className="w-[18px] h-[18px] text-[color:var(--accent-2)]" />
+                  </span>
+                  {label}
+                </li>
+              ))}
+            </ul>
+          </aside>
+        </div>
       </div>
     </div>
   );

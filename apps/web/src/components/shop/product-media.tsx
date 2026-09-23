@@ -91,7 +91,7 @@ export function ProductMedia({
         <ProductGallery images={images} name={name} badge={badge} />
       ) : (
         <>
-          <div className="relative aspect-square overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--border)] [background:var(--image-well)]">
+          <div className="relative aspect-square overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--border)] bg-[color:var(--color-ink)]">
             {!ready && (
               <div className="absolute inset-0 grid place-items-center">
                 <div className="absolute inset-0 opacity-40 [background:var(--image-well)]">

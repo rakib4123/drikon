@@ -72,13 +72,14 @@ export function MobileMenu({ brand, categories }: { brand: BrandInfo; categories
           <NavLink href="/products" icon={<Package className="w-4 h-4" />} onClick={close}>{t('allProducts')}</NavLink>
           <NavLink href="/products?featured=true" icon={<Sparkles className="w-4 h-4" />} onClick={close}>{t('deals')}</NavLink>
           <NavLink href="/products?sort=newest" icon={<Package className="w-4 h-4" />} onClick={close}>{t('new')}</NavLink>
+          <NavLink href="/products?sort=popular" icon={<Package className="w-4 h-4" />} onClick={close}>{t('bestSellers')}</NavLink>
           {isAdmin && (
             <NavLink href="/admin" icon={<LayoutDashboard className="w-4 h-4" />} onClick={close} accent>Admin</NavLink>
           )}
 
           {topLevel.length > 0 && (
             <div className="mt-4 pt-4 border-t border-[color:var(--border)]">
-              <div className="px-3 font-display text-xs font-semibold uppercase tracking-wide text-[color:var(--fg-muted)] mb-2">
+              <div className="px-3 font-display text-xs font-semibold uppercase tracking-wide text-[color:var(--fg)] mb-2">
                 {t('categories')}
               </div>
 
@@ -106,9 +107,9 @@ export function MobileMenu({ brand, categories }: { brand: BrandInfo; categories
                   return (
                     <Accordion.Item key={cat.id} value={cat.id} className="border-none">
                       <Accordion.Header className="m-0">
-                        <Accordion.Trigger className="group w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-[color:var(--bg-soft)] transition-colors">
+                        <Accordion.Trigger className="group w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-[color:var(--bg-soft)] hover:text-[color:var(--accent-2)] data-[state=open]:text-[color:var(--accent-2)] transition-colors">
                           {name}
-                          <ChevronDown className="w-4 h-4 text-[color:var(--fg-muted)] transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                          <ChevronDown className="w-4 h-4 text-[color:var(--fg-muted)] group-data-[state=open]:text-[color:var(--accent-2)] transition-transform duration-200 group-data-[state=open]:rotate-180" />
                         </Accordion.Trigger>
                       </Accordion.Header>
                       <Accordion.Content className="overflow-hidden data-[state=open]:animate-dk-fade-in">
@@ -182,7 +183,7 @@ function NavLink({
     <Link
       href={href}
       onClick={onClick}
-      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-[color:var(--bg-soft)] ${
+      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-[color:var(--bg-soft)] hover:text-[color:var(--accent-2)] transition-colors ${
         accent ? 'text-[color:var(--accent-2)] font-semibold' : ''
       }`}
     >

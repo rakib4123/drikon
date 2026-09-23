@@ -68,14 +68,19 @@ export function FlashSaleSection() {
 
   return (
     <section className="shell py-8" aria-labelledby="deal-heading">
-      <div className="rounded-[var(--radius-card)] bg-[color:var(--color-ink)] text-[color:var(--accent-fg)] p-4 sm:p-6 lg:p-8">
+      <div className="carbon rounded-[var(--radius-card)] bg-[color:var(--color-ink)] text-[color:var(--accent-fg)] p-4 sm:p-6 lg:p-8">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mb-5">
-          <h2 id="deal-heading" className="font-display flex items-center gap-2.5 text-xl md:text-2xl">
-            <span className="w-9 h-9 rounded-full bg-[color:var(--accent-2)] text-[color:var(--color-ink)] grid place-items-center">
-              <Zap aria-hidden className="w-5 h-5 fill-current" />
+          <div>
+            <span className="block text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--accent-2)]">
+              {t('dealOfTheDay')}
             </span>
-            {sale.name}
-          </h2>
+            <h2 id="deal-heading" className="font-display mt-1 flex items-center gap-2.5 text-xl md:text-2xl text-white">
+              <span className="w-9 h-9 rounded-full bg-[color:var(--accent-2)] text-[color:var(--color-ink)] grid place-items-center">
+                <Zap aria-hidden className="w-5 h-5 fill-current" />
+              </span>
+              {sale.name}
+            </h2>
+          </div>
 
           {left && (
             <div className="flex items-center gap-2" role="timer" aria-label={t('endsIn')}>
@@ -91,7 +96,32 @@ export function FlashSaleSection() {
 
         </div>
 
-        <div className="grid-auto-products">
+        {/* Scopes the shared ProductCard onto the ink-soft surface: these CSS
+            variables are what `.card`, `.price-now` etc. read, so overriding
+            them here (rather than editing product-card.tsx) turns every card
+            in this band dark without touching the component other rows use
+            on the white page. --cta-bg/--cta-border likewise re-point the
+            "Add to cart" button (normally --color-ink-on-ink, which is only
+            ~1.07:1 against this band's --color-ink-soft cards — nearly
+            invisible) to a solid var(--accent) red, hovering to a darker red
+            rather than the default's ink→accent swap (already red, so
+            hovering to the same red would show no change). */}
+        <div
+          className="grid-auto-products"
+          style={{
+            '--surface': 'var(--color-ink-soft)',
+            '--image-well': '#1c1c1f',
+            '--border': 'rgba(255,255,255,0.12)',
+            '--border-strong': 'rgba(255,255,255,0.24)',
+            '--fg': '#ffffff',
+            '--fg-muted': '#a7acb8',
+            '--shadow': 'rgba(0,0,0,0.6)',
+            '--cta-bg': 'var(--accent)',
+            '--cta-border': 'var(--accent)',
+            '--cta-hover-bg': 'color-mix(in srgb, var(--accent) 88%, #000)',
+            '--cta-hover-border': 'color-mix(in srgb, var(--accent) 88%, #000)',
+          } as React.CSSProperties}
+        >
           {products.map((p, i) => {
             const it = sale.items[i];
             const claimed = it.inventoryCap ? Math.min(100, Math.round((it.soldCount / it.inventoryCap) * 100)) : null;
@@ -119,9 +149,12 @@ export function FlashSaleSection() {
 
 function TimeBox({ value, unit }: { value: number; unit: string }) {
   return (
-    <span className="inline-flex items-baseline gap-0.5 rounded-md bg-white/10 text-[color:var(--accent-fg)] px-2 py-1 text-sm">
+    <span className="inline-flex items-baseline gap-0.5 rounded-md bg-[color:var(--accent-2)] text-[color:var(--color-fg)] px-2 py-1 text-sm font-extrabold">
       {String(value).padStart(2, '0')}
-      <span className="text-2xs font-semibold text-[color:var(--accent-fg)]/60">{unit}</span>
+      {/* Full-strength --color-fg, not a diluted /70: on the opaque orange
+          accent-2 fill, the blended 70%-opacity dark text only reached
+          ~4.2:1 — under the 4.5:1 minimum for this 2xs normal text. */}
+      <span className="text-2xs font-semibold text-[color:var(--color-fg)]">{unit}</span>
     </span>
   );
 }
