@@ -376,18 +376,6 @@ html, body {
 
   /* ─── Commerce ─── */
   /* White text on the sale-red fill: #ffffff on #e11d2a is well over WCAG AA,
-     and matches admin's original white-on-red badge. */
-  .badge-sale {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.2rem 0.45rem;
-    border-radius: 5px;
-    background: var(--color-sale);
-    color: #ffffff;
-    font-size: var(--text-2xs);
-    font-weight: 800;
-    line-height: 1;
-  }
   .badge-soft {
     display: inline-flex;
     align-items: center;
