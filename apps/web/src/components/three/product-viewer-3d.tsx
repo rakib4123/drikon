@@ -23,8 +23,8 @@ function Model({ url }: { url: string }) {
 }
 
 /**
- * Photo on a glass panel above the shared warm Stand (same cream cylinder +
- * bronze ring as ShowcaseScene); sways instead of spinning so the back never
+ * Photo on a glass panel above the shared dark Stand (same black cylinder +
+ * red ring as ShowcaseScene); sways instead of spinning so the back never
  * shows. Sized and positioned to fit inside the shared camera's frame with
  * margin — the camera itself stays untouched so Model/Bounds framing in the
  * glTF path is unaffected.
@@ -137,10 +137,11 @@ export default function ProductViewer3D({
         className="h-full w-full"
         camera={{ position: [0, 0.4, 4.2], fov: 40 }}
       >
-        <color attach="background" args={['#efe9df']} />
-        <hemisphereLight args={['#fff7ed', '#e7dfd3', 0.9]} />
-        <directionalLight position={[2.5, 4, 3]} intensity={1.6} color="#fff1dc" />
-        <directionalLight position={[-3, 1.5, -2]} intensity={0.6} color="#fde7c7" />
+        <color attach="background" args={['#0f1115']} />
+        <hemisphereLight args={['#ffffff', '#0a0a0a', 0.55]} />
+        <directionalLight position={[2.5, 4, 3]} intensity={1.5} />
+        <directionalLight position={[-3, 1.5, -2]} intensity={0.9} color="#e11d2a" />
+        <directionalLight position={[3, 1, -2.5]} intensity={0.7} color="#ff7a1a" />
         <SceneBoundary fallback={<FailSignal onFail={onFail} />}>
           <Suspense fallback={null}>
             {modelUrl ? (
