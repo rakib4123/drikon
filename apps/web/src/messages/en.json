@@ -99,7 +99,9 @@
     "trustDelivery": "Free delivery over ৳3,000",
     "trustReturns": "14-day returns",
     "trustGenuine": "Genuine devices",
-    "trustSupport": "Real support"
+    "trustSupport": "Real support",
+    "allCategories": "All categories",
+    "dealOfTheDay": "Deal of the day"
   },
   "product": {
     "soldOut": "SOLD OUT",
