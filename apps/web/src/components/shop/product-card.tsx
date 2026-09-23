@@ -16,7 +16,7 @@ import { StarRating } from './star-rating';
 import { ProductThumb } from './product-thumb';
 
 /**
- * Warm surface product tile with CSS 3D tilt: product on the image well, badges top-left,
+ * White surface product tile with CSS 3D tilt: product on the image well, badges top-left,
  * wishlist/compare rail top-right, rating, price, and a full-width add-to-cart.
  *
  * The action rail is hidden until hover only on devices that CAN hover. It
@@ -62,7 +62,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
         </Link>
 
         <div className="absolute top-2.5 left-2.5 flex flex-col items-start gap-1.5 pointer-events-none">
-          {discount > 0 && <span className="badge-sale">−{discount}%</span>}
+          {discount > 0 && <span className="badge-deal">−{discount}%</span>}
           {onFlashSale && (
             <span className="badge-deal">{t('flashSaleBadge')}</span>
           )}
@@ -114,9 +114,13 @@ export function ProductCard({ product }: { product: ProductSummary }) {
             });
             toast.success(t('addedToCartToastTitle'), { description: name });
           }}
+          // bg/border read --cta-bg/--cta-border rather than --color-ink directly: the
+          // deal band (flash-sale-section.tsx) scopes these on a wrapper style, the same
+          // way it scopes --surface/--fg, so this button stays visible against its dark
+          // ink-soft cards instead of nearly disappearing into them.
           className="mt-3 w-full inline-flex items-center justify-center gap-2 min-h-[45px] rounded-[var(--radius-ctl)] text-xs font-bold
-                     bg-[color:var(--accent)] text-[color:var(--accent-fg)] border border-[color:var(--accent)]
-                     enabled:hover:bg-[#292524] enabled:hover:border-[#292524]
+                     bg-[color:var(--cta-bg)] text-white border border-[color:var(--cta-border)]
+                     enabled:hover:bg-[color:var(--accent)] enabled:hover:border-[color:var(--accent)]
                      transition-colors disabled:border-[color:var(--border)] disabled:text-[color:var(--fg-muted)]
                      disabled:bg-[color:var(--bg-soft)] disabled:cursor-not-allowed"
         >
