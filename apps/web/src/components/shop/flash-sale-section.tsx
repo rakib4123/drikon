@@ -101,10 +101,11 @@ export function FlashSaleSection() {
             them here (rather than editing product-card.tsx) turns every card
             in this band dark without touching the component other rows use
             on the white page. --cta-bg/--cta-border likewise re-point the
-            "Add to cart" button (normally --color-ink-on-ink) to a translucent
-            white fill/border — --color-ink itself is barely distinguishable
-            from this band's --color-ink-soft cards (contrast ~1.07:1), which
-            left the button nearly invisible until it's hovered. */}
+            "Add to cart" button (normally --color-ink-on-ink, which is only
+            ~1.07:1 against this band's --color-ink-soft cards — nearly
+            invisible) to a solid var(--accent) red, hovering to a darker red
+            rather than the default's ink→accent swap (already red, so
+            hovering to the same red would show no change). */}
         <div
           className="grid-auto-products"
           style={{
@@ -115,8 +116,10 @@ export function FlashSaleSection() {
             '--fg': '#ffffff',
             '--fg-muted': '#a7acb8',
             '--shadow': 'rgba(0,0,0,0.6)',
-            '--cta-bg': 'rgba(255,255,255,0.08)',
-            '--cta-border': 'rgba(255,255,255,0.35)',
+            '--cta-bg': 'var(--accent)',
+            '--cta-border': 'var(--accent)',
+            '--cta-hover-bg': 'color-mix(in srgb, var(--accent) 88%, #000)',
+            '--cta-hover-border': 'color-mix(in srgb, var(--accent) 88%, #000)',
           } as React.CSSProperties}
         >
           {products.map((p, i) => {

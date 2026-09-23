@@ -114,13 +114,14 @@ export function ProductCard({ product }: { product: ProductSummary }) {
             });
             toast.success(t('addedToCartToastTitle'), { description: name });
           }}
-          // bg/border read --cta-bg/--cta-border rather than --color-ink directly: the
-          // deal band (flash-sale-section.tsx) scopes these on a wrapper style, the same
-          // way it scopes --surface/--fg, so this button stays visible against its dark
-          // ink-soft cards instead of nearly disappearing into them.
+          // bg/border (default AND hover) read --cta-bg/--cta-border/--cta-hover-bg/
+          // --cta-hover-border rather than --color-ink/--accent directly: the deal band
+          // (flash-sale-section.tsx) scopes these on a wrapper style, the same way it
+          // scopes --surface/--fg, so this button can become a solid on-brand red there
+          // instead of nearly disappearing (ink-on-ink) against its dark cards.
           className="mt-3 w-full inline-flex items-center justify-center gap-2 min-h-[45px] rounded-[var(--radius-ctl)] text-xs font-bold
                      bg-[color:var(--cta-bg)] text-white border border-[color:var(--cta-border)]
-                     enabled:hover:bg-[color:var(--accent)] enabled:hover:border-[color:var(--accent)]
+                     enabled:hover:bg-[color:var(--cta-hover-bg)] enabled:hover:border-[color:var(--cta-hover-border)]
                      transition-colors disabled:border-[color:var(--border)] disabled:text-[color:var(--fg-muted)]
                      disabled:bg-[color:var(--bg-soft)] disabled:cursor-not-allowed"
         >
