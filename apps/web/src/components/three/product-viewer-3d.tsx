@@ -160,7 +160,7 @@ export default function ProductViewer3D({
             ) : null}
           </Suspense>
         </SceneBoundary>
-        <ContactShadows position={[0, -1.1, 0]} opacity={0.55} scale={6} blur={2.4} far={2} color="#57534e" />
+        <ContactShadows position={[0, -1.1, 0]} opacity={0.55} scale={6} blur={2.4} far={2} color="#0a0a0a" />
         {controlsMounted && (
           // enableZoom is always off: three-stdlib's wheel handler only calls
           // preventDefault() once it's past the enableZoom check, so this is
