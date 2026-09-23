@@ -4,7 +4,9 @@ import '../styles/globals.css';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import { Providers } from '@/components/layout/providers';
+import { TopBar } from '@/components/layout/top-bar';
 import { Navbar } from '@/components/layout/navbar';
+import { CategoryBar } from '@/components/layout/category-bar';
 import { Footer } from '@/components/layout/footer';
 import { CompareTray } from '@/components/shop/compare-tray';
 import { SiteChrome } from '@/components/layout/site-chrome';
@@ -135,7 +137,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <NextIntlClientProvider locale={locale} messages={messages}>
             <Providers settings={s}>
               <SiteChrome
-                header={<Navbar brand={brand} categories={categories} brands={brands} />}
+                header={
+                  <>
+                    <TopBar
+                      supportEmail={s.supportEmail}
+                      facebook={s.socialFacebook}
+                      instagram={s.socialInstagram}
+                    />
+                    <Navbar brand={brand} categories={categories} />
+                    <CategoryBar categories={categories} brands={brands} />
+                  </>
+                }
                 footer={
                   <Footer
                     brand={brand}
