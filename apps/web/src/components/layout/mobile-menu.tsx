@@ -72,6 +72,7 @@ export function MobileMenu({ brand, categories }: { brand: BrandInfo; categories
           <NavLink href="/products" icon={<Package className="w-4 h-4" />} onClick={close}>{t('allProducts')}</NavLink>
           <NavLink href="/products?featured=true" icon={<Sparkles className="w-4 h-4" />} onClick={close}>{t('deals')}</NavLink>
           <NavLink href="/products?sort=newest" icon={<Package className="w-4 h-4" />} onClick={close}>{t('new')}</NavLink>
+          <NavLink href="/products?sort=popular" icon={<Package className="w-4 h-4" />} onClick={close}>{t('bestSellers')}</NavLink>
           {isAdmin && (
             <NavLink href="/admin" icon={<LayoutDashboard className="w-4 h-4" />} onClick={close} accent>Admin</NavLink>
           )}

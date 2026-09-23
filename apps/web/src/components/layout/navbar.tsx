@@ -65,11 +65,11 @@ export function Navbar({ brand, categories }: { brand: BrandInfo; categories: Na
 
   return (
     <header
-      className={`sticky top-0 z-40 bg-white border-b border-[color:var(--border)] transition-shadow ${
+      className={`site-header sticky top-0 z-40 bg-white border-b border-[color:var(--border)] transition-shadow ${
         scrolled ? 'shadow-[0_2px_10px_rgba(10,12,20,0.08)]' : ''
       }`}
     >
-      <div className="shell flex h-16 lg:h-[76px] items-center gap-3 lg:gap-6">
+      <div className="site-header-bar shell flex h-16 lg:h-[76px] items-center gap-3 lg:gap-6">
         <div className="flex items-center gap-1 shrink-0">
           <BrandMark brand={brand} />
         </div>
