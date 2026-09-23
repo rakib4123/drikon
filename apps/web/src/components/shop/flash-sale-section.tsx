@@ -142,7 +142,10 @@ function TimeBox({ value, unit }: { value: number; unit: string }) {
   return (
     <span className="inline-flex items-baseline gap-0.5 rounded-md bg-[color:var(--accent-2)] text-[color:var(--color-fg)] px-2 py-1 text-sm font-extrabold">
       {String(value).padStart(2, '0')}
-      <span className="text-2xs font-semibold text-[color:var(--color-fg)]/70">{unit}</span>
+      {/* Full-strength --color-fg, not a diluted /70: on the opaque orange
+          accent-2 fill, the blended 70%-opacity dark text only reached
+          ~4.2:1 — under the 4.5:1 minimum for this 2xs normal text. */}
+      <span className="text-2xs font-semibold text-[color:var(--color-fg)]">{unit}</span>
     </span>
   );
 }
