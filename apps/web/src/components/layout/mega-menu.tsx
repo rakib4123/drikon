@@ -61,9 +61,16 @@ export function MegaMenu({
                     key={i}
                     className={`p-5 ${i === 0 ? 'border-b sm:border-b-0 sm:border-r border-[color:var(--border)]' : ''}`}
                   >
-                    <h2 className="mb-3 text-xs font-bold uppercase tracking-wide text-[color:var(--accent)]">
-                      {i === 0 ? t('categories') : ' '}
-                    </h2>
+                    {i === 0 ? (
+                      <h2 className="mb-3 text-xs font-bold uppercase tracking-wide text-[color:var(--accent)]">
+                        {t('categories')}
+                      </h2>
+                    ) : (
+                      // Purely a spacer so the second column's list lines up with the
+                      // first's — not a heading, so it's invisible to screen readers
+                      // rather than announcing empty content.
+                      <div aria-hidden="true" className="mb-3 min-h-[1em] text-xs font-bold uppercase tracking-wide" />
+                    )}
                     <ul className="space-y-0.5 max-h-[52vh] overflow-y-auto">
                       {col.map((cat) => (
                         <li key={cat.id}>
