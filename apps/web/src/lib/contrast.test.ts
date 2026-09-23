@@ -45,3 +45,24 @@ describe('warm palette contrast (spec §1)', () => {
     expect(contrastRatioHex('#ffffff', '#000000')).toBeCloseTo(21, 1);
   });
 });
+
+describe('megastore palette contrast (spec §1)', () => {
+  const pairs: [string, string, string, number][] = [
+    ['white on red', '#ffffff', '#e11d2a', 4.5],
+    ['dark on orange', '#12141a', '#ff7a1a', 4.5],
+    ['text on white', '#12141a', '#ffffff', 4.5],
+    ['muted on white', '#5b6170', '#ffffff', 4.5],
+    ['red price on white', '#e11d2a', '#ffffff', 4.5],
+    ['white on ink', '#ffffff', '#0a0a0a', 4.5],
+    ['muted white on ink', '#c9ced8', '#0a0a0a', 4.5],
+    ['orange on ink', '#ff7a1a', '#0a0a0a', 4.5],
+    ['success on white', '#0d7d43', '#ffffff', 4.5],
+    ['focus ring on white', '#e11d2a', '#ffffff', 3],
+  ];
+  it.each(pairs)('%s meets its minimum', (_label, fg, bg, min) => {
+    expect(contrastRatioHex(fg, bg)).toBeGreaterThanOrEqual(min);
+  });
+  it('rejects white text on orange, which must use dark text', () => {
+    expect(contrastRatioHex('#ffffff', '#ff7a1a')).toBeLessThan(4.5);
+  });
+});
