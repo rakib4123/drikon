@@ -31,13 +31,17 @@ export function HeroSlider({ slides }: { slides: Banner[] }) {
 
   return (
     <section
-      className="relative h-[240px] sm:h-[340px] lg:h-[420px] overflow-hidden rounded-[var(--radius-card)] bg-[color:var(--color-ink)]"
+      className="carbon relative h-[240px] sm:h-[340px] lg:h-[420px] overflow-hidden rounded-[var(--radius-card)] bg-[color:var(--color-ink)]"
       aria-roledescription="carousel"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
       {slides.map((b, i) => {
         const active = i === index;
+        // Only the first slide's heading is an <h1> — the page's one and
+        // only — since every slide stays mounted (just opacity-toggled) and
+        // multiple <h1>s in the DOM would fail the a11y/SEO requirement.
+        const Heading = i === 0 ? 'h1' : 'h2';
         return (
           <div
             key={b.id}
@@ -71,7 +75,7 @@ export function HeroSlider({ slides }: { slides: Banner[] }) {
                 animate={active && !reduce ? { opacity: 1, y: 0 } : reduce ? {} : { opacity: 0, y: 24 }}
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: active ? 0.18 : 0 }}
               >
-                <h2 className="display text-2xl sm:text-4xl lg:text-5xl mb-3">{localize(b.heading, b.headingBn, locale)}</h2>
+                <Heading className="display text-2xl sm:text-4xl lg:text-5xl mb-3">{localize(b.heading, b.headingBn, locale)}</Heading>
                 {b.subheading && (
                   <p className="text-white/85 text-sm sm:text-base mb-5 sm:mb-7 max-w-md line-clamp-2 sm:line-clamp-none">
                     {localize(b.subheading, b.subheadingBn, locale)}

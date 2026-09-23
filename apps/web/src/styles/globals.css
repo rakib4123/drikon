@@ -1,38 +1,39 @@
 @import 'tailwindcss';
 
 /* ═══════════════════════════════════════════════════════════════
-   Design tokens — Warm Premium (editorial storefront)
+   Design tokens — Tech Megastore (black / red / orange / white)
    Declared in @theme so Tailwind generates utilities (bg-bg,
    text-fg-muted, bg-ink, text-sale, …). Tailwind emits each as a
    real custom property on :root, so the admin brand settings can
    still override --color-accent at runtime (see layout.tsx) and
    every utility follows.
 
-   Cream page (bg), solid off-white cards (surface), near-black
-   buttons/headings (accent/ink) and a bronze highlight (accent-2)
-   for links, focus rings and the brand accent. Text on accent
-   fills uses --color-accent-fg (cream), not white — the button
-   fill is near-black, not pure black.
+   White page (bg), solid white cards (surface), near-black bands
+   (ink) and a red/orange duotone (accent/accent-2) for buttons,
+   badges and the brand accent. Text on the red accent fill is
+   always white (--color-accent-fg); text on the orange accent-2
+   fill is always dark — orange never carries white text at AA
+   contrast, per the spec's contrast rules.
    ═══════════════════════════════════════════════════════════════ */
 @theme {
-  --color-bg:        #f5f1ea;
-  --color-bg-soft:   #efe9df;
-  --color-fg:        #1c1917;
-  --color-fg-muted:  #57534e;
-  --color-border:    #e7dfd3;
-  --color-accent:    #1c1917;
-  --color-accent-2:  #b45309;
-  --color-accent-fg: #fffdf9;
-  --color-ring:      #b45309;
+  --color-bg:        #ffffff;
+  --color-bg-soft:   #f4f5f7;
+  --color-fg:        #12141a;
+  --color-fg-muted:  #5b6170;
+  --color-border:    #e3e6ec;
+  --color-accent:    #e11d2a;
+  --color-accent-2:  #ff7a1a;
+  --color-accent-fg: #ffffff;
+  --color-ring:      #e11d2a;
 
-  --color-ink:       #1c1917;
-  --color-ink-soft:  #292524;
-  --color-sale:      #b91c1c;
-  --color-success:   #15803d;
-  --color-star:      #d97706;
+  --color-ink:       #0a0a0a;
+  --color-ink-soft:  #141414;
+  --color-sale:      #e11d2a;
+  --color-success:   #0d7d43;
+  --color-star:      #ff9f1a;
 
   --font-sans: var(--font-jakarta), var(--font-bangla), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-fraunces), var(--font-bangla), ui-serif, Georgia, serif;
+  --font-display: var(--font-chakra), var(--font-bangla), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
 
   /* Fluid type: each step grows smoothly between a 360px phone and a 1920px
@@ -65,8 +66,8 @@
   --breakpoint-2xl: 1536px;
   --breakpoint-3xl: 1920px;
 
-  --radius-card: 16px;
-  --radius-ctl:  12px;
+  --radius-card: 10px;
+  --radius-ctl:  8px;
 
   /* Radix primitives animate off their own data-state rather than Motion —
      AnimatePresence can't drive an exit for content Radix unmounts itself. */
@@ -109,15 +110,25 @@
 }
 
 :root {
-  --surface:       #fffdf9;
-  --surface-solid: #fffdf9;
-  --image-well:    #efe9df;
-  --border-strong: #d6cbbb;
-  --glass:         #fffdf9;
-  --shadow:        rgba(28, 25, 23, 0.08);
-  /* Skeleton shimmer highlight — cream on the storefront's warm surfaces,
-     white on admin's cooler ones (see .theme-classic below). */
-  --skeleton-shine: rgba(255, 253, 249, 0.7);
+  --surface:       #ffffff;
+  --surface-solid: #ffffff;
+  --image-well:    #f4f5f7;
+  --border-strong: #c9ced8;
+  --glass:         #ffffff;
+  --shadow:        rgba(10, 12, 20, 0.10);
+  /* Product-card "Add to cart" fill/border, default and hover. Defaults to
+     the same ink/accent as everywhere else, but — unlike a literal
+     var(--color-ink)/var(--accent) reference — a wrapper can override just
+     this quartet, which is what the flash-sale deal band does to keep the
+     button a solid, on-brand red instead of nearly disappearing (ink-on-ink)
+     or reading as a ghost outline against its dark cards. */
+  --cta-bg:            var(--color-ink);
+  --cta-border:        var(--color-ink);
+  --cta-hover-bg:      var(--accent);
+  --cta-hover-border:  var(--accent);
+  /* Skeleton shimmer highlight — white on the storefront's cool surfaces,
+     same on admin's (see .theme-classic below). */
+  --skeleton-shine: rgba(255, 255, 255, 0.75);
   color-scheme: light;
 }
 
@@ -146,6 +157,13 @@
   --radius-ctl:    8px;
   --glass:         rgba(255, 255, 255, 0.92);
   --shadow:        rgba(16, 24, 40, 0.08);
+  /* No admin page renders a product card today, but restated explicitly
+     (rather than left to fall through var(--color-ink)/var(--accent))
+     for consistency with every other token in this block. */
+  --cta-bg:            var(--color-ink);
+  --cta-border:        var(--color-ink);
+  --cta-hover-bg:      var(--color-accent);
+  --cta-hover-border:  var(--color-accent);
   color-scheme: light;
   background: var(--bg);
   color: var(--fg);
@@ -187,7 +205,7 @@ html, body {
   border-radius: 4px;
 }
 
-::selection { background: #b45309; color: #fffdf9; }
+::selection { background: var(--accent); color: var(--accent-fg); }
 
 /* ─── Scrollbar ─── */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
@@ -315,12 +333,11 @@ html, body {
     background: var(--accent);
     color: var(--accent-fg);
     border: 1px solid var(--accent);
-    box-shadow: 0 1px 2px var(--shadow), 0 8px 20px -12px var(--shadow);
+    box-shadow: 0 1px 2px var(--shadow);
   }
   .btn-primary:hover {
-    background: #292524;
-    border-color: #292524;
-    box-shadow: 0 1px 2px var(--shadow), 0 10px 24px -10px var(--shadow);
+    background: color-mix(in srgb, var(--accent) 88%, #000);
+    border-color: color-mix(in srgb, var(--accent) 88%, #000);
   }
   .btn-ghost {
     border: 1px solid var(--border-strong);
@@ -349,27 +366,16 @@ html, body {
     box-shadow: 0 1px 2px var(--shadow), 0 8px 24px -16px var(--shadow);
   }
   .card-hover {
-    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
   }
   .card-hover:hover {
+    transform: translateY(-2px);
     border-color: var(--border-strong);
-    box-shadow: 0 14px 32px -18px rgba(28,25,23,0.25);
+    box-shadow: 0 12px 24px -12px rgba(10, 12, 20, 0.25);
   }
 
   /* ─── Commerce ─── */
-  /* White text on the sale-red fill: #ffffff on #b91c1c is ~5.9:1, comfortably
-     over WCAG AA, and matches admin's original white-on-red badge. */
-  .badge-sale {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.2rem 0.45rem;
-    border-radius: 5px;
-    background: var(--color-sale);
-    color: #ffffff;
-    font-size: var(--text-2xs);
-    font-weight: 800;
-    line-height: 1;
-  }
+  /* White text on the sale-red fill: #ffffff on #e11d2a is well over WCAG AA,
   .badge-soft {
     display: inline-flex;
     align-items: center;
@@ -381,15 +387,15 @@ html, body {
     font-weight: 800;
     line-height: 1;
   }
-  /* Bronze deal badge. Cream text, not white: #fffdf9 on #b45309 is the same
-     accent-fg pairing used everywhere else the bronze accent is a fill. */
+  /* Orange deal badge. Dark text, not white: white on #ff7a1a fails WCAG AA
+     for text this size — orange fills always take dark text (spec §1). */
   .badge-deal {
     display: inline-flex;
     align-items: center;
     padding: 0.2rem 0.45rem;
     border-radius: 5px;
     background: var(--color-accent-2);
-    color: #fffdf9;
+    color: var(--color-fg);
     font-size: var(--text-2xs);
     font-weight: 800;
     line-height: 1;
@@ -397,6 +403,28 @@ html, body {
   .price-now { font-weight: 800; color: var(--fg); letter-spacing: -0.01em; }
   .price-now.is-sale { color: var(--color-sale); }
   .price-was { color: var(--fg-muted); text-decoration: line-through; font-weight: 500; }
+
+  /* Section heading underline: red into orange, the house signature. */
+  .section-rule { position: relative; padding-bottom: 0.6rem; }
+  .section-rule::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 3.5rem;
+    height: 3px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  }
+
+  /* Faint diagonal texture for the black bands, so they read as material. */
+  .carbon {
+    background-image: repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.04) 0 1px,
+      transparent 1px 6px
+    );
+  }
 
   /* ─── Inputs ─── */
   .input {
@@ -477,6 +505,9 @@ html, body {
   }
   .theme-classic .card { backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: 0 1px 2px var(--shadow); }
   .theme-classic .card-hover:hover {
+    /* The storefront's .card-hover:hover now lifts on hover (translateY);
+       admin never did, so this cancels that transform explicitly. */
+    transform: none;
     border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
     box-shadow: 0 12px 28px -14px rgba(16, 24, 40, 0.22);
   }

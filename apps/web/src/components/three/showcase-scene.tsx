@@ -8,8 +8,8 @@ import type { Group, PerspectiveCamera } from 'three';
 import { SceneCanvas, type SceneName } from './scene-canvas';
 import { useSafeTexture } from '@/lib/three/use-safe-texture';
 
-const CREAM = '#f3ece1';
-const BRONZE = '#b45309';
+const CREAM = '#141414';
+const BRONZE = '#e11d2a';
 
 /**
  * Keeps the subject fully framed in any container shape. A portrait or narrow
@@ -31,7 +31,7 @@ export function FitCamera({ radius }: { radius: number }) {
   return null;
 }
 
-/** Cream stand with a thin bronze ring — the constant base of every showcase.
+/** Black stand with a thin red ring — the constant base of every showcase.
  * Exported so the product viewer (product-viewer-3d.tsx) reuses the same
  * look instead of styling its own plinth. */
 export function Stand() {
@@ -93,9 +93,10 @@ export default function ShowcaseScene({
   return (
     <SceneCanvas name={name} tier={tier} fallback={fallback} className="h-full w-full" camera={{ position: [0, 0.35, 4.4], fov: 38 }}>
       <FitCamera radius={1.35} />
-      <hemisphereLight args={['#fff7ed', '#e7dfd3', 0.9]} />
-      <directionalLight position={[2.5, 4, 3]} intensity={1.6} color="#fff1dc" />
-      <directionalLight position={[-3, 1.5, -2]} intensity={0.6} color="#fde7c7" />
+      <hemisphereLight args={['#ffffff', '#0a0a0a', 0.55]} />
+      <directionalLight position={[2.5, 4, 3]} intensity={1.5} />
+      <directionalLight position={[-3, 1.5, -2]} intensity={0.9} color="#e11d2a" />
+      <directionalLight position={[3, 1, -2.5]} intensity={0.7} color="#ff7a1a" />
       <Stand />
       <Turntable spin={spin} full={!!modelUrl}>
         {modelUrl ? (
@@ -106,7 +107,7 @@ export default function ShowcaseScene({
           <Photo url={imageUrl} />
         ) : null}
       </Turntable>
-      <ContactShadows position={[0, -1.06, 0]} opacity={0.35} scale={5} blur={2.6} far={2} color="#57534e" />
+      <ContactShadows position={[0, -1.06, 0]} opacity={0.35} scale={5} blur={2.6} far={2} color="#0a0a0a" />
     </SceneCanvas>
   );
 }

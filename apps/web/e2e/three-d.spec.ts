@@ -60,28 +60,21 @@ async function firstProductHref(page: Page): Promise<string | null> {
 }
 
 test.describe('3D storefront (WebGL on)', () => {
-  test('home shows exactly one h1, the hero canvas, spotlight scenes, and no stray canvases', async () => {
+  test('home shows exactly one h1, the spotlight scene, and no stray canvases', async () => {
     await withPage(WEBGL_ON_ARGS, async (page) => {
       const errors = collectErrors(page);
       await page.goto('/');
       await expect(page.locator('h1')).toHaveCount(1);
 
-      // The hero always renders exactly one showcase slot: the WebGL scene when a
-      // featured product and WebGL are both available, otherwise the 2D fallback.
-      // CI runs without the API, so there are no products to show in 3D there.
-      const heroScene = page.locator('[data-scene="hero"]');
-      await expect(page.locator('[data-scene="hero"], [data-scene-fallback="hero"]')).toHaveCount(1);
-      if ((await heroScene.count()) > 0) {
-        await expect(heroScene.locator('canvas')).toBeVisible({ timeout: 15_000 });
-      }
-
-      const spotlightCount = await page.locator('[data-scene="spotlight"]').count();
-      // Featured products render a Spotlight section per product with a photo; skip the
-      // assertion body (rather than fail) when the seed data has none to feature.
+      // The megastore homepage puts its 3D in the spotlight band, not the hero:
+      // the hero slot belongs to the admin banner slider (or the static hero).
+      // A spotlight renders only when a featured product has a photo, so CI —
+      // which runs without the API — legitimately has none.
+      const spotlightScene = page.locator('[data-scene="spotlight"]');
+      const spotlightCount = await spotlightScene.count();
       if (spotlightCount > 0) {
-        expect(spotlightCount).toBeGreaterThanOrEqual(1);
+        await expect(spotlightScene.first().locator('canvas')).toBeVisible({ timeout: 15_000 });
       }
-
       // Every canvas on the page must live inside a marked scene container —
       // there is no backdrop or cart scene left to render one anywhere else.
       const totalCanvases = await page.locator('canvas').count();
@@ -184,7 +177,12 @@ test.describe('3D storefront (WebGL off)', () => {
     await withPage(WEBGL_OFF_ARGS, async (page) => {
       const errors = collectErrors(page);
       await page.goto('/');
-      await expect(page.locator('[data-scene-fallback="hero"]')).toBeVisible();
+      // Without WebGL every scene renders its 2D fallback instead, and no
+      // canvas exists anywhere. The spotlight band is the homepage's only scene.
+      const spotlightFallback = page.locator('[data-scene-fallback="spotlight"]');
+      if ((await spotlightFallback.count()) > 0) {
+        await expect(spotlightFallback.first()).toBeVisible();
+      }
       await expect(page.locator('canvas')).toHaveCount(0);
       const href = await firstProductHref(page);
       if (href) {

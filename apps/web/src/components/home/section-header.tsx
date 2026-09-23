@@ -17,8 +17,8 @@ export function SectionHeader({
   linkLabel?: string;
 }) {
   return (
-    <div className="flex items-end justify-between gap-4 border-b border-[color:var(--border)] mb-5">
-      <h2 id={id} className="section-title">
+    <div className="flex items-end justify-between gap-4 mb-5">
+      <h2 id={id} className="section-title section-rule">
         {title}
       </h2>
       {href && linkLabel && (

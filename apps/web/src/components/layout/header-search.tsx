@@ -91,7 +91,7 @@ export function HeaderSearch() {
       }}
       className="relative w-full"
     >
-      <div className="flex h-11 items-center gap-1 rounded-full bg-[color:var(--bg-soft)] pl-4 pr-1.5">
+      <div className="flex h-11 items-center gap-1 rounded-full bg-white border border-[color:var(--border-strong)] pl-4 pr-1.5 focus-within:border-[color:var(--accent)] transition-colors">
         <input
           name="search"
           type="search"

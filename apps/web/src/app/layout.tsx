@@ -1,10 +1,12 @@
 import type { Metadata, Viewport } from 'next';
-import { Plus_Jakarta_Sans, Hind_Siliguri, JetBrains_Mono, Fraunces } from 'next/font/google';
+import { Plus_Jakarta_Sans, Hind_Siliguri, JetBrains_Mono, Chakra_Petch } from 'next/font/google';
 import '../styles/globals.css';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import { Providers } from '@/components/layout/providers';
+import { TopBar } from '@/components/layout/top-bar';
 import { Navbar } from '@/components/layout/navbar';
+import { CategoryBar } from '@/components/layout/category-bar';
 import { Footer } from '@/components/layout/footer';
 import { CompareTray } from '@/components/shop/compare-tray';
 import { SiteChrome } from '@/components/layout/site-chrome';
@@ -40,11 +42,11 @@ const jetbrainsMono = JetBrains_Mono({
   display: 'swap',
 });
 
-// Serif display face for the warm editorial headings; body copy stays Plus Jakarta.
-const fraunces = Fraunces({
+// Technical display face for the megastore headings; body copy stays Plus Jakarta.
+const chakraPetch = Chakra_Petch({
   subsets: ['latin'],
-  weight: ['500', '600'],
-  variable: '--font-fraunces',
+  weight: ['500', '600', '700'],
+  variable: '--font-chakra',
   display: 'swap',
 });
 
@@ -70,8 +72,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  // Matches the cream storefront background.
-  themeColor: '#f5f1ea',
+  // Matches the megastore's black bands (top bar, category bar, footer).
+  themeColor: '#0a0a0a',
   width: 'device-width',
   initialScale: 1,
 };
@@ -121,7 +123,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html
       lang={locale}
       suppressHydrationWarning
-      className={`${jakarta.variable} ${bangla.variable} ${jetbrainsMono.variable} ${fraunces.variable}`}
+      className={`${jakarta.variable} ${bangla.variable} ${jetbrainsMono.variable} ${chakraPetch.variable}`}
     >
       <body>
         {accentCss && <style dangerouslySetInnerHTML={{ __html: accentCss }} />}
@@ -135,7 +137,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <NextIntlClientProvider locale={locale} messages={messages}>
             <Providers settings={s}>
               <SiteChrome
-                header={<Navbar brand={brand} categories={categories} brands={brands} />}
+                header={
+                  <>
+                    <TopBar
+                      supportEmail={s.supportEmail}
+                      facebook={s.socialFacebook}
+                      instagram={s.socialInstagram}
+                    />
+                    <Navbar brand={brand} categories={categories} />
+                    <CategoryBar categories={categories} brands={brands} />
+                  </>
+                }
                 footer={
                   <Footer
                     brand={brand}
