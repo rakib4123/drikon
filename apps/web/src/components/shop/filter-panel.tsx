@@ -158,7 +158,7 @@ export function FilterPanel({
             className="input !py-2"
           />
         </div>
-        <button type="button" onClick={applyPrice} className="btn-dark w-full mt-3 !py-2">
+        <button type="button" onClick={applyPrice} className="btn-primary w-full mt-3 !py-2">
           {t('apply')}
         </button>
       </FilterSection>
