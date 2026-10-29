@@ -615,7 +615,7 @@ model SiteSettings {
   socialFacebook  String?
   socialInstagram String?
 
-  // ── Payments (manual methods — see docs/superpowers/specs/2026-08-18-manual-payment-methods-design.md) ──
+  // ── Payments (manual methods) ──
   bkashNumber       String?
   bkashInstructions String?
   bkashEnabled      Boolean @default(true)

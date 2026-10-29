@@ -119,9 +119,7 @@ drikon/
 Neither Next.js App Router nor NestJS spells out "Model/View/Controller" by
 folder name, so here's the explicit mapping — added as part of the course
 requirement to demonstrate the separation, without breaking either
-framework's own routing/DI conventions (see
-`docs/superpowers/specs/2026-08-17-mvc-conversion-design.md` for the full
-rationale and rejected alternatives).
+framework's own routing/DI conventions.
 
 **apps/api (NestJS):**
 
@@ -134,13 +132,9 @@ rationale and rejected alternatives).
 
 **apps/web (Next.js App Router) — planned, not yet implemented:**
 
-The table below describes the *target* design for `apps/web`, specified in
-two not-yet-executed plans:
-`docs/superpowers/plans/2026-08-17-mvc-web-customer-routes.md` and
-`docs/superpowers/plans/2026-08-17-mvc-web-admin-routes.md`. As of this
-writing, `apps/web/src/` has no `models/` or `controllers/` directory —
-pages still fetch data inline via `lib/*.ts`. Do not go looking for these
-directories until one of those two plans has been executed.
+The table below describes the *target* design for `apps/web`, not yet
+implemented. As of this writing, `apps/web/src/` has no `models/` or `controllers/` directory —
+pages still fetch data inline via `lib/*.ts`.
 
 | MVC role | Where it will live | What it will do |
 |---|---|---|

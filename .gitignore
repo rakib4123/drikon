@@ -49,9 +49,6 @@ Thumbs.db
 # ─── Git worktrees (local scratch) ───
 .worktrees/
 
-# ─── Superpowers (local scratch: sdd ledgers, brainstorm sessions) ───
-.superpowers/
-
 # ─── Prisma ───
 apps/api/prisma/migrations/dev.db*
 
